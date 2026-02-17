@@ -171,6 +171,42 @@ th {
 .copy-toast.show {
   opacity: 1;
 }
+/* =========================
+   FORM GROUPS
+========================= */
+
+.form-group {
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.form-group:last-child {
+  border-bottom: none;
+}
+
+.sub-group {
+  margin-top: 16px;
+  padding-left: 18px;
+  border-left: 3px solid #e5e7eb;
+}
+
+.form-group h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.form-group h3 {
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+label {
+  display: block;
+  margin: 6px 0;
+  cursor: pointer;
+}
 
 /* =========================
    RESPONSIVE
