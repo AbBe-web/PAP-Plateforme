@@ -68,6 +68,12 @@ p {
   transform: none;
   box-shadow: none;
 }
+.btn:disabled {
+  background:#cbd5e1;
+  cursor:not-allowed;
+  box-shadow:none;
+  transform:none;
+}
 
 /* =========================
    INPUTS
