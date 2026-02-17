@@ -185,6 +185,7 @@
         </div>
     </div>
     <script>
+        
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('input[name="niveau_actuel"]').forEach(function(radio) {
                 radio.addEventListener('change', function() {
@@ -199,12 +200,18 @@
                         document.getElementById('inactif-subgroup').classList.add('hidden');
                     }
                 });
-        
+          });
+            
             function toggleSubgroup(checkboxId, subgroupId) {
   const checkbox = document.getElementById(checkboxId);
   const subgroup = document.getElementById(subgroupId);
 
   if (!checkbox || !subgroup) return;
+
+                // état initial
+if (checkbox.checked) {
+    subgroup.classList.remove("hidden");
+}
 
   checkbox.addEventListener("change", function() {
     if (this.checked) {
@@ -214,6 +221,7 @@
     }
   });
 }
+            
 toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup");
 toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
 toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
