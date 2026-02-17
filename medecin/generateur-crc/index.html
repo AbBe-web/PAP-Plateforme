@@ -104,31 +104,62 @@
             <div class="form-group">
                 <h2>8/ Je lui ai remis :</h2>
                 <div class="sub-group">
-                    <h3 class="black-text">Une ordonnance d’AP aérobie :</h3>
-                    <label><input type="radio" name="ordonnance_aerobie" value="oui"> Oui</label>
-                    <div id="ordonnance_aerobie_subgroup" class="hidden">
-                        <label>Intensité : <input type="radio" name="intensite_aerobie" value="moderee"> Modérée</label>
-                        <label><input type="radio" name="intensite_aerobie" value="elevee"> Élevée</label>
-                        <label>Fois par semaine : <input type="number" name="fois_aerobie" min="0" max="7"></label>
-                    </div>
-                    <label><input type="radio" name="ordonnance_aerobie" value="non"> Non</label>
-                </div>
-                <div class="sub-group">
-                    <h3 class="black-text">De renforcement musculaire :</h3>
-                    <label><input type="radio" name="renforcement_musculaire" value="oui"> Oui</label>
-                    <div id="renforcement_musculaire_subgroup" class="hidden">
-                        <label>Fois par semaine : <input type="number" name="fois_renforcement" min="0" max="7"></label>
-                    </div>
-                    <label><input type="radio" name="renforcement_musculaire" value="non"> Non</label>
-                </div>
-                <div class="sub-group">
-                    <h3 class="black-text">De travail de souplesse et mobilité :</h3>
-                    <label><input type="radio" name="souplesse_mobilite" value="oui"> Oui</label>
-                    <div id="souplesse_mobilite_subgroup" class="hidden">
-                        <label>Fois par semaine : <input type="number" name="fois_souplesse" min="0" max="7"></label>
-                    </div>
-                    <label><input type="radio" name="souplesse_mobilite" value="non"> Non</label>
-                </div>
+  <h3>Une ordonnance d’AP aérobie :</h3>
+
+  <label>
+    <input type="checkbox" id="ordonnance_aerobie">
+    Oui
+  </label>
+
+  <div id="ordonnance_aerobie_subgroup" class="hidden">
+    <label>
+      <input type="radio" name="intensite_aerobie" value="moderee">
+      Intensité modérée
+    </label>
+
+    <label>
+      <input type="radio" name="intensite_aerobie" value="elevee">
+      Intensité élevée
+    </label>
+
+    <label>
+      Fois par semaine :
+      <input type="number" name="fois_aerobie" min="0" max="7">
+    </label>
+  </div>
+</div>
+<div class="sub-group">
+  <h3>Renforcement musculaire :</h3>
+
+  <label>
+    <input type="checkbox" id="renforcement_musculaire">
+    Oui
+  </label>
+
+  <div id="renforcement_musculaire_subgroup" class="hidden">
+    <label>
+      Fois par semaine :
+      <input type="number" name="fois_renforcement" min="0" max="7">
+    </label>
+  </div>
+</div>
+
+            <div class="sub-group">
+  <h3>Travail de souplesse et mobilité :</h3>
+
+  <label>
+    <input type="checkbox" id="souplesse_mobilite">
+    Oui
+  </label>
+
+  <div id="souplesse_mobilite_subgroup" class="hidden">
+    <label>
+      Fois par semaine :
+      <input type="number" name="fois_souplesse" min="0" max="7">
+    </label>
+  </div>
+</div>
+
                 <div class="sub-group">
                     <h3 class="black-text">Des fiches de promotion de l’activité physique :</h3>
                     <label><input type="radio" name="fiches_promotion" value="oui"> Oui</label>
@@ -168,7 +199,24 @@
                         document.getElementById('inactif-subgroup').classList.add('hidden');
                     }
                 });
-            });
+           function toggleSubgroup(checkboxId, subgroupId) {
+  const checkbox = document.getElementById(checkboxId);
+  const subgroup = document.getElementById(subgroupId);
+
+  if (!checkbox || !subgroup) return;
+
+  checkbox.addEventListener("change", function() {
+    if (this.checked) {
+      subgroup.classList.remove("hidden");
+    } else {
+      subgroup.classList.add("hidden");
+    }
+  });
+}
+toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup");
+toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
+toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
+ });
             document.querySelectorAll('input[name="ordonnance_aerobie"]').forEach(function(radio) {
                 radio.addEventListener('change', function() {
                     if (this.value === 'oui') {
