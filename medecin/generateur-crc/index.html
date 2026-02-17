@@ -1,10 +1,448 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Générateur CRC</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outil de génération de compte-rendu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #0056b3;
+        }
+        a {
+            color: #007BFF;
+        }
+        p {
+            margin-bottom: 1em;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .sub-group {
+            margin-left: 20px;
+        }
+        label {
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+        input[type="radio"], input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        textarea, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        #reportOutput {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .black-text {
+            color: black !important;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #reportOutput, #reportOutput * {
+                visibility: visible;
+            }
+            #reportOutput {
+                position: absolute;
+                left: 0;
+                top: 0;
+                font-size: 12px;
+                width: 100%;
+                padding: 10px;
+                box-sizing: border-box;
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            button, footer {
+                display: none !important;
+            }
+            #reportText {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
 </head>
 <body>
-<h1>Espace médecin – Générateur CRC</h1>
+    <div class="container">
+        <div class="rgpd-banner">
+            Ce questionnaire, hébergé sur le site Github, ne stocke pas vos données. Vous pouvez l'imprimer pour votre usage personnel ou médical.
+            En continuant, vous acceptez que les données saisies puissent être affichées sur votre écran ou imprimées.
+            <a href="https://abbe-web.github.io/Compte-Rendu-Consultation-PAP/politique-confidentialite.html" target="_blank" rel="noopener noreferrer">Consulter la politique de confidentialité</a> |
+            <a href="https://www.cnil.fr/fr/les-droits-pour-maitriser-vos-donnees-personnelles" target="_blank" rel="noopener noreferrer">Vos droits (CNIL)</a>
+        </div>
+        <h1>Outil de génération de compte-rendu de consultation minimale d’activité physique</h1>
+        <p>Veuillez renseigner les différents items ci-dessous pour générer le compte-rendu. Vous pouvez vous aider du « Guide Prescription Activité Physique et Lutte contre la Sédentarité (« Adulte » >15 ans) »</p>
+        <form id="consultationForm">
+            <div class="form-group">
+                <h2>1/ La personne adressée est dans une des situations suivantes (page 3) :</h2>
+                <label><input type="radio" name="situation" value="symptomes"> Elle a des symptômes de maladie CV, respiratoire, métabolique et rénale décompensée</label>
+                <label><input type="radio" name="situation" value="limitations"> Elle présente des limitations ou CI à l’AP (tableau 7-9)</label>
+                <label><input type="radio" name="situation" value="situations_particulieres"> Elle est dans une des situations particulières (situation 3)</label>
+                <label><input type="radio" name="situation" value="aucune"> Votre patient n’est dans aucune de ces situations</label>
+            </div>
+            <div class="form-group">
+                <h2>2/ Évaluation de l’Activité Physique (niveau actuel et visé, motivation)</h2>
+                <div class="sub-group">
+                    <h3>Niveau actuel : (mesuré par <label><input type="radio" name="questionnaire" value="GPAQ"> GPAQ</label>, <label><input type="radio" name="questionnaire" value="Marshall"> Marshall</label>)</h3>
+                    <div style="display: flex; align-items: center;">
+                        <div style="margin-right: 20px;">
+                            <label><input type="radio" name="niveau_actuel" value="actif"> Actif</label>
+                            <div id="actif-subgroup" class="hidden">
+                                <label><input type="radio" name="actif_depuis" value="plus_6_mois"> Oui, depuis plus de 6 mois</label>
+                                <label><input type="radio" name="actif_depuis" value="moins_6_mois"> Non, depuis moins de 6 mois</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label><input type="radio" name="niveau_actuel" value="inactif"> Inactif</label>
+                            <div id="inactif-subgroup" class="hidden">
+                                <label><input type="radio" name="ap_envisagee" value="oui"> AP envisagée dans les 30 jours</label>
+                                <label><input type="radio" name="ap_envisagee" value="non"> Pas d’AP envisagée dans les 30 jours</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label><input type="radio" name="sedentaire" value="sedentaire"> Sédentaire</label>
+                        <label><input type="radio" name="sedentaire" value="non_sedentaire"> Non sédentaire</label>
+                        <label><input type="radio" name="sedentaire" value="non_recherche"> Statut de sédentarité non recherché</label>
+                    </div>
+                </div>
+                <div class="sub-group">
+                    <h3>Niveau visé :</h3>
+                    <label><input type="radio" name="niveau_vise" value="faible"> Faible</label>
+                    <label><input type="radio" name="niveau_vise" value="modere"> Modéré</label>
+                    <label><input type="radio" name="niveau_vise" value="eleve"> Élevé</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <h2>3/ Évaluation du RCV (tableau 3) :</h2>
+                <label><input type="radio" name="rcv" value="faible"> Faible</label>
+                <label><input type="radio" name="rcv" value="modere"> Modéré</label>
+                <label><input type="radio" name="rcv" value="eleve_tres_eleve"> Élevé/très élevé</label>
+            </div>
+            <div class="form-group">
+                <h2>4/ Évaluation motivationnelle (complément) :</h2>
+                <div class="sub-group">
+                    <h3 class="black-text">La personne adressée présente les <u>freins</u> suivants :</h3>
+                    <textarea name="freins"></textarea>
+                </div>
+                <div class="sub-group">
+                    <h3 class="black-text">La personne présente les <u>leviers</u> suivants :</h3>
+                    <textarea name="leviers"></textarea>
+                </div>
+                <div class="sub-group">
+                    <h3 class="black-text">Importance accordée à l’AP de 0 à 10 :</h3>
+                    <input type="number" name="importance_ap" min="0" max="10">
+                </div>
+                <div class="sub-group">
+                    <h3 class="black-text">Confiance en soi pour réussir à augmenter son niveau d’AP de 0 à 10 :</h3>
+                    <input type="number" name="confiance_ap" min="0" max="10">
+                </div>
+            </div>
+            <div class="form-group">
+                <h2>5/ Une consultation Médicale d’AP est préconisée :</h2>
+                <label><input type="radio" name="consultation_ap" value="oui"> Oui</label>
+                <label><input type="radio" name="consultation_ap" value="non"> Non</label>
+                <label><input type="radio" name="consultation_ap" value="peut_etre"> Peut être proposée</label>
+            </div>
+            <div class="form-group">
+                <h2>6/ Une épreuve d’effort est préconisée :</h2>
+                <label><input type="radio" name="epreuve_effort" value="oui"> Oui</label>
+                <label><input type="radio" name="epreuve_effort" value="non"> Non</label>
+                <label><input type="radio" name="epreuve_effort" value="peut_etre"> Peut être proposée</label>
+            </div>
+            <div class="form-group">
+                <h2>7/ Les objectifs principaux en termes d’activité physique sont :</h2>
+                <textarea name="objectifs_ap"></textarea>
+            </div>
+            <div class="form-group">
+                <h2>8/ Je lui ai remis :</h2>
+                <div class="sub-group">
+                    <h3 class="black-text">Une ordonnance d’AP aérobie :</h3>
+                    <label><input type="radio" name="ordonnance_aerobie" value="oui"> Oui</label>
+                    <div id="ordonnance_aerobie_subgroup" class="hidden">
+                        <label>Intensité : <input type="radio" name="intensite_aerobie" value="moderee"> Modérée</label>
+                        <label><input type="radio" name="intensite_aerobie" value="elevee"> Élevée</label>
+                        <label>Fois par semaine : <input type="number" name="fois_aerobie" min="0" max="7"></label>
+                    </div>
+                    <label><input type="radio" name="ordonnance_aerobie" value="non"> Non</label>
+                </div>
+                <div class="sub-group">
+                    <h3 class="black-text">De renforcement musculaire :</h3>
+                    <label><input type="radio" name="renforcement_musculaire" value="oui"> Oui</label>
+                    <div id="renforcement_musculaire_subgroup" class="hidden">
+                        <label>Fois par semaine : <input type="number" name="fois_renforcement" min="0" max="7"></label>
+                    </div>
+                    <label><input type="radio" name="renforcement_musculaire" value="non"> Non</label>
+                </div>
+                <div class="sub-group">
+                    <h3 class="black-text">De travail de souplesse et mobilité :</h3>
+                    <label><input type="radio" name="souplesse_mobilite" value="oui"> Oui</label>
+                    <div id="souplesse_mobilite_subgroup" class="hidden">
+                        <label>Fois par semaine : <input type="number" name="fois_souplesse" min="0" max="7"></label>
+                    </div>
+                    <label><input type="radio" name="souplesse_mobilite" value="non"> Non</label>
+                </div>
+                <div class="sub-group">
+                    <h3 class="black-text">Des fiches de promotion de l’activité physique :</h3>
+                    <label><input type="radio" name="fiches_promotion" value="oui"> Oui</label>
+                    <label><input type="radio" name="fiches_promotion" value="non"> Non</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <h2>9/ La personne adressée est :</h2>
+                <label><input type="radio" name="sexe" value="homme"> Un homme</label>
+                <label><input type="radio" name="sexe" value="femme"> Une femme</label>
+            </div>
+            <div class="form-group">
+                <h2>10/ Le destinataire du courrier est :</h2>
+                <label><input type="radio" name="destinataire" value="consoeur"> Une consœur</label>
+                <label><input type="radio" name="destinataire" value="confrere"> Un confrère</label>
+            </div>
+            <button type="button" id="generateReport">Générer le compte-rendu</button>
+        </form>
+        <div id="reportOutput" class="hidden">
+            <p id="reportText"></p>
+            <button type="button" id="printReport">Imprimer</button>
+            <button type="button" id="copyReport">Copier le CRC</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('input[name="niveau_actuel"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'actif') {
+                        document.getElementById('actif-subgroup').classList.remove('hidden');
+                        document.getElementById('inactif-subgroup').classList.add('hidden');
+                    } else if (this.value === 'inactif') {
+                        document.getElementById('inactif-subgroup').classList.remove('hidden');
+                        document.getElementById('actif-subgroup').classList.add('hidden');
+                    } else {
+                        document.getElementById('actif-subgroup').classList.add('hidden');
+                        document.getElementById('inactif-subgroup').classList.add('hidden');
+                    }
+                });
+            });
+            document.querySelectorAll('input[name="ordonnance_aerobie"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'oui') {
+                        document.getElementById('ordonnance_aerobie_subgroup').classList.remove('hidden');
+                    } else {
+                        document.getElementById('ordonnance_aerobie_subgroup').classList.add('hidden');
+                    }
+                });
+            });
+            document.querySelectorAll('input[name="renforcement_musculaire"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'oui') {
+                        document.getElementById('renforcement_musculaire_subgroup').classList.remove('hidden');
+                    } else {
+                        document.getElementById('renforcement_musculaire_subgroup').classList.add('hidden');
+                    }
+                });
+            });
+            document.querySelectorAll('input[name="souplesse_mobilite"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'oui') {
+                        document.getElementById('souplesse_mobilite_subgroup').classList.remove('hidden');
+                    } else {
+                        document.getElementById('souplesse_mobilite_subgroup').classList.add('hidden');
+                    }
+                });
+            });
+            document.getElementById('generateReport').addEventListener('click', function() {
+                const destinataire = document.querySelector('input[name="destinataire"]:checked') ? document.querySelector('input[name="destinataire"]:checked').value : 'confrere';
+                const salutations = destinataire === 'consoeur' ? 'Chère consœur,' : 'Cher confrère,';
+                const sexe = document.querySelector('input[name="sexe"]:checked') ? document.querySelector('input[name="sexe"]:checked').value : 'homme';
+                const titre = sexe === 'homme' ? 'Monsieur' : 'Madame';
+                const pronom = sexe === 'homme' ? 'il' : 'elle';
+                const pronomMaj = sexe === 'homme' ? 'Il' : 'Elle';
+                const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
+                let statutActif = '';
+                if (niveauActuel === 'actif') {
+                    statutActif = 'actif';
+                } else if (niveauActuel === 'inactif') {
+                    statutActif = 'inactif';
+                }
+                const sedentaire = document.querySelector('input[name="sedentaire"]:checked') ? document.querySelector('input[name="sedentaire"]:checked').value : '';
+                let statutSedentaire = '';
+                if (sedentaire === 'sedentaire') {
+                    statutSedentaire = ', sédentaire';
+                } else if (sedentaire === 'non_sedentaire') {
+                    statutSedentaire = ', non sédentaire';
+                }
+                const questionnaire = document.querySelector('input[name="questionnaire"]:checked') ? document.querySelector('input[name="questionnaire"]:checked').value : '';
+                let questionnaireText = '';
+                if (questionnaire === 'GPAQ') {
+                    questionnaireText = ' (mesuré par le GPAQ)';
+                } else if (questionnaire === 'Marshall') {
+                    questionnaireText = ' (mesuré par le Marshall)';
+                }
+                const niveauVise = document.querySelector('input[name="niveau_vise"]:checked') ? document.querySelector('input[name="niveau_vise"]:checked').value : '';
+                const rcv = document.querySelector('input[name="rcv"]:checked') ? document.querySelector('input[name="rcv"]:checked').value : '';
+                const freins = document.querySelector('textarea[name="freins"]').value;
+                const leviers = document.querySelector('textarea[name="leviers"]').value;
+                const importanceAp = document.querySelector('input[name="importance_ap"]').value;
+                const confianceAp = document.querySelector('input[name="confiance_ap"]').value;
+                const consultationAp = document.querySelector('input[name="consultation_ap"]:checked') ? document.querySelector('input[name="consultation_ap"]:checked').value : '';
+                const epreuveEffort = document.querySelector('input[name="epreuve_effort"]:checked') ? document.querySelector('input[name="epreuve_effort"]:checked').value : '';
+                const objectifsAp = document.querySelector('textarea[name="objectifs_ap"]').value;
+                let objectifsText = objectifsAp ? `Les objectifs principaux en termes d’activité physique sont : ${objectifsAp}.` : '';
+                let ordonnance = '';
+                if (document.querySelector('input[name="ordonnance_aerobie"]:checked') && document.querySelector('input[name="ordonnance_aerobie"]:checked').value === 'oui') {
+                    const intensite = document.querySelector('input[name="intensite_aerobie"]:checked') ? document.querySelector('input[name="intensite_aerobie"]:checked').value : '';
+                    const foisAerobie = document.querySelector('input[name="fois_aerobie"]').value;
+                    ordonnance += `une ordonnance d’AP aérobie (${intensite === 'moderee' ? 'modérée' : 'élevée'}, ${foisAerobie} fois par semaine)`;
+                }
+                if (document.querySelector('input[name="renforcement_musculaire"]:checked') && document.querySelector('input[name="renforcement_musculaire"]:checked').value === 'oui') {
+                    const foisRenforcement = document.querySelector('input[name="fois_renforcement"]').value;
+                    if (ordonnance) ordonnance += ', ';
+                    ordonnance += `de renforcement musculaire (${foisRenforcement} fois par semaine)`;
+                }
+                if (document.querySelector('input[name="souplesse_mobilite"]:checked') && document.querySelector('input[name="souplesse_mobilite"]:checked').value === 'oui') {
+                    const foisSouplesse = document.querySelector('input[name="fois_souplesse"]').value;
+                    if (ordonnance) ordonnance += ', ';
+                    ordonnance += `de travail de souplesse et mobilité (${foisSouplesse} fois par semaine)`;
+                }
+                if (document.querySelector('input[name="fiches_promotion"]:checked') && document.querySelector('input[name="fiches_promotion"]:checked').value === 'oui') {
+                    if (ordonnance) ordonnance += ', ';
+                    ordonnance += `ainsi qu’une fiche d’information et de promotion de l’activité physique`;
+                }
+                const situation = document.querySelector('input[name="situation"]:checked') ? document.querySelector('input[name="situation"]:checked').value : '';
+                let situationText = '';
+                if (situation === 'aucune') {
+                    situationText = `${pronomMaj} n’est pas dans une situation rendant souhaitable d’emblée une consultation médicale d’activité physique selon le <a href="https://www.has-sante.fr/jcms/c_2754766/fr/consultation-et-prescription-d-activite-physique">guide HAS "Consultation et prescription d'activité physique"</a> : maladie cardiovasculaire, respiratoire, métabolique ou rénale décompensée, contre-indication ou limitation à l’activité physique, situation particulière prévue dans le guide HAS.`;
+                }
+                const reportText = `
+                    <p>${salutations}</p>
+                    <p>Merci de m’avoir adressé ${titre} _____ pour une consultation d’activité physique.</p>
+                    <p>${situationText}</p>
+                    <p>Son niveau actuel d’activité physique est le suivant : ${statutActif}${statutSedentaire}${questionnaireText}. Le niveau d’activité physique ${sexe === 'femme' ? 'qu’elle' : 'qu’il'} a choisi est : ${getNiveauViseText(niveauVise)}.</p>
+                    <p>Son niveau de risque cardio-vasculaire est ${getRcvText(rcv)}.</p>
+                    <p>Sur le plan motivationnel, ${pronom} est au stade de <i>${getStadeMotivation()}</i> ${getMotivationText()}. L’activité physique revêt pour ${sexe === 'homme' ? 'lui' : pronom} une importance cotée à : ${importanceAp}/10. ${pronomMaj} côte sa confiance en ${sexe === 'homme' ? 'lui' : pronom} pour augmenter son niveau d’AP à : ${confianceAp}/10. Les freins à la pratique de l’activité physique sont les suivants : ${freins}. Les leviers à la pratique sont les suivants : ${leviers}.</p>
+                    <p>${objectifsText}</p>
+                    <p>Une consultation Médicale d’AP ${getConsultationText(consultationAp)} Une épreuve d’effort ${getEpreuveEffortText(epreuveEffort)}</p>
+                    <p>Lui ont été remis ${ordonnance || 'rien'}.</p>
+                    <p>J’espère que cette consultation l’aidera à augmenter son niveau d’activité physique en toute sécurité pour en tirer des bénéfices perceptibles notamment à court et moyen terme. Je me tiens à votre disposition en cas de questions complémentaires.</p>
+                    <p>Bien confraternellement.</p>
+                `;
+                document.getElementById('reportText').innerHTML = reportText;
+                document.getElementById('reportOutput').classList.remove('hidden');
+                document.getElementById('reportOutput').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            document.getElementById('printReport').addEventListener('click', function() {
+                window.print();
+            });
+            document.getElementById('copyReport').addEventListener('click', function() {
+                const reportText = document.getElementById('reportText').innerText;
+                navigator.clipboard.writeText(reportText).then(function() {
+                    alert('Le compte-rendu a été copié dans le presse-papiers.');
+                }).catch(function(err) {
+                    console.error('Erreur lors de la copie du texte: ', err);
+                });
+            });
+            function getStadeMotivation() {
+                const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
+                if (niveauActuel === 'actif') {
+                    const actifDepuis = document.querySelector('input[name="actif_depuis"]:checked') ? document.querySelector('input[name="actif_depuis"]:checked').value : '';
+                    return actifDepuis === 'plus_6_mois' ? 'consolidation' : 'action';
+                } else if (niveauActuel === 'inactif') {
+                    const apEnvisagee = document.querySelector('input[name="ap_envisagee"]:checked') ? document.querySelector('input[name="ap_envisagee"]:checked').value : '';
+                    return apEnvisagee === 'oui' ? 'préparation' : 'intention';
+                }
+                return 'indétermination';
+            }
+            function getStadeMotivationText() {
+                const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
+                if (niveauActuel === 'actif') {
+                    return 'Statut actif';
+                } else if (niveauActuel === 'inactif') {
+                    return 'Statut inactif';
+                }
+                return 'Statut indéterminé';
+            }
+            function getMotivationText() {
+                const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
+                if (niveauActuel === 'actif') {
+                    const actifDepuis = document.querySelector('input[name="actif_depuis"]:checked') ? document.querySelector('input[name="actif_depuis"]:checked').value : '';
+                    return actifDepuis === 'plus_6_mois' ? '(Actif depuis plus de 6 mois)' : '(Actif depuis moins de 6 mois)';
+                } else if (niveauActuel === 'inactif') {
+                    const apEnvisagee = document.querySelector('input[name="ap_envisagee"]:checked') ? document.querySelector('input[name="ap_envisagee"]:checked').value : '';
+                    return apEnvisagee === 'oui' ? '(AP envisagée dans les 30 jours)' : '(pas d’AP envisagée dans les 30 jours)';
+                }
+                return '';
+            }
+            function getConsultationText(value) {
+                switch(value) {
+                    case 'oui': return 'est préconisée.';
+                    case 'non': return 'n’est pas préconisée.';
+                    case 'peut_etre': return 'peut être proposée.';
+                    default: return '';
+                }
+            }
+            function getEpreuveEffortText(value) {
+                switch(value) {
+                    case 'oui': return 'est préconisée.';
+                    case 'non': return 'n’est pas préconisée.';
+                    case 'peut_etre': return 'peut être proposée.';
+                    default: return '';
+                }
+            }
+            function getNiveauViseText(value) {
+                switch(value) {
+                    case 'faible': return 'faible';
+                    case 'modere': return 'modéré';
+                    case 'eleve': return 'élevé';
+                    default: return '';
+                }
+            }
+            function getRcvText(value) {
+                switch(value) {
+                    case 'faible': return 'faible';
+                    case 'modere': return 'modéré';
+                    case 'eleve_tres_eleve': return 'élevé/très élevé';
+                    default: return '';
+                }
+            }
+        });
+    </script>
 </body>
 </html>
