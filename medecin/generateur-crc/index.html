@@ -199,6 +199,7 @@
                         document.getElementById('inactif-subgroup').classList.add('hidden');
                     }
                 });
+                  });
            function toggleSubgroup(checkboxId, subgroupId) {
   const checkbox = document.getElementById(checkboxId);
   const subgroup = document.getElementById(subgroupId);
@@ -217,33 +218,7 @@ toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup");
 toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
 toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
  });
-            document.querySelectorAll('input[name="ordonnance_aerobie"]').forEach(function(radio) {
-                radio.addEventListener('change', function() {
-                    if (this.value === 'oui') {
-                        document.getElementById('ordonnance_aerobie_subgroup').classList.remove('hidden');
-                    } else {
-                        document.getElementById('ordonnance_aerobie_subgroup').classList.add('hidden');
-                    }
-                });
-            });
-            document.querySelectorAll('input[name="renforcement_musculaire"]').forEach(function(radio) {
-                radio.addEventListener('change', function() {
-                    if (this.value === 'oui') {
-                        document.getElementById('renforcement_musculaire_subgroup').classList.remove('hidden');
-                    } else {
-                        document.getElementById('renforcement_musculaire_subgroup').classList.add('hidden');
-                    }
-                });
-            });
-            document.querySelectorAll('input[name="souplesse_mobilite"]').forEach(function(radio) {
-                radio.addEventListener('change', function() {
-                    if (this.value === 'oui') {
-                        document.getElementById('souplesse_mobilite_subgroup').classList.remove('hidden');
-                    } else {
-                        document.getElementById('souplesse_mobilite_subgroup').classList.add('hidden');
-                    }
-                });
-            });
+          
             document.getElementById('generateReport').addEventListener('click', function() {
                 const destinataire = document.querySelector('input[name="destinataire"]:checked') ? document.querySelector('input[name="destinataire"]:checked').value : 'confrere';
                 const salutations = destinataire === 'consoeur' ? 'Chère consœur,' : 'Cher confrère,';
