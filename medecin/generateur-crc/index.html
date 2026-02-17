@@ -199,8 +199,9 @@
                         document.getElementById('inactif-subgroup').classList.add('hidden');
                     }
                 });
-                  });
-           function toggleSubgroup(checkboxId, subgroupId) {
+                 });
+        
+            function toggleSubgroup(checkboxId, subgroupId) {
   const checkbox = document.getElementById(checkboxId);
   const subgroup = document.getElementById(subgroupId);
 
@@ -257,26 +258,41 @@ toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
                 const epreuveEffort = document.querySelector('input[name="epreuve_effort"]:checked') ? document.querySelector('input[name="epreuve_effort"]:checked').value : '';
                 const objectifsAp = document.querySelector('textarea[name="objectifs_ap"]').value;
                 let objectifsText = objectifsAp ? `Les objectifs principaux en termes d’activité physique sont : ${objectifsAp}.` : '';
-                let ordonnance = '';
-                if (document.querySelector('input[name="ordonnance_aerobie"]:checked') && document.querySelector('input[name="ordonnance_aerobie"]:checked').value === 'oui') {
-                    const intensite = document.querySelector('input[name="intensite_aerobie"]:checked') ? document.querySelector('input[name="intensite_aerobie"]:checked').value : '';
-                    const foisAerobie = document.querySelector('input[name="fois_aerobie"]').value;
-                    ordonnance += `une ordonnance d’AP aérobie (${intensite === 'moderee' ? 'modérée' : 'élevée'}, ${foisAerobie} fois par semaine)`;
-                }
-                if (document.querySelector('input[name="renforcement_musculaire"]:checked') && document.querySelector('input[name="renforcement_musculaire"]:checked').value === 'oui') {
-                    const foisRenforcement = document.querySelector('input[name="fois_renforcement"]').value;
-                    if (ordonnance) ordonnance += ', ';
-                    ordonnance += `de renforcement musculaire (${foisRenforcement} fois par semaine)`;
-                }
-                if (document.querySelector('input[name="souplesse_mobilite"]:checked') && document.querySelector('input[name="souplesse_mobilite"]:checked').value === 'oui') {
-                    const foisSouplesse = document.querySelector('input[name="fois_souplesse"]').value;
-                    if (ordonnance) ordonnance += ', ';
-                    ordonnance += `de travail de souplesse et mobilité (${foisSouplesse} fois par semaine)`;
-                }
-                if (document.querySelector('input[name="fiches_promotion"]:checked') && document.querySelector('input[name="fiches_promotion"]:checked').value === 'oui') {
-                    if (ordonnance) ordonnance += ', ';
-                    ordonnance += `ainsi qu’une fiche d’information et de promotion de l’activité physique`;
-                }
+                
+            let ordonnance = '';
+
+if (document.getElementById("ordonnance_aerobie")?.checked) {
+  const intensite = document.querySelector('input[name="intensite_aerobie"]:checked')?.value;
+  const foisAerobie = document.querySelector('input[name="fois_aerobie"]')?.value;
+
+  if (intensite && foisAerobie) {
+    ordonnance += `une ordonnance d’AP aérobie (${intensite === 'moderee' ? 'modérée' : 'élevée'}, ${foisAerobie} fois par semaine)`;
+  }
+}
+
+if (document.getElementById("renforcement_musculaire")?.checked) {
+  const foisRenforcement = document.querySelector('input[name="fois_renforcement"]')?.value;
+
+  if (foisRenforcement) {
+    if (ordonnance) ordonnance += ', ';
+    ordonnance += `de renforcement musculaire (${foisRenforcement} fois par semaine)`;
+  }
+}
+
+if (document.getElementById("souplesse_mobilite")?.checked) {
+  const foisSouplesse = document.querySelector('input[name="fois_souplesse"]')?.value;
+
+  if (foisSouplesse) {
+    if (ordonnance) ordonnance += ', ';
+    ordonnance += `de travail de souplesse et mobilité (${foisSouplesse} fois par semaine)`;
+  }
+}
+
+if (document.querySelector('input[name="fiches_promotion"]:checked')?.value === 'oui') {
+  if (ordonnance) ordonnance += ', ';
+  ordonnance += `ainsi qu’une fiche d’information et de promotion de l’activité physique`;
+}
+
                 const situation = document.querySelector('input[name="situation"]:checked') ? document.querySelector('input[name="situation"]:checked').value : '';
                 let situationText = '';
                 if (situation === 'aucune') {
