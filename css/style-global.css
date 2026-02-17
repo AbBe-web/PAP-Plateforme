@@ -272,4 +272,20 @@ input[type="checkbox"] {
   transform: scale(1.1);
   margin-right: 8px;
 }
+/* =========================
+   CRC – ALIGNEMENT LIGNE
+========================= */
+
+.crc-page .form-group label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 18px;
+  white-space: nowrap;
+}
+
+.crc-page .sub-group > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
 
