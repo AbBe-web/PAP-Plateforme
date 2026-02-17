@@ -288,4 +288,54 @@ input[type="checkbox"] {
   flex-wrap: wrap;
   gap: 18px;
 }
+/* =========================
+   CRC – STRUCTURE SECTIONS
+========================= */
+
+.crc-page .form-group {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.crc-page .form-group:last-child {
+  border-bottom: none;
+}
+
+.crc-page h2 {
+  font-size: 18px;
+  margin-bottom: 14px;
+  color: #111827;
+}
+
+.crc-page h3 {
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+/* =========================
+   CRC – SOUS-GROUPES
+========================= */
+
+.crc-page .sub-group {
+  margin-left: 0;
+  margin-top: 16px;
+  padding-left: 14px;
+  border-left: 3px solid #e5e7eb;
+}
+
+.crc-page .sub-group h3 {
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+}
+/* =========================
+   CRC – ESPACE BOUTON GÉNÉRATION
+========================= */
+
+.crc-page #generateReport {
+  margin-top: 20px;
+}
 
