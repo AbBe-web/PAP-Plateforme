@@ -338,4 +338,23 @@ input[type="checkbox"] {
 .crc-page #generateReport {
   margin-top: 20px;
 }
+/* =========================
+   CRC – ESPACE BOUTON GÉNÉRATION
+========================= */
+
+.crc-page #generateReport {
+  margin-top: 20px;
+}
+
+/* =========================
+   CRC – BLOC RÉSULTAT
+========================= */
+
+.crc-page #reportOutput {
+  margin-top: 30px;
+  padding: 30px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
 
