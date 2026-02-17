@@ -216,3 +216,7 @@ th {
     display: none;
   }
 }
+.hidden {
+  display: none;
+}
+
