@@ -21,12 +21,6 @@ body {
    TITRES & TEXTES
 ========================= */
 
-h1, h2, h3 {
-  font-weight: 600;
-  margin-top: 28px;
-  color: #1f2937;
-}
-
 p {
   line-height: 1.6;
   margin: 12px 0;
@@ -458,30 +452,7 @@ input[type="checkbox"] {
   margin-right: 18px;
   white-space: nowrap;
 }
-/* =========================
-   CRC – GESTION UNIQUE DES ESPACES
-========================= */
 
-/* Titre de section */
-.crc-page h2 {
-  margin-top: 0;
-  margin-bottom: 6px;
-}
-
-/* Bloc section */
-.crc-page .form-group {
-  margin-bottom: 18px;
-}
-
-/* Premier sous-bloc sous le titre */
-.crc-page .sub-group {
-  margin-top: 6px;
-}
-
-/* Sous-titres internes */
-.crc-page .sub-group h3 {
-  margin-bottom: 6px;
-}
 /* =========================
    RESTAURATION LIGNES DESIGN ORIGINAL
 ========================= */
@@ -496,4 +467,36 @@ input[type="checkbox"] {
 .crc-page .sub-group {
   padding-left: 18px;
   border-left: 3px solid #e5e7eb;
+}
+/* =========================
+   CRC – GESTION VERTICALE UNIFIÉE
+========================= */
+
+/* Supprime toute marge haute globale */
+h1, h2, h3 {
+  margin-top: 0;
+}
+
+/* Gestion cohérente des sections */
+.crc-page .form-group {
+  margin-bottom: 22px;
+}
+
+/* Titres de section */
+.crc-page .form-group h2 {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* Sous-blocs */
+.crc-page .sub-group {
+  margin-top: 8px;
+  padding-left: 18px;
+  border-left: 3px solid #e5e7eb;
+}
+
+/* Sous-titres internes */
+.crc-page .sub-group h3 {
+  margin-bottom: 6px;
 }
