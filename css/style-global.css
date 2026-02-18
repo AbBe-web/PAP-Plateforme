@@ -287,29 +287,77 @@ input[type="checkbox"] {
   gap: 18px;
 }
 /* =========================
-   CRC – STRUCTURE SECTIONS
+   CRC – STYLE HARMONISÉ (RETOUR ADN ORIGINAL)
 ========================= */
 
-.crc-page .form-group {
-  margin-bottom: 32px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.crc-page .form-group:last-child {
-  border-bottom: none;
+.crc-page h1 {
+  color: #0056b3;
+  font-size: 22px;
+  margin-bottom: 10px;
 }
 
 .crc-page h2 {
+  color: #0056b3;
   font-size: 18px;
-  margin-bottom: 14px;
-  color: #111827;
+  margin-top: 30px;
+  margin-bottom: 12px;
+  font-weight: 600;
 }
 
 .crc-page h3 {
+  color: #1f2937;
   font-size: 15px;
   margin-bottom: 8px;
-  color: #374151;
+  font-weight: 600;
+}
+
+/* Sections plus propres */
+.crc-page .form-group {
+  margin-bottom: 28px;
+}
+
+/* Sous-groupes plus compacts */
+.crc-page .sub-group {
+  margin-top: 12px;
+  margin-left: 18px;
+  padding-left: 12px;
+  border-left: 3px solid #e5e7eb;
+}
+
+/* Labels cohérents */
+.crc-page label {
+  display: block;
+  font-size: 15px;
+  margin: 6px 0;
+}
+
+/* Options alignées proprement */
+.crc-page input[type="radio"],
+.crc-page input[type="checkbox"] {
+  margin-right: 8px;
+  transform: scale(1.05);
+  accent-color: #0056b3;
+}
+
+/* Bouton principal plus net */
+.crc-page #generateReport {
+  margin-top: 25px;
+  background-color: #007BFF;
+  background-image: none;
+  font-weight: 600;
+}
+
+.crc-page #generateReport:hover {
+  background-color: #0056b3;
+}
+
+/* Bloc résultat plus clair */
+.crc-page #reportOutput {
+  margin-top: 30px;
+  padding: 25px;
+  background: #f4f8fc;
+  border-radius: 8px;
+  border: 1px solid #dbeafe;
 }
 
 /* =========================
