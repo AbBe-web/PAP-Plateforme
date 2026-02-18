@@ -492,7 +492,8 @@ h1, h2, h3 {
 /* Sous-blocs */
 .crc-page .sub-group {
   margin-top: 8px;
-  padding-left: 18px;
+  padding-left: 12px;   /* réduit l'écart */
+  margin-left: 0;       /* supprime tout décalage externe */
   border-left: 3px solid #e5e7eb;
 }
 
