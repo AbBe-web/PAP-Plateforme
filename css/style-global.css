@@ -366,6 +366,12 @@ input[type="checkbox"] {
   font-weight: 600;
   color: #374151;
 }
+/* ===== Évaluation motivationnelle en noir ===== */
+
+.crc-page .form-group:nth-of-type(4) .sub-group h3 {
+  color: #1f2937 !important;
+}
+
 /* =========================
    CRC – ESPACE BOUTON GÉNÉRATION
 ========================= */
