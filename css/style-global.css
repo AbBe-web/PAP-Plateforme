@@ -293,8 +293,9 @@ input[type="checkbox"] {
 .crc-page .sub-group > div {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
+  gap: 10px;
 }
+
 /* =========================
    CRC – STYLE HARMONISÉ (RETOUR ADN ORIGINAL)
 ========================= */
@@ -327,7 +328,6 @@ input[type="checkbox"] {
 
 /* Labels cohérents */
 .crc-page label {
-  display: block;
   font-size: 15px;
   margin: 6px 0;
 }
@@ -432,6 +432,40 @@ input[type="checkbox"] {
   .crc-page h3 {
     white-space: normal;
   }
+}
+/* =========================
+   CRC – SOUS-TITRES BLEUS
+========================= */
 
+.crc-page .sub-group h3 {
+  color: #0056b3;
+  font-size: 16px;
+  font-weight: 600;
+}
+/* ===== GPAQ / MARSHALL SUR UNE LIGNE ===== */
+
+.crc-page .sub-group h3 label {
+  display: inline-flex !important;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.crc-page .sub-group h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+/* ===== OPTIONS HORIZONTALES CRC ===== */
+
+.crc-page .form-group:nth-of-type(2) .sub-group:nth-of-type(2) label,
+.crc-page .form-group:nth-of-type(3) label,
+.crc-page .form-group:nth-of-type(5) label,
+.crc-page .form-group:nth-of-type(6) label {
+
+  display: inline-flex !important;
+  align-items: center;
+  margin-right: 18px;
+  white-space: nowrap;
 }
 
