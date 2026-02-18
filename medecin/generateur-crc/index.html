@@ -49,7 +49,7 @@
                     </div>
                     <div>
                         <label><input type="radio" name="sedentaire" value="sedentaire"> Sédentaire</label>
-                        <label><input type="radio" name="sedentaire" value="non_sedentaire"> Non sédentaire</label>
+                        " name="sedentaire" value="non_sedentaire"> Non sédentaire</label>
                         <label><input type="radio" name="sedentaire" value="non_recherche"> Statut de sédentarité non recherché</label>
                     </div>
                 </div>
@@ -161,20 +161,22 @@
 </div>
 
                 <div class="sub-group">
-                    <h3 class="black-text">Des fiches de promotion de l’activité physique :</h3>
-                    <label><input type="radio" name="fiches_promotion" value="oui"> Oui</label>
-                    <label><input type="radio" name="fiches_promotion" value="non"> Non</label>
+                    <h3 class="black-text">Des fiches de promotion d'activité physique :</h3>
+                 <label class="inline-option"><input type="radio" name="fiches_promotion" value="oui"> Oui</label>
+<label class="inline-option"><input type="radio" name="fiches_promotion" value="non"> Non</label>
                 </div>
             </div>
             <div class="form-group">
                 <h2>9/ La personne adressée est :</h2>
-                <label><input type="radio" name="sexe" value="homme"> Un homme</label>
-                <label><input type="radio" name="sexe" value="femme"> Une femme</label>
+<label class="inline-option"><input type="radio" name="sexe" value="femme"> Une femme</label>
+<label class="inline-option"><input type="radio" name="sexe" value="homme"> Un homme</label>
+
             </div>
             <div class="form-group">
                 <h2>10/ Le destinataire du courrier est :</h2>
-                <label><input type="radio" name="destinataire" value="consoeur"> Une consœur</label>
-                <label><input type="radio" name="destinataire" value="confrere"> Un confrère</label>
+              <label class="inline-option"><input type="radio" name="destinataire" value="consoeur"> Une consœur</label>
+<label class="inline-option"><input type="radio" name="destinataire" value="confrere"> Un confrère</label>
+
             </div>
            <button type="button" id="generateReport" class="btn">Générer le compte-rendu</button>
         </form>
