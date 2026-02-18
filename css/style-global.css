@@ -174,12 +174,6 @@ th {
   border-bottom: none;
 }
 
-.sub-group {
-  margin-top: 16px;
-  padding-left: 18px;
-  border-left: 3px solid #e5e7eb;
-}
-
 .form-group h3 {
   font-size: 15px;
   margin-bottom: 8px;
@@ -331,13 +325,6 @@ input[type="checkbox"] {
 /* =========================
    CRC – SOUS-GROUPES
 ========================= */
-.crc-page .sub-group {
-  margin-left: 18px;
-  margin-top: 8px;
-  padding-left: 0;
-  border-left: none;
-}
-
 .crc-page .sub-group h3 {
   margin-bottom: 8px;
   font-size: 15px;
