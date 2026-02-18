@@ -253,6 +253,30 @@ label {
 .hidden {
   display: none;
 }
+
+/* =========================
+   CRC – HARMONISATION TAILLE OPTIONS
+========================= */
+
+.crc-page .form-group:first-of-type label {
+  font-size: 15px;
+  font-weight: 400;
+}
+/* =========================
+   CRC – ALIGNEMENT RADIO INLINE (GPAQ / Marshall)
+========================= */
+
+.crc-page label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.crc-page input[type="radio"] {
+  transform: none;
+  margin: 0;
+}
+
 /* =========================
    FORM GROUP – PREMIUM
 ========================= */
@@ -391,6 +415,34 @@ input[type="checkbox"] {
 .crc-page #generateReport {
   margin-top: 20px;
 }
+/* =========================
+   CRC – BOUTON PRINCIPAL
+========================= */
+
+.crc-page #generateReport {
+  display: block;
+  width: 100%;
+  margin-top: 28px;
+  padding: 14px 18px;
+
+  background: linear-gradient(135deg, #007BFF, #0056b3);
+  color: white;
+
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.crc-page #generateReport:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 91, 187, 0.25);
+}
 
 /* =========================
    CRC – BLOC RÉSULTAT
@@ -402,5 +454,26 @@ input[type="checkbox"] {
   background: #f8fafc;
   border-radius: 14px;
   border: 1px solid #e5e7eb;
+}
+/* =========================
+   CRC – MOBILE FIX OVERFLOW
+========================= */
+
+@media (max-width: 768px) {
+
+  .crc-page {
+    overflow-x: hidden;
+  }
+
+  .crc-page label {
+    white-space: normal !important;
+    display: block;
+  }
+
+  .crc-page h2,
+  .crc-page h3 {
+    white-space: normal;
+  }
+
 }
 
