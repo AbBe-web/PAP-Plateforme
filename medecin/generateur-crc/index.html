@@ -289,9 +289,9 @@ if (window.patientData?.nombre_pas) {
 }
 
                 let objectifsText = objectifsAp ? `Les objectifs principaux en termes d’activité physique sont : ${objectifsAp}.` : '';
-                let pasText = '';
+             let pasText = '';
 if (nombrePas) {
-  pasText = ` Son nombre moyen de pas par jour sur le dernier mois est estimé à ${nombrePas} pas.`;
+  pasText = ` avec un nombre moyen estimé à environ ${nombrePas} pas par jour sur le dernier mois`;
 }
 
             let ordonnance = '';
@@ -337,7 +337,7 @@ if (document.querySelector('input[name="fiches_promotion"]:checked')?.value === 
                     <p>${salutations}</p>
                     <p>Merci de m’avoir adressé ${titre} _____ pour une consultation d’activité physique.</p>
                     <p>${situationText}</p>
-                  <p>Son niveau actuel d’activité physique est le suivant : ${statutActif}${statutSedentaire}${questionnaireText}.${pasText} Le niveau d’activité physique ${sexe === 'femme' ? 'qu’elle' : 'qu’il'} a choisi est : ${getNiveauViseText(niveauVise)}.</p>
+              <p>Son niveau actuel d’activité physique est le suivant : ${statutActif}${statutSedentaire}${questionnaireText}${pasText}. Le niveau d’activité physique ${sexe === 'femme' ? 'qu’elle' : 'qu’il'} a choisi est : ${getNiveauViseText(niveauVise)}.</p>
                     <p>Son niveau de risque cardio-vasculaire est ${getRcvText(rcv)}.</p>
                     <p>Sur le plan motivationnel, ${pronom} est au stade de <i>${getStadeMotivation()}</i> ${getMotivationText()}. L’activité physique revêt pour ${sexe === 'homme' ? 'lui' : pronom} une importance cotée à : ${importanceAp}/10. ${pronomMaj} côte sa confiance en ${sexe === 'homme' ? 'lui' : pronom} pour augmenter son niveau d’AP à : ${confianceAp}/10. Les freins à la pratique de l’activité physique sont les suivants : ${freins}. Les leviers à la pratique sont les suivants : ${leviers}.</p>
                     <p>${objectifsText}</p>
