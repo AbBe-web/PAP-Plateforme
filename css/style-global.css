@@ -482,3 +482,18 @@ input[type="checkbox"] {
 .crc-page .sub-group h3 {
   margin-bottom: 6px;
 }
+/* =========================
+   RESTAURATION LIGNES DESIGN ORIGINAL
+========================= */
+
+/* Ligne sous titres de section */
+.crc-page .form-group h2 {
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* Ligne verticale sous-blocs */
+.crc-page .sub-group {
+  padding-left: 18px;
+  border-left: 3px solid #e5e7eb;
+}
