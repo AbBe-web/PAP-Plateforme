@@ -363,18 +363,6 @@ input[type="checkbox"] {
   accent-color: #0056b3;
 }
 
-/* Bouton principal plus net */
-.crc-page #generateReport {
-  margin-top: 25px;
-  background-color: #007BFF;
-  background-image: none;
-  font-weight: 600;
-}
-
-.crc-page #generateReport:hover {
-  background-color: #0056b3;
-}
-
 /* Bloc résultat plus clair */
 .crc-page #reportOutput {
   margin-top: 30px;
@@ -400,13 +388,6 @@ input[type="checkbox"] {
   font-size: 15px;
   font-weight: 600;
   color: #374151;
-}
-/* =========================
-   CRC – ESPACE BOUTON GÉNÉRATION
-========================= */
-
-.crc-page #generateReport {
-  margin-top: 20px;
 }
 /* =========================
    CRC – ESPACE BOUTON GÉNÉRATION
