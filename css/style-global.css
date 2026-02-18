@@ -469,6 +469,16 @@ input[type="checkbox"] {
   border-left: 3px solid #e5e7eb;
 }
 /* =========================
+   OPTIONS INLINE (9,10, fiches)
+========================= */
+
+.crc-page .inline-option {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 18px;
+}
+
+/* =========================
    CRC – GESTION VERTICALE UNIFIÉE
 ========================= */
 
