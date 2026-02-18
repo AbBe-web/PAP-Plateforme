@@ -281,8 +281,19 @@ toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
                 const consultationAp = document.querySelector('input[name="consultation_ap"]:checked') ? document.querySelector('input[name="consultation_ap"]:checked').value : '';
                 const epreuveEffort = document.querySelector('input[name="epreuve_effort"]:checked') ? document.querySelector('input[name="epreuve_effort"]:checked').value : '';
                 const objectifsAp = document.querySelector('textarea[name="objectifs_ap"]').value;
+               // --- Nombre de pas (manuel ou JSON) ---
+let nombrePas = document.querySelector('input[name="nombre_pas"]')?.value || "";
+// Si une variable JSON existe et contient l'info, priorité au JSON
+if (window.patientData?.nombre_pas) {
+  nombrePas = window.patientData.nombre_pas;
+}
+
                 let objectifsText = objectifsAp ? `Les objectifs principaux en termes d’activité physique sont : ${objectifsAp}.` : '';
-                
+                let pasText = '';
+if (nombrePas) {
+  pasText = ` Son nombre moyen de pas par jour sur le dernier mois est estimé à ${nombrePas} pas.`;
+}
+
             let ordonnance = '';
 
 if (document.getElementById("ordonnance_aerobie")?.checked) {
@@ -326,7 +337,7 @@ if (document.querySelector('input[name="fiches_promotion"]:checked')?.value === 
                     <p>${salutations}</p>
                     <p>Merci de m’avoir adressé ${titre} _____ pour une consultation d’activité physique.</p>
                     <p>${situationText}</p>
-                    <p>Son niveau actuel d’activité physique est le suivant : ${statutActif}${statutSedentaire}${questionnaireText}. Le niveau d’activité physique ${sexe === 'femme' ? 'qu’elle' : 'qu’il'} a choisi est : ${getNiveauViseText(niveauVise)}.</p>
+                  <p>Son niveau actuel d’activité physique est le suivant : ${statutActif}${statutSedentaire}${questionnaireText}.${pasText} Le niveau d’activité physique ${sexe === 'femme' ? 'qu’elle' : 'qu’il'} a choisi est : ${getNiveauViseText(niveauVise)}.</p>
                     <p>Son niveau de risque cardio-vasculaire est ${getRcvText(rcv)}.</p>
                     <p>Sur le plan motivationnel, ${pronom} est au stade de <i>${getStadeMotivation()}</i> ${getMotivationText()}. L’activité physique revêt pour ${sexe === 'homme' ? 'lui' : pronom} une importance cotée à : ${importanceAp}/10. ${pronomMaj} côte sa confiance en ${sexe === 'homme' ? 'lui' : pronom} pour augmenter son niveau d’AP à : ${confianceAp}/10. Les freins à la pratique de l’activité physique sont les suivants : ${freins}. Les leviers à la pratique sont les suivants : ${leviers}.</p>
                     <p>${objectifsText}</p>
