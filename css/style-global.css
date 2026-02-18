@@ -266,11 +266,6 @@ label {
    CRC – ALIGNEMENT RADIO INLINE (GPAQ / Marshall)
 ========================= */
 
-.crc-page label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
 
 .crc-page input[type="radio"] {
   transform: none;
@@ -293,16 +288,6 @@ input[type="checkbox"] {
   accent-color: #2563eb;
   transform: scale(1.1);
   margin-right: 8px;
-}
-/* =========================
-   CRC – ALIGNEMENT LIGNE
-========================= */
-
-.crc-page .form-group label {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 18px;
-  white-space: nowrap;
 }
 
 .crc-page .sub-group > div {
@@ -338,14 +323,6 @@ input[type="checkbox"] {
 /* Sections plus propres */
 .crc-page .form-group {
   margin-bottom: 28px;
-}
-
-/* Sous-groupes plus compacts */
-.crc-page .sub-group {
-  margin-top: 12px;
-  margin-left: 18px;
-  padding-left: 12px;
-  border-left: 3px solid #e5e7eb;
 }
 
 /* Labels cohérents */
