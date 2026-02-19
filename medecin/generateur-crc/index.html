@@ -76,13 +76,13 @@
                     <label><input type="radio" name="niveau_vise" value="eleve"> Élevé</label>
                 </div>
             </div>
-            <div class="form-group">
+            ">
                 <h2>3/ Évaluation du RCV (tableau 3) :</h2>
                 <label><input type="radio" name="rcv" value="faible"> Faible</label>
                 <label><input type="radio" name="rcv" value="modere"> Modéré</label>
                 <label><input type="radio" name="rcv" value="eleve_tres_eleve"> Élevé/très élevé</label>
             </div>
-            <div class="form-group">
+            ">
                 <h2>4/ Évaluation motivationnelle (complément) :</h2>
                 <div class="sub-group">
                     <h3 class="black-text">La personne adressée présente les <u>freins</u> suivants :</h3>
@@ -101,51 +101,54 @@
                     <input type="number" name="confiance_ap" min="0" max="10">
                 </div>
             </div>
-            <div class="form-group">
+            ">
                 <h2>5/ Une consultation Médicale d’AP est préconisée :</h2>
                 <label><input type="radio" name="consultation_ap" value="oui"> Oui</label>
                 <label><input type="radio" name="consultation_ap" value="non"> Non</label>
                 <label><input type="radio" name="consultation_ap" value="peut_etre"> Peut être proposée</label>
             </div>
-            <div class="form-group">
+            ">
                 <h2>6/ Une épreuve d’effort est préconisée :</h2>
                 <label><input type="radio" name="epreuve_effort" value="oui"> Oui</label>
                 <label><input type="radio" name="epreuve_effort" value="non"> Non</label>
                 <label><input type="radio" name="epreuve_effort" value="peut_etre"> Peut être proposée</label>
             </div>
-            <div class="form-group">
+            ">
                 <h2>7/ Les objectifs principaux en termes d’activité physique sont :</h2>
                 <textarea name="objectifs_ap"></textarea>
             </div>
-        <div class="form-group">
+        ">
+<div class="form-group">
 <h2>8/ Je lui ai remis :</h2>
 
 <!-- ================= AEROBIE ================= -->
 <div class="sub-group">
   <h3>Une ordonnance d’AP aérobie :</h3>
 
-  <label class="inline-option">
-    <input type="radio" name="ordonnance_aerobie" id="ordonnance_aerobie" value="oui">
-    Oui
-  </label>
+  <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
 
-  <div id="ordonnance_aerobie_subgroup" style="display:none; margin-top:8px;">
+    <label class="inline-option" style="display:flex; align-items:center; gap:6px;">
+      <input type="radio" name="ordonnance_aerobie" id="ordonnance_aerobie" value="oui">
+      Oui
+    </label>
 
+    <div id="ordonnance_aerobie_subgroup" style="display:none; align-items:center; gap:8px;">
+      <input type="number" name="fois_aerobie" min="0" max="9"
+             style="width:55px; font-size:inherit;">
+      <span style="font-size:inherit;">fois par semaine</span>
+    </div>
+
+  </div>
+
+  <div id="intensite_aerobie_block" style="display:none; margin-top:8px;">
     <label class="inline-option">
       <input type="radio" name="intensite_aerobie" value="moderee">
       Intensité modérée
     </label>
-
     <label class="inline-option">
       <input type="radio" name="intensite_aerobie" value="elevee">
       Intensité élevée
     </label>
-
-    <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
-      <input type="number" name="fois_aerobie" min="0" max="9" style="width:55px;">
-      <span>fois par semaine</span>
-    </div>
-
   </div>
 </div>
 
@@ -153,15 +156,17 @@
 <div class="sub-group">
   <h3>Renforcement musculaire :</h3>
 
-  <label class="inline-option">
-    <input type="radio" name="renforcement_musculaire" id="renforcement_musculaire" value="oui">
-    Oui
-  </label>
+  <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+    <label class="inline-option" style="display:flex; align-items:center; gap:6px;">
+      <input type="radio" name="renforcement_musculaire" id="renforcement_musculaire" value="oui">
+      Oui
+    </label>
 
-  <div id="renforcement_musculaire_subgroup" style="display:none; margin-top:8px;">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <input type="number" name="fois_renforcement" min="0" max="9" style="width:55px;">
-      <span>fois par semaine</span>
+    <div id="renforcement_musculaire_subgroup"
+         style="display:none; align-items:center; gap:8px;">
+      <input type="number" name="fois_renforcement" min="0" max="9"
+             style="width:55px; font-size:inherit;">
+      <span style="font-size:inherit;">fois par semaine</span>
     </div>
   </div>
 </div>
@@ -170,15 +175,17 @@
 <div class="sub-group">
   <h3>Travail de souplesse et mobilité :</h3>
 
-  <label class="inline-option">
-    <input type="radio" name="souplesse_mobilite" id="souplesse_mobilite" value="oui">
-    Oui
-  </label>
+  <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+    <label class="inline-option" style="display:flex; align-items:center; gap:6px;">
+      <input type="radio" name="souplesse_mobilite" id="souplesse_mobilite" value="oui">
+      Oui
+    </label>
 
-  <div id="souplesse_mobilite_subgroup" style="display:none; margin-top:8px;">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <input type="number" name="fois_souplesse" min="0" max="9" style="width:55px;">
-      <span>fois par semaine</span>
+    <div id="souplesse_mobilite_subgroup"
+         style="display:none; align-items:center; gap:8px;">
+      <input type="number" name="fois_souplesse" min="0" max="9"
+             style="width:55px; font-size:inherit;">
+      <span style="font-size:inherit;">fois par semaine</span>
     </div>
   </div>
 </div>
@@ -186,15 +193,12 @@
 <!-- ================= FICHES ================= -->
 <div class="sub-group">
   <h3 class="black-text">Des fiches de promotion d'activité physique :</h3>
-  <label class="inline-option">
-    <input type="radio" name="fiches_promotion" value="oui"> Oui
-  </label>
-  <label class="inline-option">
-    <input type="radio" name="fiches_promotion" value="non"> Non
-  </label>
+  <label class="inline-option"><input type="radio" name="fiches_promotion" value="oui"> Oui</label>
+  <label class="inline-option"><input type="radio" name="fiches_promotion" value="non"> Non</label>
 </div>
 
 </div>
+
    
             <div class="form-group">
                 <h2>9/ La personne adressée est :</h2>
@@ -234,24 +238,28 @@
                 });
           });
             
-          function toggleSubgroup(radioId, subgroupId) {
+         function toggleSubgroup(radioId, subgroupId, extraBlockId = null) {
   const radio = document.getElementById(radioId);
   const subgroup = document.getElementById(subgroupId);
+  const extraBlock = extraBlockId ? document.getElementById(extraBlockId) : null;
 
   if (!radio || !subgroup) return;
 
   subgroup.style.display = "none";
+  if (extraBlock) extraBlock.style.display = "none";
 
-  radio.addEventListener("change", function() {
+  radio.addEventListener("change", function () {
     if (this.checked) {
-      subgroup.style.display = "block";
+      subgroup.style.display = "flex";
+      if (extraBlock) extraBlock.style.display = "block";
     } else {
       subgroup.style.display = "none";
+      if (extraBlock) extraBlock.style.display = "none";
     }
   });
 }
-            
-toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup");
+
+toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup", "intensite_aerobie_block");
 toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
 toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
           
