@@ -117,33 +117,35 @@
                 <h2>7/ Les objectifs principaux en termes d’activité physique sont :</h2>
                 <textarea name="objectifs_ap"></textarea>
             </div>
-           <div class="form-group">
+        <div class="form-group">
 <h2>8/ Je lui ai remis :</h2>
 
 <!-- ================= AEROBIE ================= -->
 <div class="sub-group">
   <h3>Une ordonnance d’AP aérobie :</h3>
 
-  <label>
+  <label class="inline-option">
     <input type="radio" name="ordonnance_aerobie" id="ordonnance_aerobie" value="oui">
     Oui
   </label>
 
-  <div id="ordonnance_aerobie_subgroup" class="hidden">
-    <label>
+  <div id="ordonnance_aerobie_subgroup" style="display:none; margin-top:8px;">
+
+    <label class="inline-option">
       <input type="radio" name="intensite_aerobie" value="moderee">
       Intensité modérée
     </label>
 
-    <label>
+    <label class="inline-option">
       <input type="radio" name="intensite_aerobie" value="elevee">
       Intensité élevée
     </label>
 
-    <label>
-      <input type="number" name="fois_aerobie" min="0" max="9" style="width:60px;">
-      fois par semaine
-    </label>
+    <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+      <input type="number" name="fois_aerobie" min="0" max="9" style="width:55px;">
+      <span>fois par semaine</span>
+    </div>
+
   </div>
 </div>
 
@@ -151,16 +153,16 @@
 <div class="sub-group">
   <h3>Renforcement musculaire :</h3>
 
-  <label>
+  <label class="inline-option">
     <input type="radio" name="renforcement_musculaire" id="renforcement_musculaire" value="oui">
     Oui
   </label>
 
-  <div id="renforcement_musculaire_subgroup" class="hidden">
-    <label>
-      <input type="number" name="fois_renforcement" min="0" max="9" style="width:60px;">
-      fois par semaine
-    </label>
+  <div id="renforcement_musculaire_subgroup" style="display:none; margin-top:8px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <input type="number" name="fois_renforcement" min="0" max="9" style="width:55px;">
+      <span>fois par semaine</span>
+    </div>
   </div>
 </div>
 
@@ -168,16 +170,16 @@
 <div class="sub-group">
   <h3>Travail de souplesse et mobilité :</h3>
 
-  <label>
+  <label class="inline-option">
     <input type="radio" name="souplesse_mobilite" id="souplesse_mobilite" value="oui">
     Oui
   </label>
 
-  <div id="souplesse_mobilite_subgroup" class="hidden">
-    <label>
-      <input type="number" name="fois_souplesse" min="0" max="9" style="width:60px;">
-      fois par semaine
-    </label>
+  <div id="souplesse_mobilite_subgroup" style="display:none; margin-top:8px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <input type="number" name="fois_souplesse" min="0" max="9" style="width:55px;">
+      <span>fois par semaine</span>
+    </div>
   </div>
 </div>
 
@@ -193,14 +195,7 @@
 </div>
 
 </div>
-
-
-                <div class="sub-group">
-                    <h3 class="black-text">Des fiches de promotion d'activité physique :</h3>
-                 <label class="inline-option"><input type="radio" name="fiches_promotion" value="oui"> Oui</label>
-<label class="inline-option"><input type="radio" name="fiches_promotion" value="non"> Non</label>
-                </div>
-            </div>
+   
             <div class="form-group">
                 <h2>9/ La personne adressée est :</h2>
 <label class="inline-option"><input type="radio" name="sexe" value="femme"> Une femme</label>
@@ -239,22 +234,19 @@
                 });
           });
             
-            function toggleSubgroup(checkboxId, subgroupId) {
-  const checkbox = document.getElementById(checkboxId);
+          function toggleSubgroup(radioId, subgroupId) {
+  const radio = document.getElementById(radioId);
   const subgroup = document.getElementById(subgroupId);
 
-  if (!checkbox || !subgroup) return;
+  if (!radio || !subgroup) return;
 
-                // état initial
-if (checkbox.checked) {
-    subgroup.classList.remove("hidden");
-}
+  subgroup.style.display = "none";
 
-  checkbox.addEventListener("change", function() {
+  radio.addEventListener("change", function() {
     if (this.checked) {
-      subgroup.classList.remove("hidden");
+      subgroup.style.display = "block";
     } else {
-      subgroup.classList.add("hidden");
+      subgroup.style.display = "none";
     }
   });
 }
