@@ -57,9 +57,10 @@ p {
 
 .btn.secondary:hover {
   background: #d1d5db;
-  transform: none;
-  box-shadow: none;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
 }
+
 .btn:disabled {
   background:#cbd5e1;
   cursor:not-allowed;
