@@ -509,3 +509,12 @@ h1, h2, h3 {
 .crc-page .rgpd-banner {
   margin-bottom: 24px;
 }
+/* Liens du bandeau RGPD uniquement */
+.crc-page .rgpd-banner a {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.crc-page .rgpd-banner a:hover {
+  opacity: 0.8;
+}
