@@ -258,21 +258,37 @@
                 });
           });
             
- function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
+function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
   const radios = document.querySelectorAll(`input[name="${groupName}"]`);
   const subgroup = document.getElementById(subgroupId);
   const extraBlock = extraBlockId ? document.getElementById(extraBlockId) : null;
 
   if (!radios || !subgroup) return;
 
+  function resetFields() {
+    // Vider les inputs number dans le sous-bloc
+    subgroup.querySelectorAll('input[type="number"]').forEach(input => {
+      input.value = "";
+    });
+
+    // Décocher les radios éventuelles dans le bloc supplémentaire
+    if (extraBlock) {
+      extraBlock.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.checked = false;
+      });
+    }
+  }
+
   function updateDisplay() {
     const selected = document.querySelector(`input[name="${groupName}"]:checked`);
+
     if (selected && selected.value === "oui") {
       subgroup.style.display = "flex";
       if (extraBlock) extraBlock.style.display = "block";
     } else {
       subgroup.style.display = "none";
       if (extraBlock) extraBlock.style.display = "none";
+      resetFields(); // 👈 nettoyage automatique
     }
   }
 
