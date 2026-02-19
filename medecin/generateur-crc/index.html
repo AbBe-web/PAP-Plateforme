@@ -258,42 +258,30 @@
                 });
           });
             
-       function toggleSubgroup(radioId, subgroupId, extraBlockId = null) {
-  const radio = document.getElementById(radioId);
+ function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
+  const radios = document.querySelectorAll(`input[name="${groupName}"]`);
   const subgroup = document.getElementById(subgroupId);
   const extraBlock = extraBlockId ? document.getElementById(extraBlockId) : null;
 
-  if (!radio || !subgroup) return;
+  if (!radios || !subgroup) return;
 
   function updateDisplay() {
-    if (radio.checked) {
+    const selected = document.querySelector(`input[name="${groupName}"]:checked`);
+    if (selected && selected.value === "oui") {
       subgroup.style.display = "flex";
       if (extraBlock) extraBlock.style.display = "block";
     } else {
       subgroup.style.display = "none";
       if (extraBlock) extraBlock.style.display = "none";
-
-      // Reset des champs
-      subgroup.querySelectorAll("input").forEach(input => {
-        if (input.type === "radio" || input.type === "checkbox") {
-          input.checked = false;
-        } else {
-          input.value = "";
-        }
-      });
-
-      if (extraBlock) {
-        extraBlock.querySelectorAll("input").forEach(input => {
-          input.checked = false;
-        });
-      }
     }
   }
 
-  radio.addEventListener("change", updateDisplay);
+  radios.forEach(radio => {
+    radio.addEventListener("change", updateDisplay);
+  });
+
   updateDisplay(); // état initial
 }
-
 
 toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup", "intensite_aerobie_block");
 toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
