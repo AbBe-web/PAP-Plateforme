@@ -303,72 +303,113 @@ function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
 toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup", "intensite_aerobie_block");
 toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
 toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
-         
-            function buildClinicalModel() {
-  return {
-
-    meta: {
-      destinataire: document.querySelector('input[name="destinataire"]:checked')?.value || "standard"
-    },
-
-    situation: document.querySelector('input[name="situation"]:checked')?.value || null,
-
-    patient: {
-      sexe: document.querySelector('input[name="sexe"]:checked')?.value || "homme",
-      questionnaire: document.querySelector('input[name="questionnaire"]:checked')?.value || null,
-      pas_moyens: document.querySelector('input[name="nombre_pas"]')?.value || null
-    },
-
-    evaluation: {
-      niveau_retenu: document.querySelector('input[name="niveau_actuel"]:checked')?.value || null,
-      sedentarite: document.querySelector('input[name="sedentaire"]:checked')?.value || null,
-      rcv: document.querySelector('input[name="rcv"]:checked')?.value || null
-    },
-
-    motivation: {
-      stade: getStadeMotivation(),
-      importance: document.querySelector('input[name="importance_ap"]')?.value || null,
-      confiance: document.querySelector('input[name="confiance_ap"]')?.value || null,
-      freins: document.querySelector('textarea[name="freins"]')?.value || null,
-      leviers: document.querySelector('textarea[name="leviers"]')?.value || null
-    },
-
-    therapeutic_plan: {
-      objectif_principal: document.querySelector('textarea[name="objectifs_ap"]')?.value || null,
-      indicateur_cible_libre: null
-    },
-
-    prescription: {
-      aerobie: {
-        frequence: document.querySelector('input[name="fois_aerobie"]')?.value || null,
-        intensite: document.querySelector('input[name="intensite_aerobie"]:checked')?.value || null
-      },
-      renforcement: {
-        frequence: document.querySelector('input[name="fois_renforcement"]')?.value || null
-      },
-      souplesse: {
-        frequence: document.querySelector('input[name="fois_souplesse"]')?.value || null
-      }
-    },
-
-    decision: {
-      specialite: "aucune", // on structurera l’interface ensuite
-      autre_specialite: null,
-      epreuve_effort: document.querySelector('input[name="epreuve_effort"]:checked')?.value || null
-    }
-
-  };
+          
+            document.getElementById('generateReport').addEventListener('click', function() {
+                const destinataire = document.querySelector('input[name="destinataire"]:checked') ? document.querySelector('input[name="destinataire"]:checked').value : 'confrere';
+                const salutations = destinataire === 'consoeur' ? 'Chère consœur,' : 'Cher confrère,';
+                const sexe = document.querySelector('input[name="sexe"]:checked') ? document.querySelector('input[name="sexe"]:checked').value : 'homme';
+                const titre = sexe === 'homme' ? 'Monsieur' : 'Madame';
+                const pronom = sexe === 'homme' ? 'il' : 'elle';
+                const pronomMaj = sexe === 'homme' ? 'Il' : 'Elle';
+                const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
+                let statutActif = '';
+                if (niveauActuel === 'actif') {
+                    statutActif = 'actif';
+                } else if (niveauActuel === 'inactif') {
+                    statutActif = 'inactif';
+                }
+                const sedentaire = document.querySelector('input[name="sedentaire"]:checked') ? document.querySelector('input[name="sedentaire"]:checked').value : '';
+                let statutSedentaire = '';
+                if (sedentaire === 'sedentaire') {
+                    statutSedentaire = ', sédentaire';
+                } else if (sedentaire === 'non_sedentaire') {
+                    statutSedentaire = ', non sédentaire';
+                }
+                const questionnaire = document.querySelector('input[name="questionnaire"]:checked') ? document.querySelector('input[name="questionnaire"]:checked').value : '';
+                let questionnaireText = '';
+                if (questionnaire === 'GPAQ') {
+                    questionnaireText = ' (mesuré par le GPAQ)';
+                } else if (questionnaire === 'Marshall') {
+                    questionnaireText = ' (mesuré par le Marshall)';
+                }
+                const niveauVise = document.querySelector('input[name="niveau_vise"]:checked') ? document.querySelector('input[name="niveau_vise"]:checked').value : '';
+                const rcv = document.querySelector('input[name="rcv"]:checked') ? document.querySelector('input[name="rcv"]:checked').value : '';
+                const freins = document.querySelector('textarea[name="freins"]').value;
+                const leviers = document.querySelector('textarea[name="leviers"]').value;
+                const importanceAp = document.querySelector('input[name="importance_ap"]').value;
+                const confianceAp = document.querySelector('input[name="confiance_ap"]').value;
+                const consultationAp = document.querySelector('input[name="consultation_ap"]:checked') ? document.querySelector('input[name="consultation_ap"]:checked').value : '';
+                const epreuveEffort = document.querySelector('input[name="epreuve_effort"]:checked') ? document.querySelector('input[name="epreuve_effort"]:checked').value : '';
+                const objectifsAp = document.querySelector('textarea[name="objectifs_ap"]').value;
+               // --- Nombre de pas (manuel ou JSON) ---
+let nombrePas = document.querySelector('input[name="nombre_pas"]')?.value || "";
+// Si une variable JSON existe et contient l'info, priorité au JSON
+if (window.patientData?.nombre_pas) {
+  nombrePas = window.patientData.nombre_pas;
 }
-        document.getElementById('generateReport').addEventListener('click', function() {
 
-  const model = buildClinicalModel();
-  const reportText = renderLongLetterV2(model);
+                let objectifsText = objectifsAp ? `Les objectifs principaux en termes d’activité physique sont : ${objectifsAp}.` : '';
+             let pasText = '';
+if (nombrePas) {
+  pasText = ` avec un nombre moyen estimé à environ ${nombrePas} pas par jour sur le dernier mois`;
+}
 
-  document.getElementById('reportText').innerHTML = reportText;
-  document.getElementById('reportOutput').classList.remove('hidden');
-  document.getElementById('reportOutput').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            let ordonnance = '';
 
-});
+if (document.getElementById("ordonnance_aerobie")?.checked) {
+  const intensite = document.querySelector('input[name="intensite_aerobie"]:checked')?.value;
+  const foisAerobie = document.querySelector('input[name="fois_aerobie"]')?.value;
+
+  if (intensite && foisAerobie) {
+    ordonnance += `une ordonnance d’AP aérobie (${intensite === 'moderee' ? 'modérée' : 'élevée'}, ${foisAerobie} fois par semaine)`;
+  }
+}
+
+if (document.getElementById("renforcement_musculaire")?.checked) {
+  const foisRenforcement = document.querySelector('input[name="fois_renforcement"]')?.value;
+
+  if (foisRenforcement) {
+    if (ordonnance) ordonnance += ', ';
+    ordonnance += `de renforcement musculaire (${foisRenforcement} fois par semaine)`;
+  }
+}
+
+if (document.getElementById("souplesse_mobilite")?.checked) {
+  const foisSouplesse = document.querySelector('input[name="fois_souplesse"]')?.value;
+
+  if (foisSouplesse) {
+    if (ordonnance) ordonnance += ', ';
+    ordonnance += `de travail de souplesse et mobilité (${foisSouplesse} fois par semaine)`;
+  }
+}
+
+if (document.querySelector('input[name="fiches_promotion"]:checked')?.value === 'oui') {
+  if (ordonnance) ordonnance += ', ';
+  ordonnance += `ainsi qu’une fiche d’information et de promotion de l’activité physique`;
+}
+
+                const situation = document.querySelector('input[name="situation"]:checked') ? document.querySelector('input[name="situation"]:checked').value : '';
+                let situationText = '';
+                if (situation === 'aucune') {
+                    situationText = `${pronomMaj} n’est pas dans une situation rendant souhaitable d’emblée une consultation médicale d’activité physique selon le <a href="https://www.has-sante.fr/jcms/c_2754766/fr/consultation-et-prescription-d-activite-physique">guide HAS "Consultation et prescription d'activité physique"</a> : maladie cardiovasculaire, respiratoire, métabolique ou rénale décompensée, contre-indication ou limitation à l’activité physique, situation particulière prévue dans le guide HAS.`;
+                }
+                const reportText = `
+                    <p>${salutations}</p>
+                    <p>Merci de m’avoir adressé ${titre} _____ pour une consultation d’activité physique.</p>
+                    <p>${situationText}</p>
+              <p>Son niveau actuel d’activité physique est le suivant : ${statutActif}${statutSedentaire}${questionnaireText}${pasText}. Le niveau d’activité physique ${sexe === 'femme' ? 'qu’elle' : 'qu’il'} a choisi est : ${getNiveauViseText(niveauVise)}.</p>
+                    <p>Son niveau de risque cardio-vasculaire est ${getRcvText(rcv)}.</p>
+                    <p>Sur le plan motivationnel, ${pronom} est au stade de <i>${getStadeMotivation()}</i> ${getMotivationText()}. L’activité physique revêt pour ${sexe === 'homme' ? 'lui' : pronom} une importance cotée à : ${importanceAp}/10. ${pronomMaj} côte sa confiance en ${sexe === 'homme' ? 'lui' : pronom} pour augmenter son niveau d’AP à : ${confianceAp}/10. Les freins à la pratique de l’activité physique sont les suivants : ${freins}. Les leviers à la pratique sont les suivants : ${leviers}.</p>
+                    <p>${objectifsText}</p>
+                    <p>Une consultation Médicale d’AP ${getConsultationText(consultationAp)} Une épreuve d’effort ${getEpreuveEffortText(epreuveEffort)}</p>
+                    <p>Lui ont été remis ${ordonnance || 'rien'}.</p>
+                    <p>J’espère que cette consultation l’aidera à augmenter son niveau d’activité physique en toute sécurité pour en tirer des bénéfices perceptibles notamment à court et moyen terme. Je me tiens à votre disposition en cas de questions complémentaires.</p>
+                    <p>Bien confraternellement.</p>
+                `;
+                document.getElementById('reportText').innerHTML = reportText;
+                document.getElementById('reportOutput').classList.remove('hidden');
+                document.getElementById('reportOutput').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
             document.getElementById('printReport').addEventListener('click', function() {
                 window.print();
             });
@@ -443,57 +484,6 @@ toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
                     default: return '';
                 }
             }
-            function renderLongLetterV2(model) {
-
-  const p = model.patient;
-  const e = model.evaluation;
-  const m = model.motivation;
-  const t = model.therapeutic_plan;
-  const pr = model.prescription;
-
-  const salutations =
-    model.meta.destinataire === "consoeur" ? "Chère consœur," :
-    model.meta.destinataire === "confrere" ? "Cher confrère," :
-    "Madame, Monsieur,";
-
-  const titre = p.sexe === "femme" ? "Madame" : "Monsieur";
-  const pronom = p.sexe === "femme" ? "elle" : "il";
-  const pronomMaj = p.sexe === "femme" ? "Elle" : "Il";
-
-  return `
-    <p>${salutations}</p>
-
-    <p>Merci de m’avoir adressé ${titre} _____ en consultation éventuelle d’activité physique.</p>
-
-    <p><strong>Évaluation de l’activité physique :</strong><br>
-    Niveau actuel : ${e.niveau_retenu || "non précisé"}.
-    ${p.pas_moyens ? `Nombre de pas : environ ${p.pas_moyens} pas/jour.` : ""}
-    ${e.sedentarite ? `Statut : ${e.sedentarite}.` : ""}
-    </p>
-
-    <p><strong>Évaluation motivationnelle :</strong><br>
-    Stade : ${m.stade || "non précisé"}.
-    Importance : ${m.importance || "—"}/10.
-    Confiance : ${m.confiance || "—"}/10.
-    ${m.freins ? `Freins : ${m.freins}.` : ""}
-    ${m.leviers ? `Leviers : ${m.leviers}.` : ""}
-    </p>
-
-    <p><strong>Risque cardiovasculaire :</strong> ${e.rcv || "non précisé"}.</p>
-
-    <p><strong>Objectifs :</strong><br>
-    ${t.objectif_principal || ""}
-    </p>
-
-    <p><strong>Prescription :</strong><br>
-    ${pr.aerobie.frequence ? `Aérobie : ${pr.aerobie.frequence} fois/semaine.` : ""}
-    ${pr.renforcement.frequence ? `Renforcement : ${pr.renforcement.frequence} fois/semaine.` : ""}
-    ${pr.souplesse.frequence ? `Souplesse : ${pr.souplesse.frequence} fois/semaine.` : ""}
-    </p>
-
-    <p>Bien confraternellement.</p>
-  `;
-}
         });
     </script>
 </body>
