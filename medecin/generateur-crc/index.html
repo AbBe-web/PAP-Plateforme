@@ -359,11 +359,9 @@ toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
 
   };
 }
-            document.getElementById('generateReport').addEventListener('click', function() {
-               document.getElementById('generateReport').addEventListener('click', function() {
+        document.getElementById('generateReport').addEventListener('click', function() {
 
   const model = buildClinicalModel();
-
   const reportText = renderLongLetterV2(model);
 
   document.getElementById('reportText').innerHTML = reportText;
@@ -371,7 +369,6 @@ toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
   document.getElementById('reportOutput').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
 });
-            });
             document.getElementById('printReport').addEventListener('click', function() {
                 window.print();
             });
