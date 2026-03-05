@@ -77,16 +77,26 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 25px;
+
+  position: static;
+
+  background: white;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+
+  padding-top: 8px;
+  padding-bottom: 8px;
+
+  scroll-margin-top: 20px;
 }
 
 .tab-btn {
   flex: 1 1 calc(25% - 10px);
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid #ccc;
+border: 1px solid #d1d5db;
   background: #f5f5f5;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
   white-space: nowrap;
   font-size: 0.9rem;
@@ -105,7 +115,8 @@
 
 /* Hover PC */
 .tab-btn:hover {
-  background-color: #e9f2fb;
+  background-color: rgba(37, 99, 235, 0.08);
+  border-color: var(--primary-color);
   transform: translateY(-1px);
   box-shadow: 0 3px 8px rgba(0,0,0,0.08);
 }
@@ -116,9 +127,10 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 .tab-btn.active {
-  background: var(--primary-color, #0077cc);
+  background: var(--primary-color);
   color: white;
-  border-color: var(--primary-color, #0077cc);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
 }
 
 /* ===== Adaptation mobile ===== */
@@ -135,27 +147,33 @@
   margin-top: 20px;
   display: flex;
   gap: 10px;
+  justify-content: center;
 }
 
 #reportActions .btn {
-  flex: 1;
   min-height: 42px;
+  flex: 1;
+  max-width: 220px;
 }
     /* Animation douce du contenu */
 
 #outputContainer {
   transition: opacity 0.18s ease;
 }
-    #generateReport {
+ #generateReport {
   position: relative;
   z-index: 10;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
     #reportOutput.hidden {
-  visibility: hidden;
-  opacity: 0;
-  height: 0;
-  overflow: hidden;
+  display: none;
 }
 
 #reportOutput {
@@ -394,12 +412,12 @@
   <h2>11/ Date du courrier (facultatif, si laissée vide = aujourd'hui) :</h2>
   <input type="date" name="date_courrier">
 </div>
-         </form>
+        </form>
 
 <button type="button" id="generateReport" class="btn">
   Générer le compte-rendu
 </button>
-    
+
     <div id="reportOutput" class="hidden">
 
   <!-- Contenu rendu -->
@@ -416,7 +434,8 @@
   <!-- Actions -->
   <div id="reportActions">
     <button type="button" id="printReport" class="btn">Imprimer</button>
-    <button type="button" id="copyReport" class="btn">Copier</button>
+<button type="button" id="copyReport" class="btn">Copier</button>
+<button type="button" id="downloadPdf" class="btn hidden">Télécharger PDF</button>
   </div>
 
 </div>
@@ -424,7 +443,7 @@
     </div>
     <script>
         
-        document.addEventListener('DOMContentLoaded', function() {
+     
            function scrollIfNeeded(element) {
 
   if (!element) return;
@@ -444,8 +463,14 @@
 }, 90);
   }
 }
-            let clinicalModel = null;
+        let clinicalModel = null;
 let activeMode = "long";
+let savedScrollPosition = 0;
+let lastScrollY = 0;
+            window.addEventListener("scroll", function () {
+  lastScrollY = window.scrollY;
+});
+         
             document.querySelectorAll('input[name="niveau_actuel"]').forEach(function(radio) {
                 radio.addEventListener('change', function() {
                     if (this.value === 'actif') {
@@ -572,38 +597,66 @@ toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
 
   };
 }
-const generateBtn = document.getElementById('generateReport');
+document.addEventListener("DOMContentLoaded", function() {
+
+  const generateBtn = document.getElementById('generateReport');
+
+  if (generateBtn) {
+
+    generateBtn.addEventListener("touchend", function () {
+      const active = document.activeElement;
+
+      if (
+        active &&
+        (active.tagName === "INPUT" || active.tagName === "TEXTAREA")
+      ) {
+        active.blur();
+      }
+    });
+
+    generateBtn.addEventListener("click", handleGenerate);
+
+  }
+
+});
+            
 const form = document.getElementById('consultationForm');
+form.addEventListener("submit", function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}); 
 
 function handleGenerate(e) {
 
   e.preventDefault();
   e.stopPropagation();
 
-  // 🔹 Forcer la perte de focus (corrige bug iOS Safari)
-  if (document.activeElement) {
+    if (document.activeElement) {
     document.activeElement.blur();
   }
 
-  clinicalModel = buildClinicalModel();
-  activeMode = "long";
+  requestAnimationFrame(() => {
+    clinicalModel = buildClinicalModel();
+    activeMode = "long";
 
-  document.getElementById("formatTabs").classList.remove("hidden");
-  document.getElementById("reportOutput").classList.remove("hidden");
+    document.getElementById("formatTabs").classList.remove("hidden");
+    document.getElementById("reportOutput").classList.remove("hidden");
+    document.getElementById("generateReport").classList.add("hidden");
 
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.querySelector('.tab-btn[data-mode="long"]').classList.add("active");
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector('.tab-btn[data-mode="long"]').classList.add("active");
 
-  renderActiveMode();
+    renderActiveMode();
+
+  }, 40);
 }
-
-generateBtn.addEventListener('click', handleGenerate);
             
+           
             document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", function () {
 
     if (!clinicalModel) return;
-
+savedScrollPosition = window.scrollY;
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
 
     this.classList.add("active");
@@ -612,29 +665,109 @@ generateBtn.addEventListener('click', handleGenerate);
     renderActiveMode();
   });
 });
-              document.getElementById('printReport').addEventListener('click', function () {
+            document.getElementById('printReport').addEventListener('click', function (e) {
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  // 🔹 Sécurise Safari iOS
+  if (document.activeElement) {
+    document.activeElement.blur();
+  }
+
+  // 🔹 Désactive temporairement la transition (évite conflit iOS)
+  const container = document.getElementById("outputContainer");
+  const previousTransition = container.style.transition;
+  container.style.transition = "none";
+
   window.print();
+
+  // 🔹 Restaure la transition
+  container.style.transition = previousTransition;
+
 });
-           
-            document.getElementById('copyReport').addEventListener('click', function() {
-              const reportText = document.getElementById('outputContainer').innerText;
-                navigator.clipboard.writeText(reportText).then(function() {
-                    alert('Le compte-rendu a été copié dans le presse-papiers.');
-                }).catch(function(err) {
-                    console.error('Erreur lors de la copie du texte: ', err);
-                });
-            });
-            function getStadeMotivation() {
-                const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
-                if (niveauActuel === 'actif') {
-                    const actifDepuis = document.querySelector('input[name="actif_depuis"]:checked') ? document.querySelector('input[name="actif_depuis"]:checked').value : '';
-                    return actifDepuis === 'plus_6_mois' ? 'consolidation' : 'action';
-                } else if (niveauActuel === 'inactif') {
-                    const apEnvisagee = document.querySelector('input[name="ap_envisagee"]:checked') ? document.querySelector('input[name="ap_envisagee"]:checked').value : '';
-                    return apEnvisagee === 'oui' ? 'préparation' : 'intention';
-                }
-                return 'indétermination';
-            }
+           document.getElementById('downloadPdf').addEventListener('click', function (e) {
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (document.activeElement) {
+    document.activeElement.blur();
+  }
+
+  const container = document.getElementById("outputContainer");
+  const previousTransition = container.style.transition;
+  container.style.transition = "none";
+
+  window.print();
+
+  container.style.transition = previousTransition;
+
+});
+        document.getElementById('copyReport').addEventListener('click', function() {
+
+  const container = document.getElementById("outputContainer").cloneNode(true);
+
+  container.querySelectorAll("a").forEach(link => {
+  const replacement = link.innerText + " : " + link.href;
+    link.replaceWith(replacement);
+  });
+
+ const reportText = container.innerText
+  .replace(/\n+/g, " ")
+  .replace(/\s+/g, " ")
+  .trim();
+
+  navigator.clipboard.writeText(reportText).then(function() {
+    alert('Le compte-rendu a été copié dans le presse-papiers.');
+  }).catch(function(err) {
+    console.error('Erreur lors de la copie du texte: ', err);
+  });
+
+});
+            document.addEventListener("visibilitychange", function () {
+
+  if (document.visibilityState === "visible" && savedScrollPosition > 0) {
+    window.scrollTo({
+      top: savedScrollPosition,
+      behavior: "auto"
+    });
+  }
+
+});
+          function getStadeMotivation() {
+    const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
+    if (niveauActuel === 'actif') {
+        const actifDepuis = document.querySelector('input[name="actif_depuis"]:checked') ? document.querySelector('input[name="actif_depuis"]:checked').value : '';
+        return actifDepuis === 'plus_6_mois' ? 'consolidation' : 'action';
+    } else if (niveauActuel === 'inactif') {
+        const apEnvisagee = document.querySelector('input[name="ap_envisagee"]:checked') ? document.querySelector('input[name="ap_envisagee"]:checked').value : '';
+        return apEnvisagee === 'oui' ? 'préparation' : 'intention';
+    }
+    return 'indétermination';
+}
+
+function getStadeMotivationPatient(stade) {
+
+  switch (stade) {
+
+    case "intention":
+      return "vous envisagez de reprendre ou de débuter une activité physique";
+
+    case "préparation":
+      return "vous êtes en train de vous préparer à débuter une activité physique";
+
+    case "action":
+      return "vous avez commencé à pratiquer une activité physique récemment";
+
+    case "consolidation":
+      return "vous pratiquez déjà une activité physique de manière régulière";
+
+    default:
+      return "";
+  }
+
+}
             function getStadeMotivationText() {
                 const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
                 if (niveauActuel === 'actif') {
@@ -742,22 +875,29 @@ if (e.sedentarite === "non_recherche") {
 
   const m = model.motivation;
 
-  let phrase = "Sur le plan motivationnel, ";
+let phrase = "Sur le plan motivationnel, ";
 
-  if (m.stade && m.stade !== "indétermination") {
-    phrase += `la personne se situe dans un stade de ${m.stade}`;
-  } else {
-    phrase += "le stade motivationnel n’a pas pu être précisé";
-  }
+if (m.stade && m.stade !== "indétermination") {
+  phrase += `la personne se situe dans un stade de ${m.stade}`;
+} else {
+  phrase += "le stade motivationnel n’a pas pu être précisé";
+}
+
+let details = [];
 
 if (m.importance !== null && m.importance !== "") {
-    phrase += `, avec une importance accordée à l’activité physique évaluée à ${m.importance}/10`;
-  }
-if (m.confiance !== null && m.confiance !== "") {
-    phrase += ` et un niveau de confiance estimé à ${m.confiance}/10`;
-  }
+  details.push(`une importance accordée à l’activité physique évaluée à ${m.importance}/10`);
+}
 
-  phrase += ".";
+if (m.confiance !== null && m.confiance !== "") {
+  details.push(`un niveau de confiance estimé à ${m.confiance}/10`);
+}
+
+if (details.length > 0) {
+  phrase += ", avec " + details.join(" et ");
+}
+
+phrase += ".";
 
   if (m.freins) {
     phrase += ` Les principaux freins identifiés sont : ${m.freins}.`;
@@ -769,24 +909,60 @@ if (m.confiance !== null && m.confiance !== "") {
 
   return phrase;
 } 
+        function buildMotivationPatient(model) {
+
+  const m = model.motivation;
+
+  let phrase = "";
+
+  const stadePatient = getStadeMotivationPatient(m.stade);
+
+  if (stadePatient) {
+    phrase += `Concernant l’activité physique, actuellement ${stadePatient}. `;
+  }
+
+  let details = [];
+
+  if (m.importance !== null && m.importance !== "") {
+    details.push(`vous avez indiqué que l’activité physique est importante pour vous à ${m.importance}/10`);
+  }
+
+  if (m.confiance !== null && m.confiance !== "") {
+    details.push(`votre confiance pour réussir à augmenter votre activité physique est estimée à ${m.confiance}/10`);
+  }
+
+  if (details.length > 0) {
+    phrase += details.join(", ") + ". ";
+  }
+
+  if (m.freins) {
+    phrase += `Les difficultés que vous avez évoquées sont : ${m.freins}. `;
+  }
+
+  if (m.leviers) {
+    phrase += `Les points positifs sur lesquels vous pouvez vous appuyer sont : ${m.leviers}.`;
+  }
+
+  return phrase.trim();
+}
             function buildRCV(model) {
 
   const rcv = model.evaluation.rcv;
 
   if (!rcv) {
-    return "Le risque cardiovasculaire global n’a pas été précisé.";
+    return "Le risque cardiovasculaire global n’a pas été précisé. ";
   }
 
   if (rcv === "faible") {
-    return "Le risque cardiovasculaire global est évalué comme faible.";
+    return "Le risque cardiovasculaire global est évalué comme faible. ";
   }
 
   if (rcv === "modere") {
-    return "Le risque cardiovasculaire global est évalué comme modéré.";
+    return "Le risque cardiovasculaire global est évalué comme modéré. ";
   }
 
   if (rcv === "eleve_tres_eleve") {
-    return "Le risque cardiovasculaire global est évalué comme élevé à très élevé.";
+    return "Le risque cardiovasculaire global est évalué comme élevé à très élevé. ";
   }
 
 }
@@ -828,7 +1004,17 @@ if (pr.fiches_promotion === "oui") {
 
   return phrases.join(" ");
 }
-       
+       function cleanMedicalText(text) {
+
+  return text
+    .replace(/\s+/g, " ")        // supprime espaces multiples
+    .replace(/\s+\./g, ".")      // espace avant point
+    .replace(/\s+,/g, ",")       // espace avant virgule
+    .replace(/\s+:/g, " :")      // espace correct avant :
+    .replace(/\.\s*/g, ". ")     // garantit espace après point
+    .trim();
+
+}
       function renderLongLetterV2(model) {
 
   const p = model.patient;
@@ -953,15 +1139,7 @@ ${prescriptionBloc}</p>
     .replace("Son niveau d’activité physique est actuellement", "Votre niveau d’activité physique est actuellement")
     .replace("au regard des recommandations actuelles", "par rapport aux recommandations de santé");
 
-  const motivationBloc = buildMotivation(model)
-    .replace("Sur le plan motivationnel,", "")
-    .replace("la personne se situe dans un stade de", "")
-    .replace("Les principaux freins identifiés sont :", "Les difficultés que vous avez évoquées sont :")
-    .replace("Les leviers mobilisables sont :", "Les points positifs sur lesquels vous pouvez vous appuyer sont :");
-
-  const stade = model.motivation.stade && model.motivation.stade !== "indétermination"
-    ? `Sur le plan de la motivation à pratiquer de l’activité physique, vous êtes actuellement dans une phase de ${model.motivation.stade}.`
-    : "";
+ const motivationBloc = buildMotivationPatient(model);
 
   const rcvBloc = buildRCV(model)
     .replace("Le risque cardiovasculaire global est évalué comme", "Votre risque cardiovasculaire est considéré comme")
@@ -1000,7 +1178,6 @@ ${evaluationBloc}
 </p>
 
 <p>
-${stade}
 ${motivationBloc}
 </p>
 
@@ -1025,21 +1202,42 @@ ${progressiviteMessage}
 
 <p>
 En cas de difficulté ou de question, n’hésitez pas à reprendre contact avec votre médecin.
-Il vous ai conseillé de consulter les recommandations des cardiologues du sport avant chaque séance d’exercices :
+Vous pouvez également consulter les recommandations des cardiologues du sport avant chaque séance d’exercices :
 <a href="https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf" target="_blank">
 Les 10 règles d’or du Club des Cardiologues du Sport
 </a>.
 </p>
+
+<div style="margin-top:20px; text-align:center;">
+  <p><strong>Accès rapide :</strong></p>
+
+  <a href="https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf"
+     target="_blank"
+     rel="noopener noreferrer">
+
+    <img 
+      src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf"
+      alt="QR code - Règles d’or cardiologie du sport"
+      width="180"
+      height="180"
+      loading="lazy"
+      style="cursor:pointer;"
+    >
+
+  </a>
+</div>
 `;
 }
            function renderActiveMode() {
 
   if (!clinicalModel) return;
-
+savedScrollPosition = window.scrollY;
   const container = document.getElementById("outputContainer");
 
   let html = "";
-
+               
+const pdfBtn = document.getElementById("downloadPdf");
+               
   switch (activeMode) {
     case "long":
       html = renderLongLetterV2(clinicalModel);
@@ -1058,21 +1256,28 @@ Les 10 règles d’or du Club des Cardiologues du Sport
   }
 
   container.classList.add("fade-out");
-
+               
+// Affiche bouton PDF uniquement en mode patient
+if (activeMode === "patient") {
+  pdfBtn.classList.remove("hidden");
+} else {
+  pdfBtn.classList.add("hidden");
+}
  container.style.opacity = "0";
 container.innerHTML = html;
 container.style.opacity = "1";
 
   container.classList.remove("fade-out");
   container.classList.add("fade-in");
+               
+document.getElementById("formatTabs").scrollIntoView({
+  behavior: "smooth",
+  block: "start"
+});
 
-  document.getElementById("reportOutput").scrollIntoView({
-    behavior: "auto",
-    block: "start"
-  });
-}
-          });
-    </script>
+}          
+               </script>
+    
     <div id="identityModal" class="modal hidden">
   <div class="modal-content">
     <h3>Identification (facultatif)</h3>
