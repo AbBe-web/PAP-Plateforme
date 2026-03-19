@@ -498,6 +498,67 @@ function finishMarshall(q2){
   state.result.marshall_score=score;
   stepsQuestion();
 }
+function stepsQuestion(){
+
+pushScreen(
+  state.tool === "marshall"
+    ? "MAR-STEPS"
+    : "GPAQ-STEPS"
+);
+
+render(`
+<h2>Activité quotidienne (facultatif)</h2>
+
+<p>
+Si vous suivez votre nombre de pas, indiquez votre moyenne sur le dernier mois.
+</p>
+
+<input type="number"
+min="0"
+placeholder="Ex. : 6500"
+value="${state.result.pas_mois ?? ""}"
+oninput="state.result.pas_mois=this.value">
+
+${state.tool === "marshall" ? `
+
+<div class="section">
+
+<h2>Sédentarité (facultatif)</h2>
+
+<p>
+Combien de temps passez-vous assis ou couché par jour (hors sommeil) lors d'une journée habituelle ?
+</p>
+
+<div class="time-row">
+
+<input type="number"
+id="hSed"
+min="0"
+max="23"
+placeholder="Heures"
+value="${state.marshall?.sed_h ?? ""}"
+oninput="state.marshall.sed_h=this.value">
+
+<input type="number"
+id="mSed"
+min="0"
+max="59"
+placeholder="Minutes"
+value="${state.marshall?.sed_m ?? ""}"
+oninput="state.marshall.sed_m=this.value">
+
+</div>
+
+</div>
+
+` : ""}
+
+<button class="btn" onclick="motivation()">Continuer</button>
+<button class="btn secondary" onclick="back()">Retour</button>
+
+`,94);
+
+}
 
 /*************************************************
  * GPAQ — FLUX COMPLET
@@ -794,12 +855,6 @@ function finishGPAQ(){
   stepsQuestion();
 }
   
-function stepsQuestion(){
- pushScreen(
-  state.tool === "marshall"
-    ? "MAR-STEPS"
-    : "GPAQ-STEPS"
-);
 render(`
 <h2>Activité quotidienne (facultatif)</h2>
 
@@ -810,10 +865,42 @@ Si vous suivez votre nombre de pas, indiquez votre moyenne sur le dernier mois.
 <input type="number" min="0" placeholder="Ex. : 6500"
 oninput="state.result.pas_mois=this.value">
 
+${state.tool === "marshall" ? `
+
+<div class="section">
+
+<p>
+Combien de temps passez-vous assis ou couché par jour (hors sommeil) lors d'une journée habituelle ?
+</p>
+
+<div class="time-row">
+
+<input type="number"
+id="hSed"
+min="0"
+max="23"
+placeholder="Heures"
+value="${state.marshall?.sed_h ?? ""}"
+oninput="state.marshall.sed_h=this.value">
+
+<input type="number"
+id="mSed"
+min="0"
+max="59"
+placeholder="Minutes"
+value="${state.marshall?.sed_m ?? ""}"
+oninput="state.marshall.sed_m=this.value">
+
+</div>
+
+</div>
+
+` : ""}
+
 <button class="btn" onclick="motivation()">Continuer</button>
 <button class="btn secondary" onclick="back()">Retour</button>
+
 `, 94);
-}
 
 /*************************************************
  * MOTIVATION + EVA
@@ -848,13 +935,17 @@ function motivation(){
       <h2>Motivation</h2>
       <p>Envisagez-vous d’augmenter votre activité physique dans les 30 jours ?</p>
 
-      <button class="btn" onclick="
-        advanceProgress(2);
-        state.result.stade='préparation';
-        evaImportance();
-      ">Oui</button>
+     <button class="btn" onclick="
+     advanceProgress(2);
+     state.result.ap_envisagee='oui';
+     state.result.stade='préparation';
+     evaImportance();
+     ">Oui</button>
 
-      <button class="btn" onclick="motivation2()">Non</button>
+    <button class="btn" onclick="
+    state.result.ap_envisagee='non';
+    motivation2();
+    ">Non</button>
 
       <button class="btn secondary" onclick="back()">Retour</button>
 
@@ -870,17 +961,19 @@ function motivation(){
       <h2>Motivation</h2>
       <p>Êtes-vous actif à ce niveau depuis plus de 6 mois ?</p>
 
-      <button class="btn" onclick="
-        advanceProgress(2);
-        state.result.stade='consolidation';
-        evaImportance();
-      ">Oui</button>
+   <button class="btn" onclick="
+   advanceProgress(2);
+   state.result.actif_depuis='oui';
+   state.result.stade='consolidation';
+   evaImportance();
+  ">Oui</button>
 
-      <button class="btn" onclick="
-        advanceProgress(2);
-        state.result.stade='action';
-        evaImportance();
-      ">Non</button>
+  <button class="btn" onclick="
+  advanceProgress(2);
+  state.result.actif_depuis='non';
+  state.result.stade='action';
+  evaImportance();
+  ">Non</button>
 
       <button class="btn secondary" onclick="back()">Retour</button>
 
@@ -900,8 +993,19 @@ pushScreen(
   render(`
 <h2>Motivation</h2>
 <p>Avez-vous l’intention de vous engager dans une activité physique régulière dans les 6 mois ?</p>
-<button class="btn" onclick="advanceProgress(2); state.result.stade='intention'; evaImportance()">Oui</button>
-<button class="btn" onclick="advanceProgress(2); state.result.stade='indétermination'; evaImportance()">Non</button>
+<button class="btn" onclick="
+advanceProgress(2);
+state.result.ap_6_mois='oui';
+state.result.stade='intention';
+evaImportance();
+">Oui</button>
+
+<button class="btn" onclick="
+advanceProgress(2);
+state.result.ap_6_mois='non';
+state.result.stade='indétermination';
+evaImportance();
+">Non</button>
 <button class="btn secondary" onclick="back()">Retour</button>
 <div class="back-info">Les réponses déjà saisies sont conservées pour le calcul final.</div>
 `,96);
@@ -1015,16 +1119,23 @@ Vous allez maintenant voir un résumé à apporter à votre consultation.
 
 function buildExportJSON(){
   return {
-    meta: {
-      outil: "preconsultation-activite-physique",
-      version: "v0.x",
-      date: new Date().toISOString(),
-      questionnaires: state.tool === "gpaq" ? "GPAQ" : "Marshall",
-      donnees_enregistrees: false
-    },
+   meta: {
+  outil: "preconsultation-activite-physique",
+  format_version: "1.0",
+  date: new Date().toISOString(),
+  questionnaire: state.tool === "gpaq" ? "GPAQ" : "Marshall",
+  donnees_enregistrees: false
+},
 
     questionnaires: {
-      marshall: state.marshall,
+      marshall: {
+        q1: state.marshall.q1 ?? null,
+        q2: state.marshall.q2 ?? null,
+        sedentarite: {
+          heures_par_jour: state.marshall.sed_h ?? null,
+          minutes_par_jour: state.marshall.sed_m ?? null
+     }
+    },
 
       gpaq: {
         travail: {
@@ -1077,8 +1188,11 @@ function buildExportJSON(){
   pas_moyens_jour_1_mois: state.result.pas_mois ?? null
 },
 
-    motivation: {
+motivation: {
       stade: state.result.stade ?? null,
+      actif_depuis: state.result.actif_depuis ?? null,
+      ap_envisagee: state.result.ap_envisagee ?? null,
+      ap_6_mois: state.result.ap_6_mois ?? null,
       importance_eva_0_10: state.result.importance ?? null,
       importance_commentaire: state.result.importance_comment ?? null,
       confiance_eva_0_10: state.result.confiance ?? null,
@@ -1101,90 +1215,15 @@ function freezeExportJSON() {
 }
 
 function openPrintable() {
-  const frozen = freezeExportJSON();
-
-  const json = encodeURIComponent(
-    JSON.stringify(frozen)
-  );
+  freezeExportJSON();
 
   window.open(
-    "print.html?data=" + json,
+    "print.html",
     "_blank"
   );
 }
 
-
-// 🔐 Copie de secours (utilisée si partage / mail échoue)
-// 🔐 Copie de secours (utilisée si partage / mail échoue)
-function copyFallback(text) {
-  if (!navigator.clipboard || !navigator.clipboard.writeText) {
-    console.warn("Clipboard indisponible");
-    return;
-  }
-
-  navigator.clipboard.writeText(text)
-    .catch(() => {
-      console.warn("Copie de secours impossible");
-    });
-}
-
-function shareToDoctor() {
-  const frozen = freezeExportJSON();
-
-  if (!frozen) {
-    alert("Données indisponibles.");
-    return;
-  }
-
-  const mailTitle = "Auto-évaluation de l’activité physique – consultation médicale";
-
-  const dataBlock =
-`--- DÉBUT DES DONNÉES ---
-${JSON.stringify(frozen, null, 2)}
---- FIN DES DONNÉES ---`;
-
-  const mailBody =
-`Bonjour,
-
-Vous trouverez ci-dessous les informations issues de mon questionnaire
-d’auto-évaluation de l’activité physique, rempli en amont de la consultation.
-
-Ces données peuvent être copiées et intégrées dans votre compte-rendu médical.
-
-${dataBlock}`;
-
-  const subject = encodeURIComponent(mailTitle);
-  const body = encodeURIComponent(mailBody);
-
-  /* 📱 Mobile → partage natif */
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  if (isMobile && navigator.share) {
-    navigator.share({
-      title: mailTitle,
-      text: mailTitle + "\n\n" + mailBody
-    }).catch(() => {
-      copyFallback(mailTitle + "\n\n" + mailBody);
-    });
-    return;
-  }
-
-  /* 🖥️ PC → client mail par défaut (Outlook / Exchange) */
-  window.location.href = `mailto:?subject=${subject}&body=${body}`;
-
-/* Aide explicite pour les webmails */
-setTimeout(() => {
-  alert(
-    "Si aucun nouveau message ne s’est ouvert automatiquement, " +
-    "les données ont été copiées.\n\n" +
-    "Vous pouvez les coller manuellement dans un email à destination de votre médecin."
-  );
-}, 500);
-
-/* Copie systématique de secours */
-copyFallback(mailTitle + "\n\n" + mailBody);
-}
-  
+ 
 function final(){
 
   state.exportJSON = buildExportJSON();
@@ -1218,15 +1257,23 @@ ${state.result.pas_mois ? `
   <div class="answer">${state.result.pas_mois} pas / jour</div>
 </div>
 ` : ""}
-${(state.gpaq?.sed_h && state.gpaq.sed_h !== "0") || 
-(state.gpaq?.sed_m && state.gpaq.sed_m !== "0") ? `
+${(() => {
+
+const sedH = state.gpaq?.sed_h ?? state.marshall?.sed_h;
+const sedM = state.gpaq?.sed_m ?? state.marshall?.sed_m;
+
+if(!sedH && !sedM) return "";
+
+return `
 <div class="section">
-  <strong>Temps passé assis (hors sommeil)</strong>
-  <div class="answer">
-    ${state.gpaq.sed_h ?? 0} h ${state.gpaq.sed_m ?? 0} min / jour
-  </div>
+<strong>Temps passé assis (hors sommeil)</strong>
+<div class="answer">
+${sedH ? sedH + " h " : ""}${sedM ? sedM + " min" : ""}
 </div>
-` : ""}
+</div>
+`;
+
+})()}
 
 <div class="section">
   <strong>Stade motivationnel</strong>
@@ -1280,7 +1327,7 @@ if (
 
 state.exportJSON = parsed;
       
-state.tool = parsed.meta.questionnaires === "GPAQ"
+state.tool = parsed.meta.questionnaire === "GPAQ"
   ? "gpaq"
   : "marshall";
 
