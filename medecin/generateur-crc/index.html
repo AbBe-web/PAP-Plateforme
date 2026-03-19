@@ -41,78 +41,89 @@
   justify-content: space-between;
   margin-top: 10px;
 }
+    
+/* =========================
+   Réponses patient importées
+========================= */
 
-@media print {
-  body {
-    margin: 0;
-  }
-
-  .container.crc-page > * {
-    display: none;
-  }
-
-  #reportOutput {
-    display: block !important;
-  }
-
-  #outputContainer {
-    display: block;
-    width: 100%;
-    margin: 0;
-  }
-
-  #reportActions,
-  #formatTabs {
-    display: none !important;
-  }
-}
-    @page {
-  margin: 15mm;
+.patient-comment-block{
+  margin-top:6px;
+  padding:8px;
+  background:#f7f7f7;
+  border-left:3px solid #d1d5db;
+  font-size:0.85rem;
 }
 
-/* ===== Onglets séparés et responsive ===== */
+.patient-comment-label{
+  color:#666;
+  font-size:0.75rem;
+  margin-bottom:4px;
+}
 
+.patient-comment-text{
+  width:100%;
+  resize:vertical;
+  font-size:0.85rem;
+  background:#fafafa;
+}
+
+.patient-copy-btn{
+  margin-top:4px;
+  font-size:0.75rem;
+  padding:2px 6px;
+  border:1px solid #ccc;
+  background:#f3f3f3;
+  cursor:pointer;
+}
+
+.patient-copy-btn:hover{
+  background:#e9e9e9;
+}
+    
 .format-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 25px;
 
-  position: static;
-
-  background: white;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
-
-  padding-top: 8px;
-  padding-bottom: 8px;
-
-  scroll-margin-top: 20px;
+  width: 100%;
 }
+    
+@media (min-width: 769px) {
+
+  .tab-btn {
+    flex: 1 1 0;
+  }
+
+}
+    
+ /* ===== Onglets (comme version stable NON DEV) ===== */
 
 .tab-btn {
   flex: 1 1 calc(25% - 10px);
   padding: 10px 12px;
   border-radius: 8px;
-border: 1px solid #d1d5db;
+  border: 1px solid #d1d5db;
+
   background: #f5f5f5;
   cursor: pointer;
+
   font-weight: 600;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
   font-size: 0.9rem;
   min-height: 42px;
 
-  -webkit-tap-highlight-color: transparent; /* suppression flash iOS */
-}
-/* ===== Animations boutons onglets ===== */
-
-.tab-btn {
-  transition: 
-    background-color 0.2s ease,
-    transform 0.08s ease,
-    box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* état actif */
+.tab-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}   
+    
 /* Hover PC */
 .tab-btn:hover {
   background-color: rgba(37, 99, 235, 0.08);
@@ -136,11 +147,13 @@ border: 1px solid #d1d5db;
 /* ===== Adaptation mobile ===== */
 
 @media (max-width: 768px) {
+
   .tab-btn {
     flex: 1 1 calc(50% - 10px);
   }
-}
 
+}
+    
 /* ===== Boutons d'action ===== */
 
 #reportActions {
@@ -179,7 +192,12 @@ button {
 #reportOutput {
   transition: opacity 0.2s ease;
 }
+.hidden{
+  display:none;
+}
+    
 </style>
+    <script src="https://unpkg.com/html5-qrcode"></script>
  </head>
 <body>
 <div class="container crc-page">
@@ -189,10 +207,31 @@ button {
             <a href="https://abbe-web.github.io/Compte-Rendu-Consultation-PAP/politique-confidentialite.html" target="_blank" rel="noopener noreferrer">Consulter la politique de confidentialité</a> |
             <a href="https://www.cnil.fr/fr/les-droits-pour-maitriser-vos-donnees-personnelles" target="_blank" rel="noopener noreferrer">Vos droits (CNIL)</a>
         </div>
-     <h1>Générateur de compte-rendu – Consultation d’activité physique</h1>
+    <h1>Générateur de compte-rendu – Consultation d’activité physique</h1>
 
-        <p>Veuillez renseigner les différents items ci-dessous pour générer le compte-rendu. Vous pouvez vous aider du « Guide Prescription Activité Physique et Lutte contre la Sédentarité (« Adulte » >15 ans) »</p>
-        <form id="consultationForm">
+<p>
+Vous pouvez importer les données issues du questionnaire d’auto-évaluation
+rempli par le patient afin de préremplir certains champs du formulaire.
+</p>
+
+<button type="button" id="scanQRBtn" class="btn">
+Scanner QR patient
+</button>
+
+<button type="button" id="importJSONBtn" class="btn">
+Importer fichier JSON
+</button>
+
+<input type="file" id="importJSONFile" accept=".json" style="display:none;">
+<div id="qrScannerContainer" style="display:none;margin-top:15px;">
+  <div id="qr-reader" style="width:300px;"></div>
+  <button type="button" id="closeQRScanner" class="btn">Fermer scanner</button>
+</div>
+    
+<p>Veuillez ensuite vérifier et compléter les informations avant de générer le compte-rendu.</p>
+
+<form id="consultationForm">
+    
             <div class="form-group">
                 <h2>1/ La personne adressée est dans une des situations suivantes (page 3) :</h2>
                 <label><input type="radio" name="situation" value="symptomes"> Elle a des symptômes de maladie CV, respiratoire, métabolique et rénale décompensée</label>
@@ -203,24 +242,76 @@ button {
             <div class="form-group">
                 <h2>2/ Évaluation de l’Activité Physique (niveau actuel et visé, motivation)</h2>
                 <div class="sub-group">
-                   <h3>Niveau actuel (mesuré par <label><input type="radio" name="questionnaire" value="GPAQ"> GPAQ</label>, <label><input type="radio" name="questionnaire" value="Marshall"> Marshall</label>) :</h3>
-                    <div style="display: flex; align-items: center;">
-                        <div style="margin-right: 20px;">
-                            <label><input type="radio" name="niveau_actuel" value="actif"> Actif</label>
-                            <div id="actif-subgroup" class="hidden">
-                                <label><input type="radio" name="actif_depuis" value="plus_6_mois"> Oui, depuis plus de 6 mois</label>
-                                <label><input type="radio" name="actif_depuis" value="moins_6_mois"> Non, depuis moins de 6 mois</label>
-                            </div>
-                        </div>
-                        <div>
-                            <label><input type="radio" name="niveau_actuel" value="inactif"> Inactif</label>
-                            <div id="inactif-subgroup" class="hidden">
-                                <label><input type="radio" name="ap_envisagee" value="oui"> AP envisagée dans les 30 jours</label>
-                                <label><input type="radio" name="ap_envisagee" value="non"> Pas d’AP envisagée dans les 30 jours</label>
-                            </div>
-                        </div>
-                    </div>
-                   <div>
+<h3 id="niveau-actuel-title">Niveau actuel (mesuré par 
+<label><input type="radio" name="questionnaire" value="GPAQ"> GPAQ</label>, 
+<label><input type="radio" name="questionnaire" value="Marshall"> Marshall</label>) :
+</h3>
+
+<div style="display: flex; align-items: center; gap:25px;">
+
+<label>
+<input id="niveau_tres_actif" type="radio" name="niveau_actuel" value="tres_actif"> Très actif
+</label>
+
+<label>
+<input id="niveau_actif" type="radio" name="niveau_actuel" value="actif"> Actif
+</label>
+
+<label>
+<input id="niveau_moyen" type="radio" name="niveau_actuel" value="moyennement_actif"> Moyennement actif
+</label>
+
+<label>
+<input id="niveau_inactif" type="radio" name="niveau_actuel" value="inactif"> Insuffisamment actif
+</label>
+
+</div>
+
+
+<div id="actif-subgroup" class="hidden" style="display:none;">
+
+<label>
+<input type="radio" name="actif_depuis" value="plus_6_mois">
+Oui, depuis plus de 6 mois
+</label>
+
+<label>
+<input type="radio" name="actif_depuis" value="moins_6_mois">
+Non, depuis moins de 6 mois
+</label>
+
+</div>
+
+
+<div id="inactif-subgroup" class="hidden" style="display:none;">
+
+<label>
+<input type="radio" name="ap_envisagee" value="oui">
+AP envisagée dans les 30 jours
+</label>
+
+<label>
+<input type="radio" name="ap_envisagee" value="non">
+Pas d’AP envisagée dans les 30 jours
+</label>
+
+</div>
+
+<div id="sixmois-subgroup" class="hidden" style="display:none;">
+
+<label>
+<input type="radio" name="ap_6_mois" value="oui">
+AP envisagée dans les 6 mois
+</label>
+
+<label>
+<input type="radio" name="ap_6_mois" value="non">
+Pas d’AP envisagée dans les 6 mois
+</label>
+
+</div>
+
+<div>
     <label>
         <input type="radio" name="sedentaire" value="sedentaire">
         Sédentaire
@@ -272,15 +363,63 @@ button {
         <h3 class="black-text">La personne présente les <u>leviers</u> suivants :</h3>
         <textarea name="leviers"></textarea>
     </div>
-    <div class="sub-group">
-        <h3 class="black-text">Importance accordée à l’AP de 0 à 10 :</h3>
-        <input type="number" name="importance_ap" min="0" max="10">
-    </div>
-    <div class="sub-group">
-        <h3 class="black-text">Confiance en soi pour réussir à augmenter son niveau d’AP de 0 à 10 :</h3>
-        <input type="number" name="confiance_ap" min="0" max="10">
-    </div>
+   <div class="sub-group">
+
+<h3 class="black-text">Importance accordée à l’AP de 0 à 10 :</h3>
+
+<input type="number" name="importance_ap" min="0" max="10">
+
+<div id="importance_patient_block" class="patient-comment-block" style="display:none;">
+
+  <div class="patient-comment-label">
+  🛈 Réponse du patient (questionnaire)
+  </div>
+
+  <textarea
+  id="importance_patient_comment"
+  class="patient-comment-text"
+  readonly></textarea>
+
+  <button
+  type="button"
+  class="patient-copy-btn"
+  onclick="copyPatientComment('importance_patient_comment')">
+  copier
+  </button>
+
 </div>
+
+</div>
+
+
+<div class="sub-group">
+
+<h3 class="black-text">Confiance en soi pour réussir à augmenter son niveau d’AP de 0 à 10 :</h3>
+
+<input type="number" name="confiance_ap" min="0" max="10">
+
+<div id="confiance_patient_block" class="patient-comment-block" style="display:none;">
+
+  <div class="patient-comment-label">
+  🛈 Réponse du patient (questionnaire)
+  </div>
+
+  <textarea
+  id="confiance_patient_comment"
+  class="patient-comment-text"
+  readonly></textarea>
+
+  <button
+  type="button"
+  class="patient-copy-btn"
+  onclick="copyPatientComment('confiance_patient_comment')">
+  copier
+  </button>
+
+</div>
+
+</div>
+
 
 <div class="form-group">
     <h2>5/ Une consultation Médicale d’AP est préconisée :</h2>
@@ -413,23 +552,23 @@ button {
   <input type="date" name="date_courrier">
 </div>
         </form>
-
+    
 <button type="button" id="generateReport" class="btn">
   Générer le compte-rendu
 </button>
-
+    
     <div id="reportOutput" class="hidden">
 
   <!-- Contenu rendu -->
   <div id="outputContainer"></div>
 
-  <!-- Onglets de format -->
-  <div id="formatTabs" class="format-tabs hidden">
-    <button type="button" class="tab-btn active" data-mode="long">Courrier complet</button>
-    <button type="button" class="tab-btn" data-mode="paragraph">Paragraphe</button>
-    <button type="button" class="tab-btn" data-mode="medical">Dossier médical</button>
-    <button type="button" class="tab-btn" data-mode="patient">Version patient</button>
-  </div>
+<!-- Onglets de format -->
+<div id="formatTabs" class="format-tabs hidden">
+<button type="button" class="tab-btn active" data-mode="long">Courrier complet</button>
+<button type="button" class="tab-btn" data-mode="paragraph">Paragraphe</button>
+<button type="button" class="tab-btn" data-mode="medical">Dossier médical</button>
+<button type="button" class="tab-btn" data-mode="patient">Version patient</button>
+</div>
 
   <!-- Actions -->
   <div id="reportActions">
@@ -448,7 +587,7 @@ button {
 
   if (!element) return;
 
-  if (window.innerWidth <= 768) {
+if (window.matchMedia("(max-width: 768px)").matches) {
 
     setTimeout(() => {
 
@@ -465,33 +604,418 @@ button {
 }
         let clinicalModel = null;
 let activeMode = "long";
+        
+      function importPatientJSON(jsonText) {
+          isImporting = true;
+      console.log("IMPORT JSON APPELE");
+      console.log("JSON reçu :", jsonText);
+      let data;
+
+ let questionnaire;
+let niveau;
+let pas;
+let sedentarite;
+
+let actifDepuis;
+let apEnvisagee;
+let ap6Mois;
+
+let importance;
+let confiance;
+let importanceComment;
+let confianceComment;
+
+  try {
+
+    data = JSON.parse(jsonText);
+    console.log("JSON importé :", data);
+      
+    questionnaire = data.q ?? data.questionnaire;
+   niveau =
+ data.n ??
+ data.niveau ??
+ data.resultats?.niveau_activite ??
+ null;
+
+// normalisation niveau JSON → formulaire
+if (niveau === "suffisamment_actif") niveau = "actif";
+if (niveau === "insuffisamment_actif") niveau = "inactif";
+    pas = data.p ?? data.pas;
+   sedentarite =
+     data.sd ??
+     data.sedentarite ??
+     data.questionnaires?.gpaq?.sedentarite?.heures_par_jour ??
+     data.questionnaires?.marshall?.sedentarite?.heures_par_jour ??
+     null;
+   actifDepuis = data.ad ?? data.motivation?.actif_depuis ?? null;
+
+if (actifDepuis === "oui") actifDepuis = "plus_6_mois";
+if (actifDepuis === "non") actifDepuis = "moins_6_mois";
+      apEnvisagee = data.ae ?? data.motivation?.ap_envisagee ?? null;
+      ap6Mois = data.a6 ?? data.motivation?.ap_6_mois ?? null;
+    importance = data.i ?? data.importance;
+    confiance = data.c ?? data.confiance;
+    importanceComment = data.ci ?? data.importance_commentaire;
+    confianceComment = data.cc ?? data.confiance_commentaire;
+
+  } catch (e) {
+    alert("JSON invalide");
+    return;
+      }
+          
+    console.log("niveau QR importé :", niveau);       
+    console.log("motivation import :", actifDepuis, apEnvisagee, ap6Mois);
+          
+        if (questionnaire) {
+
+  const radio = document.querySelector(`input[name="questionnaire"][value="${questionnaire}"]`);
+
+  if (radio) {
+    radio.checked = true;
+    radio.dispatchEvent(new Event("change"));
+  }
+
+}
+if (niveau) {
+
+  const radios = document.querySelectorAll('input[name="niveau_actuel"]');
+
+  radios.forEach(r => {
+    if (r.value === niveau) {
+      r.checked = true;
+      r.dispatchEvent(new Event("change", { bubbles: true }));
+    } else {
+      r.checked = false;
+    }
+  });
+// forcer affichage complet avant motivation
+setTimeout(() => {
+  appliquerMotivation(actifDepuis, apEnvisagee, ap6Mois);
+}, 50);
+}
+  
+ if (pas !== undefined && pas !== null) {
+  const pasInput = document.querySelector('input[name="nombre_pas"]');
+  if (pasInput) pasInput.value = pas;
+}
+          
+if (sedentarite !== undefined && sedentarite !== null) {
+
+  let heures = 0;
+
+  if (typeof sedentarite === "string" && sedentarite.includes(":")) {
+    const parts = sedentarite.split(":");
+    heures = parseInt(parts[0]);
+  } else {
+    heures = parseInt(sedentarite);
+  }
+
+  const heuresInput = document.querySelector('input[name="heures_assises"]');
+  if (heuresInput) heuresInput.value = heures;
+
+  const sedRadio =
+    heures >= 7
+      ? document.querySelector('input[name="sedentaire"][value="sedentaire"]')
+      : document.querySelector('input[name="sedentaire"][value="non_sedentaire"]');
+
+  if (sedRadio) {
+    sedRadio.checked = true;
+    sedRadio.dispatchEvent(new Event("change"));
+  }
+}
+          
+if (importance !== undefined && importance !== null) {
+  const imp = document.querySelector('input[name="importance_ap"]');
+  if (imp) imp.value = importance;
+}
+            
+const impBlock = document.getElementById("importance_patient_block");
+const impField = document.getElementById("importance_patient_comment");
+
+if (impBlock && impField) {
+
+  if (importanceComment) {
+
+    impField.value = importanceComment;
+    impBlock.style.display = "block";
+
+  } else {
+
+    impField.value = "Commentaire éventuellement non transmis via QR code (trop long).\nConsultez le fichier JSON ou interrogez le patient.";
+    impBlock.style.display = "block";
+
+  }
+
+}
+ if (confiance !== undefined && confiance !== null) {
+  const conf = document.querySelector('input[name="confiance_ap"]');
+  if (conf) conf.value = confiance;
+}
+const confBlock = document.getElementById("confiance_patient_block");
+const confField = document.getElementById("confiance_patient_comment");
+
+if (confBlock && confField) {
+
+  if (confianceComment) {
+
+    confField.value = confianceComment;
+    confBlock.style.display = "block";
+
+  } else {
+
+    confField.value = "Commentaire éventuellement non transmis via QR code (trop long).\nConsultez le fichier JSON ou interrogez le patient.";
+    confBlock.style.display = "block";
+
+  }
+
+}
+setTimeout(() => {
+  isImporting = false;
+}, 100); }
+
+function appliquerMotivation(actifDepuis, apEnvisagee, ap6Mois){
+
+  console.log("Application motivation après affichage UI");
+
+  // 🔒 GARDE-FOU
+  if (!document.querySelector('input[name="niveau_actuel"]:checked')) {
+    return;
+  }
+
+  if (actifDepuis) {
+
+  const r = document.querySelector(
+    `input[name="actif_depuis"][value="${actifDepuis}"]`
+  );
+
+if (r) {
+
+  r.click();
+
+  setTimeout(() => {
+    
+    const block = document.getElementById("actif-subgroup");
+  
+  }, 100);
+
+}
+
+}
+
+if (apEnvisagee) {
+
+  const r = document.querySelector(
+    `input[name="ap_envisagee"][value="${apEnvisagee}"]`
+  );
+
+  if (r) {
+
+    r.click();
+
+    // 🔥 gestion spécifique du cas "non" → affichage bloc 6 mois
+    if (apEnvisagee === "non" && ap6Mois) {
+
+      setTimeout(() => {
+
+        const r6 = document.querySelector(
+          `input[name="ap_6_mois"][value="${ap6Mois}"]`
+        );
+
+        if (r6) {
+          r6.click();
+        }
+
+      }, 80);
+    }
+  }
+}
+}
+        
+        function updateNiveauButtons(mode){
+
+const tres = document.getElementById("niveau_tres_actif").parentElement;
+const actif = document.getElementById("niveau_actif").parentElement;
+const moyen = document.getElementById("niveau_moyen").parentElement;
+const inactif = document.getElementById("niveau_inactif").parentElement;
+            
+  if(mode === "clinique"){
+
+    tres.style.display = "";
+    actif.style.display = "";
+    moyen.style.display = "none";
+    inactif.style.display = "";
+
+  }
+
+  if(mode === "gpaq"){
+
+    tres.style.display = "";
+    actif.style.display = "none";
+    moyen.style.display = "";
+    inactif.style.display = "";
+
+  }
+
+  if(mode === "marshall"){
+
+    tres.style.display = "none";
+    actif.style.display = "";
+    moyen.style.display = "none";
+    inactif.style.display = "";
+
+  }
+
+}
+        
 let savedScrollPosition = 0;
 let lastScrollY = 0;
-            window.addEventListener("scroll", function () {
+window.addEventListener("scroll", function () {
   lastScrollY = window.scrollY;
 });
-         
-            document.querySelectorAll('input[name="niveau_actuel"]').forEach(function(radio) {
-                radio.addEventListener('change', function() {
-                    if (this.value === 'actif') {
-  const actifBlock = document.getElementById('actif-subgroup');
-  actifBlock.classList.remove('hidden');
-  document.getElementById('inactif-subgroup').classList.add('hidden');
+window.addEventListener("DOMContentLoaded", function(){
 
+  updateNiveauButtons("clinique");
+
+  document.getElementById("actif-subgroup").classList.add("hidden");
+  document.getElementById("inactif-subgroup").classList.add("hidden");
+  document.getElementById("sixmois-subgroup").classList.add("hidden");
+
+});
+ 
+document.querySelectorAll('input[name="questionnaire"]').forEach(function(radio){
+
+  radio.addEventListener("change", function(){
+
+    if(this.value === "GPAQ"){
+      updateNiveauButtons("gpaq");
+    }
+
+    if(this.value === "Marshall"){
+      updateNiveauButtons("marshall");
+    }
+
+  });
+
+});      
+
+// reset niveaux et motivation si changement questionnaire
+document.querySelectorAll('input[name="questionnaire"]').forEach(function(radio){
+ 
+    radio.addEventListener("change", function(){
+        
+    
+        if(isImporting) return;   // ← ICI EXACTEMENT
+
+  document.querySelectorAll('input[name="niveau_actuel"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+
+  document.getElementById("actif-subgroup").style.display = "none";
+  document.getElementById("inactif-subgroup").style.display = "none";
+  document.getElementById("sixmois-subgroup").style.display = "none";
+     
+    document.getElementById("niveau-actuel-title").scrollIntoView({
+  behavior: "auto",
+  block: "start"
+});
+  });
+
+});
+
+// reset motivation si changement niveau activité
+document.querySelectorAll('input[name="niveau_actuel"]').forEach(function(radio){
+
+radio.addEventListener("change", function(){
+
+  if(isImporting) return;   // ← AJOUT ICI UNIQUEMENT
+
+  document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+
+});
+
+});
+
+
+// reset 6 mois si changement réponse 30 jours
+document.querySelectorAll('input[name="ap_envisagee"]').forEach(function(radio){
+
+  radio.addEventListener("change", function(){
+
+    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+
+  });
+
+});
+        
+document.querySelectorAll('input[name="niveau_actuel"]').forEach(function(radio) {
+
+  radio.addEventListener('change', function() {
+  
+      console.log("NIVEAU CHANGE DETECTÉ:", this.value);
+ 
+      document.activeElement.blur();
+
+    const actifBlock = document.getElementById('actif-subgroup');
+    const inactifBlock = document.getElementById('inactif-subgroup');
+    const sixMoisBlock = document.getElementById('sixmois-subgroup');
+
+    // on ferme tout au départ
+    actifBlock.classList.add('hidden');
+    inactifBlock.classList.add('hidden');
+    sixMoisBlock.classList.add('hidden');
+
+    actifBlock.style.display = "none";
+    inactifBlock.style.display = "none";
+    sixMoisBlock.style.display = "none";
+
+    if (this.value === 'actif' || this.value === 'tres_actif' || this.value === 'moyennement_actif') {
+
+      actifBlock.classList.remove('hidden');
+      actifBlock.style.display = "";
+if (window.matchMedia("(max-width: 768px)").matches) {
   scrollIfNeeded(actifBlock);
-} else if (this.value === 'inactif') {
-  const inactifBlock = document.getElementById('inactif-subgroup');
-  inactifBlock.classList.remove('hidden');
-  document.getElementById('actif-subgroup').classList.add('hidden');
+}
 
+    }
+
+    if (this.value === 'inactif') {
+
+      inactifBlock.classList.remove('hidden');
+    inactifBlock.style.display = "";
+if (window.matchMedia("(max-width: 768px)").matches) {
   scrollIfNeeded(inactifBlock);
-} else {
-                        document.getElementById('actif-subgroup').classList.add('hidden');
-                        document.getElementById('inactif-subgroup').classList.add('hidden');
-                    }
-                });
-          });
-            
+}
+
+    }
+
+  });
+
+});
+
+document.querySelectorAll('input[name="ap_envisagee"]').forEach(function(radio){
+
+  radio.addEventListener("change", function(){
+
+    const sixMoisBlock = document.getElementById("sixmois-subgroup");
+
+    if(!sixMoisBlock) return;
+
+  sixMoisBlock.classList.add("hidden");
+sixMoisBlock.style.display = "none";
+
+if(this.value === "non"){
+  sixMoisBlock.classList.remove("hidden");
+  sixMoisBlock.style.display = "block";
+}
+
+  });
+
+});
+        
+        
 function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
   const radios = document.querySelectorAll(`input[name="${groupName}"]`);
   const subgroup = document.getElementById(subgroupId);
@@ -513,6 +1037,23 @@ function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
     }
   }
 
+ window.copyPatientComment = function(id){
+
+  const field = document.getElementById(id);
+  if(!field) return;
+
+  const text = field.value || field.innerText || "";
+
+  const temp = document.createElement("textarea");
+  temp.value = text;
+
+  document.body.appendChild(temp);
+  temp.select();
+  document.execCommand("copy");
+  document.body.removeChild(temp);
+
+};
+    
   function updateDisplay() {
     const selected = document.querySelector(`input[name="${groupName}"]:checked`);
 
@@ -617,10 +1158,212 @@ document.addEventListener("DOMContentLoaded", function() {
     generateBtn.addEventListener("click", handleGenerate);
 
   }
+/* =========================
+   SCANNER QR CODE
+========================= */
+
+const scanBtn = document.getElementById("scanQRBtn");
+const qrContainer = document.getElementById("qrScannerContainer");
+const closeQR = document.getElementById("closeQRScanner");
+
+let qrScanner = null;
+let qrAlreadyRead = false;   // ← AJOUT ICI
+
+if(scanBtn){
+
+  scanBtn.addEventListener("click", function(){
+
+    qrContainer.style.display = "block";
+
+    qrScanner = new Html5Qrcode("qr-reader");
+
+    qrScanner.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: 250
+      },
+        
+function(decodedText){
+
+  if(qrAlreadyRead) return;
+  qrAlreadyRead = true;
+
+  try{
+
+    decodedText = decodedText.substring(
+      decodedText.indexOf("{"),
+      decodedText.lastIndexOf("}") + 1
+    );
+
+    importPatientJSON(decodedText);
+
+   qrScanner.stop();
+   qrAlreadyRead = false;   // 🔥 reset immédiat
+   qrContainer.style.display = "none";
+
+    alert("QR patient importé.");
+
+  }catch(e){
+
+    qrAlreadyRead = false;
+    alert("QR invalide.");
+  }
+
+}   
+    );
+  });
+}
+
+if(closeQR){
+  closeQR.addEventListener("click", function(){
+    if(qrScanner){
+      qrScanner.stop();
+    }
+
+    qrAlreadyRead = false;   // 🔥 AJOUT CRITIQUE
+
+    qrContainer.style.display = "none";
+  });
+}
+  // 🔹 IMPORT JSON (ouvre le sélecteur de fichier)
+
+  const importBtn = document.getElementById("importJSONBtn");
+  const importFile = document.getElementById("importJSONFile");
+
+  if(importBtn && importFile){
+
+    importBtn.addEventListener("click", function(){
+      importFile.click();
+    });
+
+  }
 
 });
             
 const form = document.getElementById('consultationForm');
+
+        // =============================
+// IMPORT JSON AUTO-EVALUATION
+// =============================
+
+document.getElementById("importJSONFile")
+.addEventListener("change", function(e){
+
+  const file = e.target.files[0];
+
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(){
+
+    try{
+
+      const data = JSON.parse(reader.result);
+      importPatientJSON(reader.result);
+        
+    // Pas moyens
+const pas = data?.resultats?.pas_moyens_jour_1_mois;
+if(pas){
+  const inputPas = document.querySelector('input[name="nombre_pas"]');
+  if(inputPas) inputPas.value = pas;
+}
+
+// Heures assises (sédentarité)
+const heuresAssises =
+  data?.questionnaires?.gpaq?.sedentarite?.heures_par_jour ??
+  data?.questionnaires?.marshall?.sedentarite?.heures_par_jour ??
+  null;
+
+if (heuresAssises !== null) {
+
+  const input = document.querySelector('input[name="heures_assises"]');
+
+if (input) input.value = Number(heuresAssises);
+
+}
+
+      // Questionnaire utilisé
+const q = data?.meta?.questionnaire;
+
+if(q){
+
+  const radio = document.querySelector(`input[name="questionnaire"][value="${q}"]`);
+
+  if(radio){
+    radio.checked = true;
+    setTimeout(() => {
+      radio.dispatchEvent(new Event("change"));
+    },0);
+  }
+
+}
+
+/* ======================
+   IMPORT EVA IMPORTANCE
+====================== */
+
+const importance = data?.motivation?.importance_eva_0_10;
+
+if(importance !== undefined && importance !== null){
+  const inputImportance = document.querySelector('input[name="importance_ap"]');
+  if(inputImportance) inputImportance.value = importance;
+}    
+       const importanceComment = data?.motivation?.importance_commentaire;
+
+const block = document.getElementById("importance_patient_block");
+const field = document.getElementById("importance_patient_comment");
+
+if(block && field){
+
+  if(importanceComment){
+
+    field.value = importanceComment;
+    block.style.display = "block";
+
+  }
+ }
+/* ======================
+   IMPORT EVA CONFIANCE
+====================== */
+
+const confiance = data?.motivation?.confiance_eva_0_10;
+
+if(confiance !== undefined && confiance !== null){
+  const inputConfiance = document.querySelector('input[name="confiance_ap"]');
+  if(inputConfiance) inputConfiance.value = confiance;
+}
+const confianceComment = data?.motivation?.confiance_commentaire;
+
+const blockC = document.getElementById("confiance_patient_block");
+const fieldC = document.getElementById("confiance_patient_comment");
+
+if(blockC && fieldC){
+
+  if(confianceComment){
+
+    fieldC.value = confianceComment;
+    blockC.style.display = "block";
+
+  }
+
+  }
+
+
+alert("Données patient importées.\n\nVérifiez et complétez les champs avant de générer le compte-rendu.");
+
+    }catch(err){
+
+      alert("Fichier JSON invalide.");
+
+    }
+
+  };
+
+  reader.readAsText(file);
+
+});
 form.addEventListener("submit", function(e) {
   e.preventDefault();
   e.stopPropagation();
@@ -665,45 +1408,44 @@ savedScrollPosition = window.scrollY;
     renderActiveMode();
   });
 });
-            document.getElementById('printReport').addEventListener('click', function (e) {
+ 
+document.getElementById('downloadPdf').addEventListener('click', function (e) {
 
   e.preventDefault();
   e.stopPropagation();
 
-  // 🔹 Sécurise Safari iOS
-  if (document.activeElement) {
-    document.activeElement.blur();
-  }
+  const content = document.getElementById("outputContainer").innerHTML;
 
-  // 🔹 Désactive temporairement la transition (évite conflit iOS)
-  const container = document.getElementById("outputContainer");
-  const previousTransition = container.style.transition;
-  container.style.transition = "none";
+  const win = window.open('', '', 'width=800,height=600');
 
-  window.print();
+  win.document.write(`
+    <html>
+      <head>
+        <title>PDF</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 15mm;
+          }
+        </style>
+      </head>
+      <body>
+        ${content}
+      </body>
+    </html>
+  `);
 
-  // 🔹 Restaure la transition
-  container.style.transition = previousTransition;
+  win.document.close();
 
-});
-           document.getElementById('downloadPdf').addEventListener('click', function (e) {
+  win.focus();
 
-  e.preventDefault();
-  e.stopPropagation();
-
-  if (document.activeElement) {
-    document.activeElement.blur();
-  }
-
-  const container = document.getElementById("outputContainer");
-  const previousTransition = container.style.transition;
-  container.style.transition = "none";
-
-  window.print();
-
-  container.style.transition = previousTransition;
+  setTimeout(() => {
+    win.print();
+    win.close();
+  }, 300);
 
 });
+        
         document.getElementById('copyReport').addEventListener('click', function() {
 
   const container = document.getElementById("outputContainer").cloneNode(true);
@@ -735,6 +1477,44 @@ savedScrollPosition = window.scrollY;
   }
 
 });
+
+        document.getElementById('printReport').addEventListener('click', function (e) {
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const content = document.getElementById("outputContainer").innerHTML;
+
+  const win = window.open('', '', 'width=800,height=600');
+
+  win.document.write(`
+    <html>
+      <head>
+        <title>Impression</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 15mm;
+          }
+        </style>
+      </head>
+      <body>
+        ${content}
+      </body>
+    </html>
+  `);
+
+  win.document.close();
+
+  win.focus();
+
+  setTimeout(() => {
+    win.print();
+    win.close();
+  }, 300);
+
+});
+        
           function getStadeMotivation() {
     const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
     if (niveauActuel === 'actif') {
@@ -1112,6 +1892,7 @@ ${prescriptionBloc}
   const prescriptionBloc = buildPrescription(model);
 
   return `
+<p style="margin-bottom:28px;">
 <p><strong>Consultation d’activité physique – Synthèse</strong></p>
 
 <p><strong>Motif :</strong><br>
@@ -1171,7 +1952,9 @@ Augmenter progressivement votre niveau d’activité physique reste important po
 })();
 
   return `
-<p><strong>Compte-rendu de votre consultation d’activité physique</strong></p>
+<p style="margin-bottom:28px;">
+  <strong>Compte-rendu de votre consultation d’activité physique</strong>
+</p>
 
 <p>
 ${evaluationBloc}
@@ -1271,7 +2054,7 @@ container.style.opacity = "1";
   container.classList.add("fade-in");
                
 document.getElementById("formatTabs").scrollIntoView({
-  behavior: "smooth",
+  behavior: "auto",
   block: "start"
 });
 
