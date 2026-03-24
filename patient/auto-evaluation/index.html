@@ -32,6 +32,15 @@ p + p {
   color: #6b7280;
 }
 
+/* ===== Exemples questions ===== */
+.example {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 400;
+}
+
 /* ===== Buttons ===== */
 
 .btn:disabled {
@@ -399,7 +408,7 @@ function renderHome() {
   sessionStorage.removeItem("nav_stack");
 
   render(`
-    <h1>Activité physique</h1>
+    <h1>Evaluation de votre activité physique</h1>
     <p>Questionnaire destiné à préparer votre consultation médicale.<br>
     Aucune donnée n’est enregistrée.</p>
 
@@ -468,7 +477,12 @@ function marshallQ1(){
 pushScreen("MAR-Q1");
 render(`
 <h2>Marshall – Question 1</h2>
-<p>Au cours d’une semaine habituelle, combien de fois pratiquez-vous une activité physique intense d’au moins 20 minutes ?</p>
+<p>
+Au cours d’une semaine habituelle, combien de fois pratiquez-vous au moins 20 minutes une activité physique intense, au point de transpirer ou d'haleter ?
+<span class="example">
+Exemples : jogging, port de charge lourde, aérobic ou cyclisme à allure rapide.
+</span>
+</p>
 <button class="btn" onclick="state.marshall.q1=4; advanceProgress(1); marshallQ2()">≥ 3 fois / semaine</button>
 <button class="btn" onclick="state.marshall.q1=2; advanceProgress(1); marshallQ2()">1–2 fois / semaine</button>
 <button class="btn" onclick="state.marshall.q1=0; advanceProgress(1); marshallQ2()">Jamais</button>
@@ -481,7 +495,12 @@ function marshallQ2(){
 pushScreen("MAR-Q2");
   render(`
 <h2>Marshall – Question 2</h2>
-<p>Combien de fois par semaine pratiquez-vous une activité physique modérée ou de la marche rapide pendant au moins 30 minutes ?</p>
+<p>
+Combien de fois par semaine pratiquez-vous pendant au moins 30 minutes une activité physique modérée ou de la marche rapide qui augmente votre fréquence cardiaque ou qui vous fait respirer plus fort que normalement ?
+<span class="example">
+Exemples : tondre la pelouse, porter des charges légères, faire du vélo à allure modérée ou jouer au tennis en double.
+</span>
+</p>
 <button class="btn" onclick="advanceProgress(1); finishMarshall(4)">≥ 5 fois / semaine</button>
 <button class="btn" onclick="advanceProgress(1); finishMarshall(2)">3–4 fois / semaine</button>
 <button class="btn" onclick="advanceProgress(1); finishMarshall(1)">1–2 fois / semaine</button>
@@ -713,7 +732,7 @@ advanceProgress(1); // fin bloc "déplacements"
   pushScreen("GPAQ-Q10");
   render(`
 <h2>Loisirs – activité intense</h2>
-<p>Est-ce que vous pratiquez des sports, du fitness ou des activités de loisirs de forte intensité qui nécessitent une augmentation importante de la respiration ou du rythme cardiaque comme [courir ou jouer au football] pendant au moins dix minutes d'affilée ?</p>
+<p>Est-ce que vous pratiquez des sports, du fitness ou des activités de loisirs de forte intensité qui nécessitent une augmentation importante de la respiration ou du rythme cardiaque (comme courir ou jouer au football) pendant au moins dix minutes d'affilée ?</p>
 <button class="btn" onclick="state.gpaq.li=1; gpaqQ11()">Oui</button>
 <button class="btn" onclick="state.gpaq.li=0; gpaqQ13()">Non</button>
 <button class="btn secondary" onclick="back()">Retour</button>
@@ -1019,7 +1038,7 @@ pushScreen(
     );
   render(`
 <h2>Importance de l’activité physique</h2>
-<p>Quelle importance accordez-vous à l’activité physique dans votre vie ?</p>
+<p>Quelle importance accordez-vous à l’activité physique dans votre vie, entre 0, aucune importance, et 10, une importance majeure ?</p>
 <input type="range" min="0" max="10" value="5"
 oninput="this.nextElementSibling.innerText=this.value">
 <div>5</div>
@@ -1055,8 +1074,8 @@ onchange="state.result.importance_comment=this.value"></textarea>
 
 function evaConfiance(){
   const question = state.result.niveau==="insuffisamment_actif"
-    ? "Dans quelle mesure êtes-vous confiant(e) en vous pour réussir à augmenter votre niveau d’activité physique ?"
-    : "Dans quelle mesure êtes-vous confiant(e) en vous pour réussir à maintenir voire augmenter votre niveau d’activité physique ?";
+    ? "Dans quelle mesure êtes-vous confiant(e) en vous pour réussir à augmenter votre niveau d’activité physique, entre 0, aucune confiance en vous, et 10, une extrêmement grande confiance en moi ?"
+    : "Dans quelle mesure êtes-vous confiant(e) en vous pour réussir à maintenir voire augmenter votre niveau d’activité physique, entre 0, aucune confiance en vous, et 10, une très grande confiance en vous ?";
 pushScreen(
   state.tool === "marshall"
   ? "MAR-EVA-CONF"
@@ -1087,7 +1106,7 @@ pushScreen(
   render(`
 <h2>Votre réponse</h2>
 <p>
-Pouvez-vous m’indiquer en quelques mots ce qui vous rend confiant(e) ou, au contraire, ce qui vous freine ?<br>
+Pouvez-vous m’indiquer en quelques mots ce qui vous rend confiant(e) en vous ou, au contraire, ce qui vous freine ?<br>
 <em>Sinon, passez à la question suivante.</em>
 </p>
 <textarea placeholder="Votre réponse (facultative)"
@@ -1243,7 +1262,7 @@ pushScreen(
       : null
   );
 render(`
-<h2>Résultat</h2>
+<h2>Bilan résumé d'activité physique</h2>
 
 <p>
   <strong>Niveau d’activité :</strong>
@@ -1294,7 +1313,7 @@ ${sedH ? sedH + " h " : ""}${sedM ? sedM + " min" : ""}
   </div>
 </div>
 
-<button class="btn" onclick="openPrintable()">Voir mon bilan d'activité physique</button>
+<button class="btn" onclick="openPrintable()">Voir mon bilan complet d'activité physique et de sédentarité</button>
 <button class="btn secondary" onclick="restart()">Recommencer</button>
 <button class="btn secondary" onclick="safeBack()">Retour</button>
 
