@@ -198,6 +198,7 @@ button {
     
 </style>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
  </head>
 <body>
 <div class="container crc-page">
@@ -582,7 +583,8 @@ Pas d’AP envisagée dans les 6 mois
     </div>
     <script>
         
-     
+     let isImporting = false;
+        
            function scrollIfNeeded(element) {
 
   if (!element) return;
@@ -625,9 +627,35 @@ let confiance;
 let importanceComment;
 let confianceComment;
 
-  try {
+try {
 
-    data = JSON.parse(jsonText);
+  let decompressed = LZString.decompressFromBase64(jsonText);
+
+  if (decompressed && decompressed.length > 0) {
+
+    data = JSON.parse(decompressed);
+
+  } else {
+
+    decompressed = LZString.decompressFromEncodedURIComponent(jsonText);
+
+    if (decompressed && decompressed.length > 0) {
+
+      data = JSON.parse(decompressed);
+
+    } else {
+
+      data = JSON.parse(jsonText);
+
+    }
+  }
+
+} catch (e) {
+
+  alert("QR invalide ou illisible");
+  return;
+
+}
     console.log("JSON importé :", data);
       
     questionnaire = data.q ?? data.questionnaire;
@@ -659,11 +687,7 @@ if (actifDepuis === "non") actifDepuis = "moins_6_mois";
       const importanceTruncated = data.ci_truncated ?? false;
     confianceComment = data.cc ?? data.confiance_commentaire;
       const confianceTruncated = data.cc_truncated ?? false;
-  } catch (e) {
-    alert("JSON invalide");
-    return;
-      }
-          
+           
     console.log("niveau QR importé :", niveau);       
     console.log("motivation import :", actifDepuis, apEnvisagee, ap6Mois);
           
@@ -1187,53 +1211,64 @@ if(scanBtn){
 
     qrScanner = new Html5Qrcode("qr-reader");
 
-    qrScanner.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: 250
-      },
-        
-function(decodedText){
+qrScanner.start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
 
-  if(qrAlreadyRead) return;
-  qrAlreadyRead = true;
+  function(decodedText){
 
-  try{
+    if(qrAlreadyRead) return;
+    qrAlreadyRead = true;
 
-    decodedText = decodedText.substring(
-      decodedText.indexOf("{"),
-      decodedText.lastIndexOf("}") + 1
-    );
+    try{
+      importPatientJSON(decodedText);
 
-    importPatientJSON(decodedText);
+      if(qrScanner){
+        qrScanner.stop().then(() => {
+          qrContainer.style.display = "none";
+        });
+      }
 
-   qrScanner.stop();
-   qrAlreadyRead = false;   // 🔥 reset immédiat
-   qrContainer.style.display = "none";
+      setTimeout(() => {
+        qrAlreadyRead = false;
+      }, 1500);
 
-    alert("QR patient importé.");
-
-  }catch(e){
-
-    qrAlreadyRead = false;
-    alert("QR invalide.");
-  }
-
-}   
-    );
-  });
-}
-
-if(closeQR){
-  closeQR.addEventListener("click", function(){
-    if(qrScanner){
-      qrScanner.stop();
+    } catch(e){
+      console.warn("QR invalide");
+      setTimeout(() => {
+        qrAlreadyRead = false;
+      }, 1000);
     }
 
-    qrAlreadyRead = false;   // 🔥 AJOUT CRITIQUE
+  },
 
-    qrContainer.style.display = "none";
+  function(error){
+    // ⚠️ obligatoire pour éviter bug syntaxique + compat iOS
+    console.warn("Scan error", error);
+  }
+
+)
+.then(() => {
+  console.log("Scanner QR démarré");
+})
+.catch(err => {
+  console.error("Erreur caméra :", err);
+});
+});
+}
+    
+if(closeQR){
+  closeQR.addEventListener("click", function(){
+
+    if(qrScanner){
+      qrScanner.stop().then(() => {
+        qrContainer.style.display = "none";
+      });
+    } else {
+      qrContainer.style.display = "none";
+    }
+
+    qrAlreadyRead = false;
   });
 }
   // 🔹 IMPORT JSON (ouvre le sélecteur de fichier)
@@ -1271,7 +1306,7 @@ document.getElementById("importJSONFile")
     try{
 
       const data = JSON.parse(reader.result);
-      importPatientJSON(reader.result);
+   importPatientJSON(JSON.stringify(data));
         
     // Pas moyens
 const pas = data?.resultats?.pas_moyens_jour_1_mois;
