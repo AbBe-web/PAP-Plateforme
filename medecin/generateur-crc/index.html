@@ -1,8 +1,19 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="/PAP-Plateforme-dev/manifest.json">
+
+<link rel="icon" href="/PAP-Plateforme-dev/assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/PAP-Plateforme-dev/assets/icons/icon-192.png">
+
+<meta name="theme-color" content="#2b7cff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
     <title>PAP – Générateur de compte-rendu médical</title>
 
         <link rel="stylesheet" href="../../css/style-global.css">
@@ -605,7 +616,10 @@ if (window.matchMedia("(max-width: 768px)").matches) {
   }
 }
         let clinicalModel = null;
-let activeMode = "long";
+        let activeMode = "long";
+
+        let lastPrenom = "";
+        let lastNom = "";
         
       function importPatientJSON(jsonText) {
           isImporting = true;
@@ -900,155 +914,22 @@ const inactif = document.getElementById("niveau_inactif").parentElement;
   }
 
 }
-        
-let savedScrollPosition = 0;
-let lastScrollY = 0;
-window.addEventListener("scroll", function () {
-  lastScrollY = window.scrollY;
-});
-window.addEventListener("DOMContentLoaded", function(){
+ window.copyPatientComment = function(id){
 
-  updateNiveauButtons("clinique");
+  const field = document.getElementById(id);
+  if(!field) return;
 
-  document.getElementById("actif-subgroup").classList.add("hidden");
-  document.getElementById("inactif-subgroup").classList.add("hidden");
-  document.getElementById("sixmois-subgroup").classList.add("hidden");
+  const text = field.value || field.innerText || "";
 
-});
- 
-document.querySelectorAll('input[name="questionnaire"]').forEach(function(radio){
+  const temp = document.createElement("textarea");
+  temp.value = text;
 
-  radio.addEventListener("change", function(){
+  document.body.appendChild(temp);
+  temp.select();
+  document.execCommand("copy");
+  document.body.removeChild(temp);
 
-    if(this.value === "GPAQ"){
-      updateNiveauButtons("gpaq");
-    }
-
-    if(this.value === "Marshall"){
-      updateNiveauButtons("marshall");
-    }
-
-  });
-
-});      
-
-// reset niveaux et motivation si changement questionnaire
-document.querySelectorAll('input[name="questionnaire"]').forEach(function(radio){
- 
-    radio.addEventListener("change", function(){
-        
-    
-        if(isImporting) return;   // ← ICI EXACTEMENT
-
-  document.querySelectorAll('input[name="niveau_actuel"]').forEach(r => r.checked = false);
-  document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
-  document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
-  document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
-
-  document.getElementById("actif-subgroup").style.display = "none";
-  document.getElementById("inactif-subgroup").style.display = "none";
-  document.getElementById("sixmois-subgroup").style.display = "none";
-     
-    document.getElementById("niveau-actuel-title").scrollIntoView({
-  behavior: "auto",
-  block: "start"
-});
-  });
-
-});
-
-// reset motivation si changement niveau activité
-document.querySelectorAll('input[name="niveau_actuel"]').forEach(function(radio){
-
-radio.addEventListener("change", function(){
-
-  if(isImporting) return;   // ← AJOUT ICI UNIQUEMENT
-
-  document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
-  document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
-  document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
-
-});
-
-});
-
-
-// reset 6 mois si changement réponse 30 jours
-document.querySelectorAll('input[name="ap_envisagee"]').forEach(function(radio){
-
-  radio.addEventListener("change", function(){
-
-    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
-
-  });
-
-});
-        
-document.querySelectorAll('input[name="niveau_actuel"]').forEach(function(radio) {
-
-  radio.addEventListener('change', function() {
-  
-      console.log("NIVEAU CHANGE DETECTÉ:", this.value);
- 
-      document.activeElement.blur();
-
-    const actifBlock = document.getElementById('actif-subgroup');
-    const inactifBlock = document.getElementById('inactif-subgroup');
-    const sixMoisBlock = document.getElementById('sixmois-subgroup');
-
-    // on ferme tout au départ
-    actifBlock.classList.add('hidden');
-    inactifBlock.classList.add('hidden');
-    sixMoisBlock.classList.add('hidden');
-
-    actifBlock.style.display = "none";
-    inactifBlock.style.display = "none";
-    sixMoisBlock.style.display = "none";
-
-    if (this.value === 'actif' || this.value === 'tres_actif' || this.value === 'moyennement_actif') {
-
-      actifBlock.classList.remove('hidden');
-      actifBlock.style.display = "";
-if (window.matchMedia("(max-width: 768px)").matches) {
-  scrollIfNeeded(actifBlock);
-}
-
-    }
-
-    if (this.value === 'inactif') {
-
-      inactifBlock.classList.remove('hidden');
-    inactifBlock.style.display = "";
-if (window.matchMedia("(max-width: 768px)").matches) {
-  scrollIfNeeded(inactifBlock);
-}
-
-    }
-
-  });
-
-});
-
-document.querySelectorAll('input[name="ap_envisagee"]').forEach(function(radio){
-
-  radio.addEventListener("change", function(){
-
-    const sixMoisBlock = document.getElementById("sixmois-subgroup");
-
-    if(!sixMoisBlock) return;
-
-  sixMoisBlock.classList.add("hidden");
-sixMoisBlock.style.display = "none";
-
-if(this.value === "non"){
-  sixMoisBlock.classList.remove("hidden");
-  sixMoisBlock.style.display = "block";
-}
-
-  });
-
-});
-        
+};
         
 function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
   const radios = document.querySelectorAll(`input[name="${groupName}"]`);
@@ -1070,23 +951,6 @@ function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
       });
     }
   }
-
- window.copyPatientComment = function(id){
-
-  const field = document.getElementById(id);
-  if(!field) return;
-
-  const text = field.value || field.innerText || "";
-
-  const temp = document.createElement("textarea");
-  temp.value = text;
-
-  document.body.appendChild(temp);
-  temp.select();
-  document.execCommand("copy");
-  document.body.removeChild(temp);
-
-};
     
   function updateDisplay() {
     const selected = document.querySelector(`input[name="${groupName}"]:checked`);
@@ -1110,11 +974,8 @@ function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
   updateDisplay(); // état initial
 }
 
-toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup", "intensite_aerobie_block");
-toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
-toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
          
-            function buildClinicalModel() {
+function buildClinicalModel() {
   return {
 
     meta: {
@@ -1172,26 +1033,153 @@ toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
 
   };
 }
+
+let savedScrollPosition = 0;
+        
 document.addEventListener("DOMContentLoaded", function() {
 
-  const generateBtn = document.getElementById('generateReport');
+window.addEventListener("scroll", function () {
+  lastScrollY = window.scrollY;
+});
+    
+// 🔹 INIT UI + SETUP
+updateNiveauButtons("clinique");
 
-  if (generateBtn) {
+toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup", "intensite_aerobie_block");
+toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
+toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
+    
+document.getElementById("actif-subgroup")?.classList.add("hidden");
+document.getElementById("inactif-subgroup")?.classList.add("hidden");
+document.getElementById("sixmois-subgroup")?.classList.add("hidden");
 
-    generateBtn.addEventListener("touchend", function () {
-      const active = document.activeElement;
 
-      if (
-        active &&
-        (active.tagName === "INPUT" || active.tagName === "TEXTAREA")
-      ) {
-        active.blur();
-      }
-    });
+// ==========================
+// QUESTIONNAIRE
+// ==========================
+document.querySelectorAll('input[name="questionnaire"]').forEach(function(radio){
 
-    generateBtn.addEventListener("click", handleGenerate);
+  radio.addEventListener("change", function(){
 
-  }
+    if(this.value === "GPAQ"){
+      updateNiveauButtons("gpaq");
+    }
+
+    if(this.value === "Marshall"){
+      updateNiveauButtons("marshall");
+    }
+
+    if(isImporting) return;
+
+    document.querySelectorAll('input[name="niveau_actuel"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+
+    document.getElementById("actif-subgroup").style.display = "none";
+    document.getElementById("inactif-subgroup").style.display = "none";
+    document.getElementById("sixmois-subgroup").style.display = "none";
+
+  });
+
+});
+
+
+// ==========================
+// NIVEAU ACTIVITÉ
+// ==========================
+document.querySelectorAll('input[name="niveau_actuel"]').forEach(function(radio){
+
+  radio.addEventListener("change", function(){
+
+    console.log("NIVEAU CHANGE DETECTÉ:", this.value);
+
+    if(isImporting) return;
+
+    document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+
+    const actifBlock = document.getElementById('actif-subgroup');
+    const inactifBlock = document.getElementById('inactif-subgroup');
+    const sixMoisBlock = document.getElementById('sixmois-subgroup');
+
+    actifBlock.style.display = "none";
+    inactifBlock.style.display = "none";
+    sixMoisBlock.style.display = "none";
+
+    if (this.value === 'actif' || this.value === 'tres_actif' || this.value === 'moyennement_actif') {
+      actifBlock.style.display = "";
+    }
+
+    if (this.value === 'inactif') {
+      inactifBlock.style.display = "";
+    }
+
+  });
+
+});
+
+
+// ==========================
+// AP ENVISAGÉE
+// ==========================
+document.querySelectorAll('input[name="ap_envisagee"]').forEach(function(radio){
+
+  radio.addEventListener("change", function(){
+
+    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+
+    const sixMoisBlock = document.getElementById("sixmois-subgroup");
+
+    if(!sixMoisBlock) return;
+
+    sixMoisBlock.style.display = "none";
+
+    if(this.value === "non"){
+      sixMoisBlock.style.display = "block";
+    }
+
+  });
+
+});
+
+
+// ==========================
+// MODAL + BOUTONS
+// ==========================
+document.getElementById("confirmPrint")?.addEventListener("click", function() {
+
+  const prenom = formatName(document.getElementById("modalPrenom").value);
+  const nom = formatName(document.getElementById("modalNom").value);
+
+  lastPrenom = prenom;
+  lastNom = nom;
+
+  closeIdentityModal();
+  proceedWithAction(prenom, nom);
+
+});
+
+document.getElementById("cancelPrint")?.addEventListener("click", function() {
+  closeIdentityModal();
+});
+
+document.getElementById('generateReport')?.addEventListener("click", handleGenerate);
+
+document.getElementById('printReport')?.addEventListener("click", function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  openIdentityModal("print");
+});
+
+document.getElementById('copyReport')?.addEventListener("click", function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  openIdentityModal("copy");
+});
+
+});
 /* =========================
    SCANNER QR CODE
 ========================= */
@@ -1283,9 +1271,7 @@ if(closeQR){
     });
 
   }
-
-});
-            
+          
 const form = document.getElementById('consultationForm');
 
         // =============================
@@ -1454,7 +1440,7 @@ savedScrollPosition = window.scrollY;
   });
 });
  
-document.getElementById('downloadPdf').addEventListener('click', function (e) {
+document.getElementById('downloadPdf')?.addEventListener('click', function (e) {
 
   e.preventDefault();
   e.stopPropagation();
@@ -1491,28 +1477,8 @@ document.getElementById('downloadPdf').addEventListener('click', function (e) {
 
 });
         
-        document.getElementById('copyReport').addEventListener('click', function() {
 
-  const container = document.getElementById("outputContainer").cloneNode(true);
-
-  container.querySelectorAll("a").forEach(link => {
-  const replacement = link.innerText + " : " + link.href;
-    link.replaceWith(replacement);
-  });
-
- const reportText = container.innerText
-  .replace(/\n+/g, " ")
-  .replace(/\s+/g, " ")
-  .trim();
-
-  navigator.clipboard.writeText(reportText).then(function() {
-    alert('Le compte-rendu a été copié dans le presse-papiers.');
-  }).catch(function(err) {
-    console.error('Erreur lors de la copie du texte: ', err);
-  });
-
-});
-            document.addEventListener("visibilitychange", function () {
+document.addEventListener("visibilitychange", function () {
 
   if (document.visibilityState === "visible" && savedScrollPosition > 0) {
     window.scrollTo({
@@ -1523,44 +1489,148 @@ document.getElementById('downloadPdf').addEventListener('click', function (e) {
 
 });
 
-        document.getElementById('printReport').addEventListener('click', function (e) {
+let identityAction = null;
 
-  e.preventDefault();
-  e.stopPropagation();
+function openIdentityModal(action) {
+  identityAction = action;
 
-  const content = document.getElementById("outputContainer").innerHTML;
+  document.getElementById("modalPrenom").value = lastPrenom || "";
+  document.getElementById("modalNom").value = lastNom || "";
 
-  const win = window.open('', '', 'width=800,height=600');
+  document.getElementById("identityModal").classList.remove("hidden");
+}
 
-  win.document.write(`
-    <html>
-      <head>
-        <title>Impression</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            margin: 15mm;
-          }
-        </style>
-      </head>
-      <body>
-        ${content}
-      </body>
-    </html>
-  `);
+function closeIdentityModal() {
+  document.getElementById("identityModal").classList.add("hidden");
+}
 
-  win.document.close();
+function injectIdentityIntoHTML(html, prenom, nom) {
 
-  win.focus();
+  if (!prenom && !nom) return html;
 
-  setTimeout(() => {
-    win.print();
-    win.close();
-  }, 300);
+  const identity = `${prenom || ""} ${nom || ""}`.trim();
 
-});
+  return html.replace("_____", identity);
+} 
         
-          function getStadeMotivation() {
+function formatName(str) {
+
+  if (!str) return "";
+
+  const particles = [
+    "de", "du", "des", "la", "le", "les",
+    "van", "von", "der", "den", "da", "dos", "das"
+  ];
+
+  return str
+    .toLowerCase()
+    .trim()
+    .split(/[\s-]+/)
+    .map((word, index) => {
+
+      // particules → minuscule sauf en début
+      if (particles.includes(word) && index !== 0) {
+        return word;
+      }
+
+      // cas McDonald / MacDonald
+      if (word.startsWith("mc") && word.length > 2) {
+        return "Mc" + word.charAt(2).toUpperCase() + word.slice(3);
+      }
+
+      if (word.startsWith("mac") && word.length > 3) {
+        return "Mac" + word.charAt(3).toUpperCase() + word.slice(4);
+      }
+
+      // normal
+      return word.charAt(0).toUpperCase() + word.slice(1);
+
+    })
+    .join(" ")
+    .replace(/\s-\s/g, "-"); // sécurité tiret
+}
+
+ function updateNamePreview(inputId, previewId) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+
+  if (!input || !preview) return;
+
+  const value = input.value;
+  const formatted = formatName(value);
+
+preview.textContent = (formatted && formatted !== value)
+  ? `→ ${formatted}`
+  : "";
+}
+        
+function proceedWithAction(prenom, nom) {
+
+  let content = document.getElementById("outputContainer").innerHTML;
+// injection conditionnelle selon mode
+if (activeMode === "long") {
+  content = injectIdentityIntoHTML(content, prenom, nom);
+}
+
+if (activeMode === "medical" || activeMode === "patient") {
+
+  const identityLine = `<p><strong>Patient :</strong> ${prenom || ""} ${nom || ""}</p>`;
+
+  content = identityLine + content;
+
+}
+
+  if (identityAction === "print") {
+
+    const win = window.open('', '', 'width=800,height=600');
+
+    win.document.write(`
+      <html>
+        <head>
+          <title>Impression</title>
+          <style>
+            body { font-family: Arial; margin: 15mm; }
+          </style>
+        </head>
+        <body>
+          ${content}
+        </body>
+      </html>
+    `);
+
+    win.document.close();
+    win.focus();
+
+    setTimeout(() => {
+      win.print();
+      win.close();
+    }, 300);
+
+  }
+
+  if (identityAction === "copy") {
+
+    const temp = document.createElement("div");
+    temp.innerHTML = content;
+
+    temp.querySelectorAll("a").forEach(link => {
+      const replacement = link.innerText + " : " + link.href;
+      link.replaceWith(replacement);
+    });
+
+    const text = temp.innerText
+      .replace(/\n+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Compte-rendu copié.");
+    });
+
+  }
+}
+       
+        function getStadeMotivation() {
     const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
     if (niveauActuel === 'actif') {
         const actifDepuis = document.querySelector('input[name="actif_depuis"]:checked') ? document.querySelector('input[name="actif_depuis"]:checked').value : '';
@@ -2110,13 +2180,17 @@ document.getElementById("formatTabs").scrollIntoView({
   <div class="modal-content">
     <h3>Identification (facultatif)</h3>
 
-    <label>Prénom :
-      <input type="text" id="modalPrenom">
-    </label>
+   <label>Prénom :
+  <input type="text" id="modalPrenom"
+         oninput="updateNamePreview('modalPrenom','previewPrenom')">
+</label>
+<div id="previewPrenom" style="font-size:0.8rem;color:#666;"></div>
 
-    <label>Nom :
-      <input type="text" id="modalNom">
-    </label>
+<label>Nom :
+  <input type="text" id="modalNom"
+         oninput="updateNamePreview('modalNom','previewNom')">
+</label>
+<div id="previewNom" style="font-size:0.8rem;color:#666;"></div>
 
     <div class="modal-buttons">
       <button id="confirmPrint" class="btn">Imprimer</button>
