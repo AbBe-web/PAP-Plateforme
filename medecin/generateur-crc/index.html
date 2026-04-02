@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="manifest" href="/PAP-Plateforme/manifest.json">
+<link rel="manifest" href="/PAP-Plateforme-dev/manifest.json">
 
-<link rel="icon" href="/PAP-Plateforme/assets/icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/PAP-Plateforme/assets/icons/icon-192.png">
+<link rel="icon" href="/PAP-Plateforme-dev/assets/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/PAP-Plateforme-dev/assets/icons/icon-192.png">
     
 <meta name="theme-color" content="#2b7cff">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -260,8 +260,56 @@ button {
 .patient-qr {
   margin-top: 10px;
   text-align: center;
-}    
+}   
+
+/* =========================
+   CHECKBOX / RADIO = 1 PAR LIGNE
+========================= */
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+}
+.form-group label input[type="number"] {
+  margin-top: 4px;
+}
+
+/* 🔥 FIX DÉFINITIF champs AP */
+.form-group label:has(input[name="heures_assises"]),
+.form-group label:has(input[name="nombre_pas"]) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+.form-group input[name="heures_assises"],
+.form-group input[name="nombre_pas"] {
+  width: 100%;
+  max-width: 180px;
+  margin-top: 4px;
+}
+
+/* FIX affichage champs AP */
+.crc-page .sub-group > label {
+  display: block !important;
+  width: 100% !important;
+  margin-bottom: 10px; /* espace entre les champs */
+}
+
+.crc-page label input[type="number"] {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  margin-top: 10px;
+}
+#niveau-container label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}  
+    
 </style>
+    
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
  </head>
@@ -407,22 +455,215 @@ Importer fichier JSON
 
 <form id="consultationForm">
     
+                  <div class="form-group">
+
+<h2>1/ Données générales</h2>
+
+<div style="display:flex; gap:20px; align-items:flex-end; flex-wrap:wrap;">
+
+  <!-- Sexe -->
+  <div style="display:flex; flex-direction:column; font-size:0.8rem;">
+    <span style="font-weight:500;">Sexe</span>
+    <div style="display:flex; gap:10px;">
+      <label><input type="radio" name="sexe" value="femme"> F</label>
+      <label><input type="radio" name="sexe" value="homme"> H</label>
+    </div>
+  </div>
+
+  <!-- Âge -->
+  <div style="display:flex; flex-direction:column; font-size:0.8rem;">
+    <span style="font-weight:500;">Âge</span>
+    <input type="number" id="age_input" style="width:70px;">
+  </div>
+
+  <!-- Taille -->
+  <div style="display:flex; flex-direction:column; font-size:0.8rem;">
+    <span style="font-weight:500;">Taille</span>
+    <input type="number" id="taille_input" style="width:90px;">
+  </div>
+
+  <!-- Poids -->
+  <div style="display:flex; flex-direction:column; font-size:0.8rem;">
+    <span style="font-weight:500;">Poids</span>
+    <input type="number" id="poids_input" style="width:90px;">
+  </div>
+
+  <!-- IMC -->
+  <div style="display:flex; flex-direction:column; font-size:0.8rem;">
+    <span style="font-weight:500;">IMC</span>
+    <div id="imc_result" style="min-width:120px;"></div>
+  </div>
+
+</div>
+
+<!-- 🔻 FALLBACKS EN DESSOUS -->
+
+<div style="margin-top:6px; display:flex; gap:20px; flex-wrap:wrap; font-size:0.8rem;">
+
+  <div id="age_fallback" style="display:none;">
+    <span>Âge :</span>
+    <label><input type="radio" name="age_condition" value="<65"> &lt;65</label>
+    <label><input type="radio" name="age_condition" value=">=65"> ≥65</label>
+  </div>
+
+  <div id="imc_fallback" style="display:none;">
+    <span>IMC :</span>
+    <label><input type="radio" name="imc_condition" value="<35"> ≤35</label>
+    <label><input type="radio" name="imc_condition" value=">=35"> ≥35</label>
+  </div>
+
+</div>
+
+<div class="form-group">
+
+  <h2>2/ Contexte médical et situations particulières</h2>
+
+  <!-- ========================= -->
+  <!-- 🔹 SITUATIONS SPÉCIFIQUES -->
+  <!-- ========================= -->
+
+<div style="margin:10px 0 6px 0; font-weight:600;">
+    <strong>Situations spécifiques</strong>
+  </div>
+
+  <!-- Grossesse (conditionnelle) -->
+  <div id="grossesse_container" style="display:none; margin-bottom:10px;">
+
+    <label>
+      <input type="checkbox" id="grossesse_checkbox">
+      Grossesse en cours
+    </label>
+
+    <div id="grossesse_block" style="display:none; margin-left:15px;">
+
+      <label>
+        <input type="checkbox" name="grossesse_comorbidite">
+        Comorbidité associée
+      </label>
+
+      <label>
+        <input type="checkbox" name="grossesse_complication">
+        Complication obstétricale
+      </label>
+
+    </div>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- 🔹 SITUATIONS CLINIQUES -->
+  <!-- ========================= -->
+
+  <!-- Symptômes -->
+  <label>
+    <input type="checkbox" id="symptomes_checkbox">
+    Symptômes de maladie CV, respiratoire, métabolique ou rénale décompensée
+  </label>
+
+  <div id="symptomes_alert" style="
+    display:none;
+    margin-top:6px;
+    padding:8px;
+    background:#fff4e5;
+    border-left:4px solid #f59e0b;
+    border-radius:6px;
+    font-size:0.9rem;
+  ">
+    ⚠️ Situation nécessitant une prise en charge médicale préalable.
+  </div>
+
+  <!-- ATCD CV -->
+<label>
+  <input type="checkbox" name="atcd_cv">
+  ATCD personnel de maladie cardiovasculaire (hors HTA équilibrée)
+</label>
+
+<div id="atcd_familial_block" style="display:none;">
+  <label>
+    <input type="checkbox" name="atcd_familial_cv">
+    Âge ≤ 35 ans ET ATCD familial de maladie CV héréditaire
+    ou mort subite < 50 ans (1er degré)
+  </label>
+</div>
+
+<label>
+  <input type="checkbox" name="cardiotoxicite">
+  ATCD de cancer avec traitement cardiotoxique
+</label>
+    
+  <!-- BPCO -->
+  <label>
+    <input type="checkbox" id="bpco_checkbox">
+    Maladie respiratoire chronique
+  </label>
+
+  <div id="bpco_block" style="display:none; margin-left:15px;">
+
+    <label>
+      <input type="checkbox" name="efr_ok">
+      EFR < 1 an
+    </label>
+
+    <label>
+      <input type="checkbox" id="bpco_severe">
+      Stade sévère
+    </label>
+
+    <div id="bpco_severe_block" style="display:none; margin-left:15px;">
+      <label>
+        <input type="checkbox" name="test_marche_ok">
+        Test de marche avec SpO₂ < 1 an
+      </label>
+    </div>
+
+  </div>
+
+  <!-- Handicap -->
+  <label>
+    <input type="checkbox" id="handicap_checkbox">
+    Situation de handicap
+  </label>
+
+  <div id="handicap_block" style="display:none; margin-left:15px;">
+    <label>
+      <input type="checkbox" name="avis_specialise_ok">
+      Avis spécialisé / CMAP < 1 an
+    </label>
+  </div>
+
+  <!-- Risque MSK -->
+  <label>
+    <input type="checkbox" name="risque_msk">
+    Risque de blessure musculosquelettique ou cutanée
+  </label>
+
+  <!-- Biologie -->
+<div style="margin:10px 0 6px 0; font-weight:600;">
+  <strong>Biologie récente</strong>
+</div>
+
+<label>
+  <input type="checkbox" name="bio_ok">
+  Bilan biologique (bilan lipidique et créatininémie) datant de moins d’un an
+</label>
+</div>
+        
+    <div class="form-group">
+    <h2>3/ Évaluation du RCV (tableau 3) :</h2>
+    <label><input type="radio" name="rcv" value="faible"> Faible</label>
+    <label><input type="radio" name="rcv" value="modere"> Modéré</label>
+    <label><input type="radio" name="rcv" value="eleve_tres_eleve"> Élevé/très élevé</label>
+</div>
+        
             <div class="form-group">
-                <h2>1/ La personne adressée est dans une des situations suivantes (page 3) :</h2>
-                <label><input type="radio" name="situation" value="symptomes"> Elle a des symptômes de maladie CV, respiratoire, métabolique et rénale décompensée</label>
-                <label><input type="radio" name="situation" value="limitations"> Elle présente des limitations ou CI à l’AP (tableau 7-9)</label>
-                <label><input type="radio" name="situation" value="situations_particulieres"> Elle est dans une des situations particulières (situation 3)</label>
-                <label><input type="radio" name="situation" value="aucune"> Votre patient n’est dans aucune de ces situations</label>
-            </div>
-            <div class="form-group">
-                <h2>2/ Évaluation de l’Activité Physique (niveau actuel et visé, motivation)</h2>
+                <h2>4/ Évaluation de l’Activité Physique (niveau actuel et visé, motivation)</h2>
                 <div class="sub-group">
 <h3 id="niveau-actuel-title">Niveau actuel (mesuré par 
 <label><input type="radio" name="questionnaire" value="GPAQ"> GPAQ</label>, 
 <label><input type="radio" name="questionnaire" value="Marshall"> Marshall</label>) :
 </h3>
 
-<div style="display: flex; align-items: center; gap:25px;">
+<div id="niveau-container" style="display: flex; align-items: center; gap:25px; flex-wrap: wrap;">
 
 <label>
 <input id="niveau_tres_actif" type="radio" name="niveau_actuel" value="tres_actif"> Très actif
@@ -485,7 +726,12 @@ Pas d’AP envisagée dans les 6 mois
 </label>
 
 </div>
-
+                    
+<label>
+  Nombre de pas par jour sur le dernier mois :
+  <input type="number" name="nombre_pas" placeholder="Ex : 7500">
+</label>
+                    
 <div>
     <label>
         <input type="radio" name="sedentaire" value="sedentaire">
@@ -502,14 +748,12 @@ Pas d’AP envisagée dans les 6 mois
         Statut de sédentarité non recherché
     </label>
 </div>
-                    <label>
-  Nombre moyen d’heures assises par jour :
-  <input type="number" name="heures_assises" min="0" max="24" placeholder="Ex : 8">
-</label>
 <label>
-  Nombre de pas par jour sur le dernier mois :
-  <input type="number" name="nombre_pas" min="0" placeholder="Ex : 7500">
+  Nombre moyen d’heures assises par jour :
+  <input type="number" name="heures_assises" placeholder="Ex : 8">
 </label>
+
+
 
                 </div>
                 <div class="sub-group">
@@ -522,14 +766,7 @@ Pas d’AP envisagée dans les 6 mois
  </div>
 
 <div class="form-group">
-    <h2>3/ Évaluation du RCV (tableau 3) :</h2>
-    <label><input type="radio" name="rcv" value="faible"> Faible</label>
-    <label><input type="radio" name="rcv" value="modere"> Modéré</label>
-    <label><input type="radio" name="rcv" value="eleve_tres_eleve"> Élevé/très élevé</label>
-</div>
-
-<div class="form-group">
-    <h2>4/ Évaluation motivationnelle (complément) :</h2>
+    <h2>5/ Évaluation motivationnelle (complément) :</h2>
     <div class="sub-group">
         <h3 class="black-text">La personne adressée présente les <u>freins</u> suivants :</h3>
         <textarea name="freins"></textarea>
@@ -597,27 +834,27 @@ Pas d’AP envisagée dans les 6 mois
 
 
 <div class="form-group">
-    <h2>5/ Une consultation Médicale d’AP est préconisée :</h2>
+    <h2>6/ Une consultation Médicale d’AP est préconisée :</h2>
     <label><input type="radio" name="consultation_ap" value="oui"> Oui</label>
     <label><input type="radio" name="consultation_ap" value="non"> Non</label>
     <label><input type="radio" name="consultation_ap" value="peut_etre"> Peut être proposée</label>
 </div>
 
 <div class="form-group">
-    <h2>6/ Une épreuve d’effort est préconisée :</h2>
+    <h2>7/ Une épreuve d’effort est préconisée :</h2>
     <label><input type="radio" name="epreuve_effort" value="oui"> Oui</label>
     <label><input type="radio" name="epreuve_effort" value="non"> Non</label>
     <label><input type="radio" name="epreuve_effort" value="peut_etre"> Peut être proposée</label>
 </div>
 
 <div class="form-group">
-    <h2>7/ Les objectifs principaux en termes d’activité physique sont :</h2>
+    <h2>8/ Les objectifs principaux en termes d’activité physique sont :</h2>
     <textarea name="objectifs_ap"></textarea>
 </div>
 
         
 <div class="form-group">
-<h2>8/ Je lui ai remis :</h2>
+<h2>9/ Je lui ai remis :</h2>
 
 <!-- ================= AEROBIE ================= -->
 <div class="sub-group">
@@ -710,13 +947,6 @@ Pas d’AP envisagée dans les 6 mois
 
 </div>
 
-   
-            <div class="form-group">
-                <h2>9/ La personne adressée est :</h2>
-<label class="inline-option"><input type="radio" name="sexe" value="femme"> Une femme</label>
-<label class="inline-option"><input type="radio" name="sexe" value="homme"> Un homme</label>
-
-            </div>
             <div class="form-group">
                 <h2>10/ Le destinataire du courrier est :</h2>
               <label class="inline-option"><input type="radio" name="destinataire" value="consoeur"> Une consœur</label>
@@ -757,10 +987,12 @@ Pas d’AP envisagée dans les 6 mois
     </div>
 
 
-    <script>
-        
-     let isImporting = false;
-        
+<script>
+
+const DEBUG = false; // ✅ AJOUT ICI
+
+let isImporting = false;
+            
            function scrollIfNeeded(element) {
 
   if (!element) return;
@@ -785,9 +1017,33 @@ if (window.matchMedia("(max-width: 768px)").matches) {
 
         let lastPrenom = "";
         let lastNom = "";
-        
-      function importPatientJSON(jsonText) {
-          isImporting = true;
+            
+function resetFormulaireComplet() {
+
+  // 🔹 reset radios / checkbox
+  document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => {
+    el.checked = false;
+  });
+
+  // 🔹 reset inputs texte / number
+  document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => {
+    el.value = "";
+  });
+
+  // 🔹 reset motivation UI (important)
+  document.querySelectorAll('#actif-subgroup, #inactif-subgroup, #sixmois-subgroup')
+    .forEach(el => el.style.display = "none");
+
+}
+            
+function importPatientJSON(jsonText) {
+
+  isImporting = true;
+
+  // 🔥 AJOUT CRITIQUE
+  resetFormulaireComplet();
+
+  console.log("IMPORT JSON APPELE");
       console.log("IMPORT JSON APPELE");
       console.log("JSON reçu :", jsonText);
       let data;
@@ -892,10 +1148,8 @@ if (niveau) {
       r.checked = false;
     }
   });
-// forcer affichage complet avant motivation
-setTimeout(() => {
-  appliquerMotivation(actifDepuis, apEnvisagee, ap6Mois);
-}, 50);
+// 🔥 appliquer motivation APRÈS mise à jour UI
+appliquerMotivation(actifDepuis, apEnvisagee, ap6Mois);    
 }
   
  if (pas !== undefined && pas !== null) {
@@ -981,104 +1235,114 @@ if (confBlock && confField) {
   }
 
 }
-          
+    
+alert("Données patient importées.\n\nVérifiez et complétez les champs avant de générer le compte-rendu.");          
 setTimeout(() => {
   isImporting = false;
-}, 100); }
+}, 100); 
+      
+}
 
 function appliquerMotivation(actifDepuis, apEnvisagee, ap6Mois){
 
   console.log("Application motivation après affichage UI");
+
+  // 🔥 RESET COMPLET
+  document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+
+  document.getElementById('actif-subgroup').style.display = "none";
+  document.getElementById('inactif-subgroup').style.display = "none";
+  document.getElementById('sixmois-subgroup').style.display = "none";
 
   // 🔒 GARDE-FOU
   if (!document.querySelector('input[name="niveau_actuel"]:checked')) {
     return;
   }
 
+  // 🔹 ACTIF
   if (actifDepuis) {
+    const r = document.querySelector(
+      `input[name="actif_depuis"][value="${actifDepuis}"]`
+    );
+    if (r) {
+      r.checked = true;
+      document.getElementById('actif-subgroup').style.display = "";
+    }
+  }
 
-  const r = document.querySelector(
-    `input[name="actif_depuis"][value="${actifDepuis}"]`
-  );
-
-if (r) {
-
-  r.click();
-
-  setTimeout(() => {
-    
-    const block = document.getElementById("actif-subgroup");
-  
-  }, 100);
-
-}
-
-}
-
+  // 🔹 AP ENVISAGÉE
 if (apEnvisagee) {
+
+  // 🔥 AJOUT CRITIQUE → afficher bloc inactif
+  document.getElementById('inactif-subgroup').style.display = "";
 
   const r = document.querySelector(
     `input[name="ap_envisagee"][value="${apEnvisagee}"]`
   );
 
   if (r) {
+    r.checked = true;
 
-    r.click();
+    if (apEnvisagee === "non") {
+      document.getElementById('sixmois-subgroup').style.display = "";
 
-    // 🔥 gestion spécifique du cas "non" → affichage bloc 6 mois
-    if (apEnvisagee === "non" && ap6Mois) {
-
-      setTimeout(() => {
-
+      if (ap6Mois) {
         const r6 = document.querySelector(
           `input[name="ap_6_mois"][value="${ap6Mois}"]`
         );
-
-        if (r6) {
-          r6.click();
-        }
-
-      }, 80);
+        if (r6) r6.checked = true;
+      }
     }
   }
 }
 }
-        
-        function updateNiveauButtons(mode){
 
-const tres = document.getElementById("niveau_tres_actif").parentElement;
-const actif = document.getElementById("niveau_actif").parentElement;
-const moyen = document.getElementById("niveau_moyen").parentElement;
-const inactif = document.getElementById("niveau_inactif").parentElement;
-            
-  if(mode === "clinique"){
+    
+function updateNiveauButtons(mode){
 
-    tres.style.display = "";
-    actif.style.display = "";
-    moyen.style.display = "none";
-    inactif.style.display = "";
+  const tres = document.getElementById("niveau_tres_actif").closest("label");
+  const actif = document.getElementById("niveau_actif").closest("label");
+  const moyen = document.getElementById("niveau_moyen").closest("label");
+  const inactif = document.getElementById("niveau_inactif").closest("label");
 
-  }
+          if(mode === "clinique"){
 
-  if(mode === "gpaq"){
-
-    tres.style.display = "";
-    actif.style.display = "none";
-    moyen.style.display = "";
-    inactif.style.display = "";
-
-  }
-
-  if(mode === "marshall"){
-
-    tres.style.display = "none";
-    actif.style.display = "";
-    moyen.style.display = "none";
-    inactif.style.display = "";
-
-  }
+  tres.style.setProperty("display", "", "important");
+  actif.style.setProperty("display", "", "important");
+  moyen.style.setProperty("display", "none", "important");
+  inactif.style.setProperty("display", "", "important");
 
 }
+
+if(mode === "gpaq"){
+
+  tres.style.setProperty("display", "", "important");
+  actif.style.setProperty("display", "none", "important");
+  moyen.style.setProperty("display", "", "important");
+  inactif.style.setProperty("display", "", "important");
+
+}
+
+if(mode === "marshall"){
+
+  tres.style.setProperty("display", "none", "important");
+  actif.style.setProperty("display", "", "important");
+  moyen.style.setProperty("display", "none", "important");
+  inactif.style.setProperty("display", "", "important");
+
+}
+    if (DEBUG) {
+  console.log("DEBUG niveau :", mode, {
+    tres: document.getElementById("niveau_tres_actif").parentElement.style.display,
+    actif: document.getElementById("niveau_actif").parentElement.style.display,
+    moyen: document.getElementById("niveau_moyen").parentElement.style.display,
+    inactif: document.getElementById("niveau_inactif").parentElement.style.display
+  });
+}
+}
+
  window.copyPatientComment = function(id){
 
   const field = document.getElementById(id);
@@ -1095,8 +1359,263 @@ const inactif = document.getElementById("niveau_inactif").parentElement;
   document.body.removeChild(temp);
 
 };
+
+// ==========================
+// AGE + ATCD FAMILIAL
+// ==========================
+
+function initAge() {
+    
+const ageInput = document.getElementById("age_input");
+const ageFallback = document.getElementById("age_fallback");
+const atcdFamilialBlock = document.getElementById("atcd_familial_block");
+
+function updateAgeUI() {
+
+  if (!ageInput || !atcdFamilialBlock) return;
+
+  const value = ageInput.value;
+  const age = parseInt(value);
+
+  // fallback âge
+  if (!value) {
+    ageFallback.style.display = "block";
+  } else {
+    ageFallback.style.display = "none";
+    document.querySelectorAll('input[name="age_condition"]').forEach(r => r.checked = false);
+  }
+
+  // ATCD familial
+  if (!value || age <= 35) {
+    atcdFamilialBlock.style.display = "block";
+  } else {
+    atcdFamilialBlock.style.display = "none";
+    document.querySelectorAll('input[name="atcd_familial_cv"]').forEach(r => r.checked = false);
+  }
+}
+
+// écoute
+if (ageInput) {
+  ageInput.addEventListener("input", updateAgeUI);
+}
+
+// 🔥 INITIALISATION
+updateAgeUI();
+ }
+
+function initIMC() {
+
+  const tailleInput = document.getElementById("taille_input");
+  const poidsInput = document.getElementById("poids_input");
+  const imcResult = document.getElementById("imc_result");
+  const imcFallback = document.getElementById("imc_fallback");
+
+  function calculIMC() {
+
+    const taille = parseFloat(tailleInput.value);
+    const poids = parseFloat(poidsInput.value);
+
+    if (!taille || !poids) {
+      imcResult.innerHTML = "";
+      imcFallback.style.display = "block";
+      return;
+    }
+
+    const imc = poids / ((taille / 100) ** 2);
+    const imcRounded = imc.toFixed(1);
+
+    let interpretation = imc >= 35
+      ? "IMC ≥ 35 kg/m²"
+      : "IMC ≤ 35 kg/m²";
+
+    imcResult.innerHTML = `IMC : <strong>${imcRounded}</strong> (${interpretation})`;
+
+    imcFallback.style.display = "none";
+
+    document.querySelectorAll('input[name="imc_condition"]').forEach(r => r.checked = false);
+  }
+
+  if (tailleInput && poidsInput) {
+    tailleInput.addEventListener("input", calculIMC);
+    poidsInput.addEventListener("input", calculIMC);
+  }
+
+}
+            
+ function initGrossesse() {
+
+  const sexeRadios = document.querySelectorAll('input[name="sexe"]');
+  const grossesseContainer = document.getElementById("grossesse_container");
+  const grossesseCheckbox = document.getElementById("grossesse_checkbox");
+  const grossesseBlock = document.getElementById("grossesse_block");
+
+  if (!sexeRadios || !grossesseContainer) return;
+
+  sexeRadios.forEach(radio => {
+    radio.addEventListener("change", function(){
+
+      if (this.value === "femme") {
+        grossesseContainer.style.display = "block";
+      } else {
+        grossesseContainer.style.display = "none";
+
+        if (grossesseCheckbox) grossesseCheckbox.checked = false;
+        if (grossesseBlock) grossesseBlock.style.display = "none";
+
+        document.querySelectorAll('input[name="grossesse_comorbidite"], input[name="grossesse_complication"]')
+          .forEach(r => r.checked = false);
+      }
+
+    });
+  });
+
+  if (grossesseCheckbox) {
+    grossesseCheckbox.addEventListener("change", function(){
+      grossesseBlock.style.display = this.checked ? "block" : "none";
+    });
+  }
+
+}           
+
+function initSymptomes() {
+
+  const symptomesCheckbox = document.getElementById("symptomes_checkbox");
+  const symptomesAlert = document.getElementById("symptomes_alert");
+
+  if (!symptomesCheckbox || !symptomesAlert) return;
+
+  symptomesCheckbox.addEventListener("change", function(){
+    symptomesAlert.style.display = this.checked ? "block" : "none";
+  });
+
+}
+
+function initBPCO() {
+
+  const bpcoCheckbox = document.getElementById("bpco_checkbox");
+  const bpcoBlock = document.getElementById("bpco_block");
+
+  const bpcoSevere = document.getElementById("bpco_severe");
+  const bpcoSevereBlock = document.getElementById("bpco_severe_block");
+
+  if (bpcoCheckbox) {
+    bpcoCheckbox.addEventListener("change", function(){
+      bpcoBlock.style.display = this.checked ? "block" : "none";
+    });
+  }
+
+  if (bpcoSevere) {
+    bpcoSevere.addEventListener("change", function(){
+      bpcoSevereBlock.style.display = this.checked ? "block" : "none";
+    });
+  }
+
+}
+            
+function initHandicap() {
+
+  const handicapCheckbox = document.getElementById("handicap_checkbox");
+  const handicapBlock = document.getElementById("handicap_block");
+
+  if (!handicapCheckbox || !handicapBlock) return;
+
+  handicapCheckbox.addEventListener("change", function(){
+    handicapBlock.style.display = this.checked ? "block" : "none";
+  });
+
+}
+ 
+        function initActivitePhysique() {
+
+  const questionnaireRadios = document.querySelectorAll('input[name="questionnaire"]');
+  const niveauRadios = document.querySelectorAll('input[name="niveau_actuel"]');
+  const apRadios = document.querySelectorAll('input[name="ap_envisagee"]');
+
+  const actifBlock = document.getElementById('actif-subgroup');
+  const inactifBlock = document.getElementById('inactif-subgroup');
+  const sixMoisBlock = document.getElementById('sixmois-subgroup');
+
+  function resetMotivation() {
+    document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+
+    actifBlock.style.display = "none";
+    inactifBlock.style.display = "none";
+    sixMoisBlock.style.display = "none";
+  }
+
+  function updateNiveauUI(value) {
+
+    resetMotivation();
+
+    if (value === 'actif' || value === 'tres_actif' || value === 'moyennement_actif') {
+      actifBlock.style.display = "";
+    }
+
+    if (value === 'inactif') {
+      inactifBlock.style.display = "";
+    }
+  }
+
+ function updateAP(value) {
+
+  if (isImporting) return; // 🔥 AJOUT
+
+    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+    sixMoisBlock.style.display = "none";
+
+    if (value === "non") {
+      sixMoisBlock.style.display = "block";
+    }
+  }
+
+  // 🎯 QUESTIONNAIRE
+questionnaireRadios.forEach(radio => {
+  radio.addEventListener("change", function(){
+
+    const mode = this.value === "GPAQ"
+      ? "gpaq"
+      : this.value === "Marshall"
+      ? "marshall"
+      : "clinique";
+
+    // 🔥 1. appliquer affichage
+    updateNiveauButtons(mode);
+
+    if(isImporting) return;
+
+    // 🔥 2. reset
+    document.querySelectorAll('input[name="niveau_actuel"]').forEach(r => r.checked = false);
+    resetMotivation();
+
+    // 🔥 3. RÉAPPLIQUER (clé du bug)
+    updateNiveauButtons(mode);
+
+  });
+});
+
+  // 🎯 NIVEAU
+  niveauRadios.forEach(radio => {
+    radio.addEventListener("change", function(){
+      if(isImporting) return;
+      updateNiveauUI(this.value);
+    });
+  });
+
+  // 🎯 AP ENVISAGÉE
+  apRadios.forEach(radio => {
+    radio.addEventListener("change", function(){
+      updateAP(this.value);
+    });
+  });
+
+  // 🔥 INIT ÉTAT
+resetMotivation();
+
+} 
         
-function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
+            function toggleSubgroup(groupName, subgroupId, extraBlockId = null) {
   const radios = document.querySelectorAll(`input[name="${groupName}"]`);
   const subgroup = document.getElementById(subgroupId);
   const extraBlock = extraBlockId ? document.getElementById(extraBlockId) : null;
@@ -1208,7 +1727,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const isChrome = navigator.userAgent.includes("CriOS");
 
   const warning = document.getElementById("iosBrowserWarning");
-  if (!warning) return;
 
   // 🔒 déjà fermé → ne jamais réafficher
 let warningClosed = false;
@@ -1219,8 +1737,6 @@ try {
   warningClosed = false;
 }
 
-if (warningClosed) return;
-
   // 👉 condition cible
   if (isIOS && (isFirefox || isChrome)) {
 
@@ -1230,10 +1746,21 @@ if (warningClosed) return;
 
 }
 
+    
+// ===== INIT GLOBAL =====
+initIMC();
+initAge();
+initGrossesse();
+initSymptomes();
+initBPCO();
+initHandicap();
+initActivitePhysique();
+
+updateNiveauButtons("clinique");
 });
     
-// 🔹 INIT UI + SETUP
-updateNiveauButtons("clinique");
+
+
 
 toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup", "intensite_aerobie_block");
 toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
@@ -1243,101 +1770,6 @@ document.getElementById("actif-subgroup")?.classList.add("hidden");
 document.getElementById("inactif-subgroup")?.classList.add("hidden");
 document.getElementById("sixmois-subgroup")?.classList.add("hidden");
 
-
-// ==========================
-// QUESTIONNAIRE
-// ==========================
-document.querySelectorAll('input[name="questionnaire"]').forEach(function(radio){
-
-  radio.addEventListener("change", function(){
-
-    if(this.value === "GPAQ"){
-      updateNiveauButtons("gpaq");
-    }
-
-    if(this.value === "Marshall"){
-      updateNiveauButtons("marshall");
-    }
-
-    if(isImporting) return;
-
-    document.querySelectorAll('input[name="niveau_actuel"]').forEach(r => r.checked = false);
-    document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
-    document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
-    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
-
-    document.getElementById("actif-subgroup").style.display = "none";
-    document.getElementById("inactif-subgroup").style.display = "none";
-    document.getElementById("sixmois-subgroup").style.display = "none";
-
-  });
-
-});
-
-
-// ==========================
-// NIVEAU ACTIVITÉ
-// ==========================
-document.querySelectorAll('input[name="niveau_actuel"]').forEach(function(radio){
-
-  radio.addEventListener("change", function(){
-
-    console.log("NIVEAU CHANGE DETECTÉ:", this.value);
-
-    if(isImporting) return;
-
-    document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
-    document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
-    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
-
-    const actifBlock = document.getElementById('actif-subgroup');
-    const inactifBlock = document.getElementById('inactif-subgroup');
-    const sixMoisBlock = document.getElementById('sixmois-subgroup');
-
-    actifBlock.style.display = "none";
-    inactifBlock.style.display = "none";
-    sixMoisBlock.style.display = "none";
-
-    if (this.value === 'actif' || this.value === 'tres_actif' || this.value === 'moyennement_actif') {
-      actifBlock.style.display = "";
-    }
-
-    if (this.value === 'inactif') {
-      inactifBlock.style.display = "";
-    }
-
-  });
-
-});
-
-
-// ==========================
-// AP ENVISAGÉE
-// ==========================
-document.querySelectorAll('input[name="ap_envisagee"]').forEach(function(radio){
-
-  radio.addEventListener("change", function(){
-
-    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
-
-    const sixMoisBlock = document.getElementById("sixmois-subgroup");
-
-    if(!sixMoisBlock) return;
-
-    sixMoisBlock.style.display = "none";
-
-    if(this.value === "non"){
-      sixMoisBlock.style.display = "block";
-    }
-
-  });
-
-});
-
-
-// ==========================
-// MODAL + BOUTONS
-// ==========================
 document.getElementById("confirmPrint")?.addEventListener("click", function() {
 
   const prenom = formatName(document.getElementById("modalPrenom").value);
@@ -2444,7 +2876,8 @@ function closeIOSWarning() {
   }
 
 }
-               </script>
+            
+            </script>
     
     <div id="identityModal" class="modal hidden">
   <div class="modal-content">
