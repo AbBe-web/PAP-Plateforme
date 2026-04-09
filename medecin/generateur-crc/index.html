@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<
+<link rel="manifest" href="/PAP-Plateforme-dev/manifest.json">
 
-<link rel="manifest" href="/PAP-Plateforme/manifest.json">
-
-<link rel="icon" href="/PAP-Plateforme/assets/icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/PAP-Plateforme/assets/icons/icon-192.png">
+<link rel="icon" href="/PAP-Plateforme-dev/assets/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/PAP-Plateforme-dev/assets/icons/icon-192.png">
     
 <meta name="theme-color" content="#2b7cff">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,7 +32,12 @@
 .modal.hidden {
   display: none;
 }
-
+    
+.modal,
+.modal * {
+  pointer-events: auto !important;
+}
+    
 .modal-content {
   background: white;
   padding: 24px;
@@ -308,6 +313,13 @@ button {
   gap: 4px;
 }  
     
+ .has-missing {
+  outline: 2px solid #f59e0b;
+  border-radius: 6px;
+  background: #fff7ed;
+  transition: all 0.2s ease;
+}   
+    
 </style>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -500,12 +512,6 @@ Importer fichier JSON
 
 <div style="margin-top:6px; display:flex; gap:20px; flex-wrap:wrap; font-size:0.8rem;">
 
-  <div id="age_fallback" style="display:none;">
-    <span>Âge :</span>
-    <label><input type="radio" name="age_condition" value="<65"> &lt;65</label>
-    <label><input type="radio" name="age_condition" value=">=65"> ≥65</label>
-  </div>
-
   <div id="imc_fallback" style="display:none;">
     <span>IMC :</span>
     <label><input type="radio" name="imc_condition" value="<35"> ≤35</label>
@@ -581,7 +587,7 @@ Importer fichier JSON
 <div id="atcd_familial_block" style="display:none;">
   <label>
     <input type="checkbox" name="atcd_familial_cv">
-    Âge ≤ 35 ans ET ATCD familial de maladie CV héréditaire
+    ATCD familial de maladie CV héréditaire
     ou mort subite < 50 ans (1er degré)
   </label>
 </div>
@@ -589,6 +595,11 @@ Importer fichier JSON
 <label>
   <input type="checkbox" name="cardiotoxicite">
   ATCD de cancer avec traitement cardiotoxique
+</label>
+
+    <label>
+  <input type="checkbox" id="cancer_suivi_checkbox">
+  Patient actuellement suivi pour un cancer
 </label>
     
   <!-- BPCO -->
@@ -764,7 +775,7 @@ Pas d’AP envisagée dans les 6 mois
                 </div>
     
  </div>
-
+        
 <div class="form-group">
     <h2>5/ Évaluation motivationnelle (complément) :</h2>
     <div class="sub-group">
@@ -832,7 +843,28 @@ Pas d’AP envisagée dans les 6 mois
 
 </div>
 
+<div id="hasBlock" style="
+  margin:20px 0;
+  padding:12px;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  background:#f9fafb;
+">
 
+<strong>🧠 Aide à la décision (référentiel HAS)</strong>
+
+<div style="margin-top:10px;">
+  <button type="button" id="refreshHAS" class="btn secondary">
+    🔄 Actualiser l'analyse
+  </button>
+</div>
+
+<div id="hasContent" style="margin-top:10px; font-size:0.9rem;">
+  Remplissez les informations pour afficher les recommandations.
+</div>
+
+</div>
+    
 <div class="form-group">
     <h2>6/ Une consultation Médicale d’AP est préconisée :</h2>
     <label><input type="radio" name="consultation_ap" value="oui"> Oui</label>
@@ -988,12 +1020,29 @@ Pas d’AP envisagée dans les 6 mois
 
 
 <script>
-
-const DEBUG = false; // ✅ AJOUT ICI
+    
+/* =====================================
+1. VARIABLES GLOBALES ==================
+===================================== */
+const DEBUG = false;
 
 let isImporting = false;
-            
-           function scrollIfNeeded(element) {
+let clinicalModel = null;
+let activeMode = "long";
+
+let lastPrenom = "";
+let lastNom = "";
+
+let savedScrollPosition = 0;
+let identityAction = null;
+
+let qrScanner = null;
+let qrAlreadyRead = false;    
+
+/* =====================================
+2.   ===== FONCTIONS UTILITAIRES =========
+===================================== */
+function scrollIfNeeded(element) {
 
   if (!element) return;
 
@@ -1012,12 +1061,1084 @@ if (window.matchMedia("(max-width: 768px)").matches) {
 }, 90);
   }
 }
-        let clinicalModel = null;
-        let activeMode = "long";
+   
+function cleanMedicalText(text) {
 
-        let lastPrenom = "";
-        let lastNom = "";
-            
+  return text
+    .replace(/\s+/g, " ")        // supprime espaces multiples
+    .replace(/\s+\./g, ".")      // espace avant point
+    .replace(/\s+,/g, ",")       // espace avant virgule
+    .replace(/\s+:/g, " :")      // espace correct avant :
+    .replace(/\.\s*/g, ". ")     // garantit espace après point
+    .trim();
+
+}
+    
+ window.copyPatientComment = function(id){
+
+  const field = document.getElementById(id);
+  if(!field) return;
+
+  const text = field.value || field.innerText || "";
+
+  const temp = document.createElement("textarea");
+  temp.value = text;
+
+  document.body.appendChild(temp);
+  temp.select();
+  document.execCommand("copy");
+  document.body.removeChild(temp);
+
+};   
+
+/* =====================================
+3. INITIALISATION UI ===================
+===================================== */
+function initUI() {
+
+initIMC();
+initAge();
+initGrossesse();
+initSymptomes();
+initBPCO();
+initHandicap();
+initActivitePhysique();
+
+
+toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup", "intensite_aerobie_block");
+toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
+toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
+    
+document.getElementById("actif-subgroup")?.classList.add("hidden");
+document.getElementById("inactif-subgroup")?.classList.add("hidden");
+document.getElementById("sixmois-subgroup")?.classList.add("hidden");
+
+updateNiveauButtons("clinique");
+    
+}
+
+/* =====================================
+4. IMPORT / EXPORT / QR ===============
+===================================== */
+function initImportExport() {
+    
+/* =========================
+   SCANNER QR CODE
+========================= */
+
+const scanBtn = document.getElementById("scanQRBtn");
+const qrContainer = document.getElementById("qrScannerContainer");
+const closeQR = document.getElementById("closeQRScanner");
+
+if(scanBtn){
+
+  scanBtn.addEventListener("click", function(){
+
+    qrContainer.style.display = "block";
+
+    qrScanner = new Html5Qrcode("qr-reader");
+
+qrScanner.start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
+
+  function(decodedText){
+
+    if(qrAlreadyRead) return;
+    qrAlreadyRead = true;
+
+    try{
+      importPatientJSON(decodedText);
+
+      if(qrScanner){
+        qrScanner.stop().then(() => {
+          qrContainer.style.display = "none";
+        });
+      }
+
+      setTimeout(() => {
+        qrAlreadyRead = false;
+      }, 1500);
+
+    } catch(e){
+      console.warn("QR invalide");
+      setTimeout(() => {
+        qrAlreadyRead = false;
+      }, 1000);
+    }
+
+  },
+
+  function(error){
+    // ⚠️ obligatoire pour éviter bug syntaxique + compat iOS
+    console.warn("Scan error", error);
+  }
+
+)
+.then(() => {
+  console.log("Scanner QR démarré");
+})
+.catch(err => {
+  console.error("Erreur caméra :", err);
+});
+});
+}
+    
+if(closeQR){
+  closeQR.addEventListener("click", function(){
+
+    if(qrScanner){
+      qrScanner.stop().then(() => {
+        qrContainer.style.display = "none";
+      });
+    } else {
+      qrContainer.style.display = "none";
+    }
+
+    qrAlreadyRead = false;
+  });
+}
+  // 🔹 IMPORT JSON (ouvre le sélecteur de fichier)
+
+  const importBtn = document.getElementById("importJSONBtn");
+  const importFile = document.getElementById("importJSONFile");
+
+  if(importBtn && importFile){
+
+    importBtn.addEventListener("click", function(){
+      importFile.click();
+    });
+
+  }
+// =============================
+// IMPORT JSON AUTO-EVALUATION
+// =============================
+
+const importJSONInput = document.getElementById("importJSONFile");
+
+if (importJSONInput) {
+  importJSONInput.addEventListener("change", function(e){
+
+  const file = e.target.files[0];
+
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(){
+
+    try{
+
+      const data = JSON.parse(reader.result);
+   importPatientJSON(JSON.stringify(data));
+        
+    // Pas moyens
+const pas = data?.resultats?.pas_moyens_jour_1_mois;
+if (pas !== undefined && pas !== null) {
+  const inputPas = document.querySelector('input[name="nombre_pas"]');
+  if(inputPas) inputPas.value = pas;
+}
+
+// Heures assises (sédentarité)
+const heuresAssises =
+  data?.questionnaires?.gpaq?.sedentarite?.heures_par_jour ??
+  data?.questionnaires?.marshall?.sedentarite?.heures_par_jour ??
+  null;
+
+if (heuresAssises !== null) {
+
+  const input = document.querySelector('input[name="heures_assises"]');
+
+if (input) input.value = Number(heuresAssises);
+
+}
+
+      // Questionnaire utilisé
+const q = data?.meta?.questionnaire;
+
+if (q !== undefined && q !== null) {
+
+  const radio = document.querySelector(`input[name="questionnaire"][value="${q}"]`);
+
+  if(radio){
+    radio.checked = true;
+    setTimeout(() => {
+      radio.dispatchEvent(new Event("change"));
+    },0);
+  }
+
+}
+
+/* ======================
+   IMPORT EVA IMPORTANCE
+====================== */
+
+const importance = data?.motivation?.importance_eva_0_10;
+
+if(importance !== undefined && importance !== null){
+  const inputImportance = document.querySelector('input[name="importance_ap"]');
+  if(inputImportance) inputImportance.value = importance;
+}    
+       const importanceComment = data?.motivation?.importance_commentaire;
+
+const block = document.getElementById("importance_patient_block");
+const field = document.getElementById("importance_patient_comment");
+
+if(block && field){
+
+if (importanceComment && importanceComment.trim() !== "") {
+
+    field.value = importanceComment;
+    block.style.display = "block";
+
+  }
+ }
+/* ======================
+   IMPORT EVA CONFIANCE
+====================== */
+
+const confiance = data?.motivation?.confiance_eva_0_10;
+
+if(confiance !== undefined && confiance !== null){
+  const inputConfiance = document.querySelector('input[name="confiance_ap"]');
+  if(inputConfiance) inputConfiance.value = confiance;
+}
+const confianceComment = data?.motivation?.confiance_commentaire;
+
+const blockC = document.getElementById("confiance_patient_block");
+const fieldC = document.getElementById("confiance_patient_comment");
+
+if(blockC && fieldC){
+
+  if(confianceComment){
+
+    fieldC.value = confianceComment;
+    blockC.style.display = "block";
+
+  }
+
+  }
+
+
+alert("Données patient importées.\n\nVérifiez et complétez les champs avant de générer le compte-rendu.");
+
+    }catch(err){
+
+      alert("Fichier JSON invalide.");
+
+    }
+
+  };
+
+  reader.readAsText(file);
+
+});
+  }
+    
+}
+
+/* =====================================
+5. LOGIQUE METIER HAS ==================
+===================================== */
+// 🔥 AUTO UPDATE HAS
+function updateHAS(){
+
+  const ageInput = document.getElementById("age_input");
+  const age = parseInt(ageInput?.value);
+
+  const rcvRadios = document.querySelectorAll('input[name="rcv"]');
+  const rcv = document.querySelector('input[name="rcv"]:checked')?.value;
+  const niveauViseRadios = document.querySelectorAll('input[name="niveau_vise"]');
+  const niveauVise = document.querySelector('input[name="niveau_vise"]:checked')?.value;
+
+  const niveauActuelRadios = document.querySelectorAll('input[name="niveau_actuel"]');
+  const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked')?.value;
+  const container = document.getElementById("hasContent");
+
+  // 🔹 RESET visuel (AJOUT)
+  clearHighlight(ageInput);
+  rcvRadios.forEach(r => clearHighlight(r.closest("label")));
+  niveauViseRadios.forEach(r => clearHighlight(r.closest("label")));
+  niveauActuelRadios.forEach(r => clearHighlight(r.closest("label")));
+ 
+    // 🔹 ÉTAT 1 : RIEN REMPLI
+let missingFields = [];
+
+// Vérification âge
+if (!age) {
+  highlightMissing(ageInput);
+  missingFields.push("l'âge");
+}
+
+// Vérification RCV
+if (!rcv) {
+  rcvRadios.forEach(r => highlightMissing(r.closest("label")));
+  missingFields.push("le risque cardiovasculaire");
+}
+
+// Vérification niveau visé
+if (!niveauVise) {
+  niveauViseRadios.forEach(r => highlightMissing(r.closest("label")));
+  missingFields.push("le niveau d'activité visé");
+}
+
+// Vérification niveau actuel
+if (!niveauActuel) {
+  niveauActuelRadios.forEach(r => highlightMissing(r.closest("label")));
+  missingFields.push("le niveau d'activité actuel");
+}
+
+// Si champs manquants → message global
+if (missingFields.length > 0) {
+
+  if (container) {
+    container.innerHTML = `
+      <div style="
+        padding:10px;
+        border-left:4px solid #f59e0b;
+        background:#fff4e5;
+        border-radius:6px;
+        font-size:0.9rem;
+      ">
+      ⚠️ Merci de renseigner les éléments suivants :<br><br>
+      ${missingFields.map(f => "• " + f).join("<br>")}
+      <br><br>
+      Cela est nécessaire pour afficher les recommandations du guide HAS.
+      </div>
+    `;
+  }
+
+  return;
+}
+    
+  const model = buildClinicalModel();
+  const reco = runHAS(model);
+  displayHASRecommendations(reco);
+}
+
+function runHAS(model){
+
+  const reco = {
+    cmap: [],
+    cardio: [],
+    effort: [],
+    bio: [],
+    pneumo: []
+  };
+
+  const evalData = model.evaluation;
+  const p = model.patient;
+
+  // 🔹 Raccourcis
+const niveauVise = document.querySelector('input[name="niveau_vise"]:checked')?.value;
+  const niveauActuel = evalData.classification;
+  const rcv = evalData.rcv;
+
+  const age = parseInt(document.getElementById("age_input")?.value) || null;
+const imcText = document.getElementById("imc_result")?.innerText || "";
+const imcMatch = imcText.match(/IMC : ([0-9.]+)/);
+const imc = imcMatch ? parseFloat(imcMatch[1]) : null;
+
+  const handicap = document.getElementById("handicap_checkbox")?.checked;
+  const bpco = document.getElementById("bpco_checkbox")?.checked;
+  const bpcoSevere = document.getElementById("bpco_severe")?.checked;
+
+  const atcdCV = document.querySelector('input[name="atcd_cv"]')?.checked;
+  const atcdFamilial = document.querySelector('input[name="atcd_familial_cv"]')?.checked;
+  const cardiotox = document.querySelector('input[name="cardiotoxicite"]')?.checked;
+const cancer = document.getElementById("cancer_suivi_checkbox")?.checked;
+  const msk = document.querySelector('input[name="risque_msk"]')?.checked;
+
+  const bioOk = document.querySelector('input[name="bio_ok"]')?.checked;
+  const efrOk = document.querySelector('input[name="efr_ok"]')?.checked;
+  const testMarcheOk = document.querySelector('input[name="test_marche_ok"]')?.checked;
+
+// =========================
+// 1️⃣ CMAP — VERSION CLEAN SÉCURISÉE
+// =========================
+
+let cmapReco = [];
+
+// 🔹 RÈGLES PRIORITAIRES
+
+// Handicap
+if (handicap) {
+  cmapReco.push("prioritaire_handicap");
+}
+
+// Cancer
+if (cancer) {
+  cmapReco.push("preconisee");
+}
+
+// Risque MSK
+if (msk) {
+  cmapReco.push("preconisee");
+}
+
+// 🔹 AP INTENSE — RÈGLE MAJEURE HAS
+if (
+  niveauVise === "eleve" &&
+  (
+    rcv !== "faible" ||
+    cardiotox ||
+    (age && age >= 65)
+  )
+) {
+  cmapReco.push("preconisee");
+}
+
+// 🔹 IMC ≥ 35 + AP intense
+if (niveauVise === "eleve" && imc >= 35) {
+  cmapReco.push("proposable");
+}
+
+// 🔹 AP modérée + inactif + haut risque
+if (
+  niveauVise === "modere" &&
+  niveauActuel === "inactif" &&
+  (
+    rcv === "eleve_tres_eleve" ||
+    cardiotox ||
+    (age && age >= 70)
+  )
+) {
+  cmapReco.push("proposable");
+}
+
+// 🔹 BPCO (info complémentaire, non prioritaire)
+if (bpco && (niveauVise === "modere" || niveauVise === "eleve")) {
+  cmapReco.push("pneumo");
+}
+
+// =========================
+// 🔥 PRIORISATION FINALE
+// =========================
+
+if (cmapReco.includes("prioritaire_handicap")) {
+
+  reco.cmap.push("Une consultation médicale d’activité physique est préconisée et un avis médical spécialisé et/ou médicotechnique peut se justifier.");
+
+} else if (cmapReco.includes("preconisee")) {
+
+  reco.cmap.push("Une consultation médicale d’activité physique est préconisée.");
+
+} else if (cmapReco.includes("proposable")) {
+
+  reco.cmap.push("Une consultation médicale d’activité physique peut être proposée.");
+
+} else {
+
+  // 🔐 CAS NON PRÉVU = NON RECOMMANDÉE (sécurité)
+  reco.cmap.push("Une consultation médicale d’activité physique n’est pas recommandée.");
+
+}
+
+  // =========================
+  // 2️⃣ CARDIO
+  // =========================
+
+  if (
+    niveauVise === "eleve" &&
+    (
+      atcdCV ||
+      ((age && age <= 35) && atcdFamilial)
+    )
+  ) {
+    reco.cardio.push("Un avis cardiologique spécialisé et/ou un ECG sont recommandés.");
+  }
+
+  // =========================
+  // 3️⃣ ÉPREUVE D’EFFORT
+  // =========================
+
+  let effortReco = [];
+
+  if (niveauVise === "faible") {
+    effortReco.push("non");
+  }
+
+  if (niveauVise === "modere" && rcv === "faible") {
+    effortReco.push("non");
+  }
+
+  if (niveauVise === "modere" && rcv !== "faible") {
+    effortReco.push("non_preconise");
+  }
+if (niveauVise === "eleve") {
+
+  if (atcdFamilial) {
+    effortReco.push("indique");
+  } 
+
+  else {
+
+    if (niveauActuel === "inactif") {
+      if (rcv === "faible") effortReco.push("non_preconise");
+      if (rcv === "modere") effortReco.push("possible");
+      if (rcv === "eleve_tres_eleve") effortReco.push("recommande");
+    }
+
+    if (niveauActuel === "actif") {
+      if (rcv === "faible") effortReco.push("non");
+      if (rcv === "modere") effortReco.push("non_preconise");
+      if (rcv === "eleve_tres_eleve") effortReco.push("recommande");
+    }
+
+  }
+}
+
+  // 🔥 PRIORISATION
+  if (effortReco.includes("recommande")) {
+    reco.effort.push("Une épreuve d’effort est recommandée.");
+  } else if (effortReco.includes("indique")) {
+    reco.effort.push("Une épreuve d’effort est indiquée.");
+  } else if (effortReco.includes("possible")) {
+    reco.effort.push("Une épreuve d’effort peut être réalisée.");
+  } else if (effortReco.includes("non")) {
+    reco.effort.push("Une épreuve d’effort n’est pas recommandée.");
+  } else {
+    reco.effort.push("Une épreuve d’effort n’est pas préconisée.");
+  }
+
+  // =========================
+  // 4️⃣ BIO
+  // =========================
+
+  if (!bioOk && niveauVise !== "faible") {
+    reco.bio.push("Un bilan biologique (glycémie, bilan lipidique, créatininémie) peut se justifier.");
+  }
+
+  // =========================
+  // 5️⃣ BPCO
+  // =========================
+
+  if (bpco && !efrOk && niveauVise !== "faible") {
+    reco.pneumo.push("Un avis pneumologique et un contrôle des EFR peuvent se justifier.");
+  }
+
+  if (bpco && bpcoSevere && !testMarcheOk && niveauVise !== "faible") {
+    reco.pneumo.push("Un test de marche avec SpO₂ peut être indiqué (stade sévère).");
+  }
+
+  return reco;
+}
+
+function formatHASRecommendation(text) {
+
+  return text
+
+    .replace(/n’est pas recommandée/gi, "<strong>n’est pas recommandée</strong>")
+    .replace(/n’est pas préconisée/gi, "<strong>n’est pas préconisée</strong>")
+    .replace(/est recommandée/gi, "<strong>est recommandée</strong>")
+    .replace(/est préconisée/gi, "<strong>est préconisée</strong>")
+    .replace(/est indiquée/gi, "<strong>est indiquée</strong>")
+    .replace(/peut être proposée/gi, "<strong>peut être proposée</strong>")
+    .replace(/peut être réalisée/gi, "<strong>peut être réalisée</strong>")
+    .replace(/peut se justifier/gi, "<strong>peut se justifier</strong>");
+
+}
+    
+function displayHASRecommendations(reco){
+
+  let html = `<div style="
+    margin-top:20px;
+    padding:12px;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    background:#f9fafb;
+  ">`;
+
+  const all = [
+    ...reco.cmap,
+    ...reco.cardio,
+    ...reco.effort,
+    ...reco.bio,
+    ...reco.pneumo
+  ];
+
+  if (all.length === 0) {
+    html += "Aucune recommandation spécifique.<br>";
+  } else {
+   all.forEach(r => {
+  html += `• ${formatHASRecommendation(r)}<br>`;
+});
+  }
+html += `<br><em>À interpréter selon le contexte clinique.</em></div>`;
+
+const container = document.getElementById("hasContent");
+if (container) {
+  container.innerHTML = html;
+}
+}
+
+/* =====================================
+6. GENERATION CRC / RENDU =============
+===================================== */
+function handleGenerate(e) {
+
+  e.preventDefault();
+  e.stopPropagation();
+
+    if (document.activeElement) {
+    document.activeElement.blur();
+  }
+
+  requestAnimationFrame(() => {
+clinicalModel = buildClinicalModel();
+
+    activeMode = "long";
+
+    document.getElementById("formatTabs").classList.remove("hidden");
+    document.getElementById("reportOutput").classList.remove("hidden");
+    document.getElementById("generateReport").classList.add("hidden");
+
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector('.tab-btn[data-mode="long"]').classList.add("active");
+
+    renderActiveMode();
+
+  }, 40);
+}
+
+      function renderLongLetterV2(model) {
+
+  const p = model.patient;
+          
+  const inputDate = document.querySelector('input[name="date_courrier"]')?.value;
+
+  const today = inputDate
+    ? new Date(inputDate).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      })
+    : new Date().toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+          
+  const salutations =
+    model.meta.destinataire === "consoeur" ? "Chère consœur," :
+    model.meta.destinataire === "confrere" ? "Cher confrère," :
+    "Madame, Monsieur,";
+
+  const titre = p.sexe === "femme" ? "Madame" : "Monsieur";
+
+  const evaluationBloc = buildEvaluationAP(model);
+  const motivationBloc = buildMotivation(model);
+  const rcvBloc = buildRCV(model);
+  const prescriptionBloc = buildPrescription(model);
+ 
+  return `
+<p style="text-align:right;">Le ${today}</p>
+
+<p>${salutations}</p>
+
+<p>
+Merci de m’avoir adressé ${titre} _____ en consultation d’activité physique.
+</p>
+
+<p>
+${evaluationBloc}
+</p>
+
+<p>
+${motivationBloc}
+</p>
+
+<p>
+${rcvBloc}
+</p>
+
+<p>
+Les objectifs de cette prescription d’activité physique sont : ${model.therapeutic_plan.objectif_principal || "à préciser"}.
+</p>
+
+<p>
+${prescriptionBloc}
+</p>
+
+<p>
+J’espère que cette consultation l’aidera à augmenter son niveau d’activité physique en toute sécurité et à en tirer des bénéfices perceptibles à court et moyen terme.
+Je me tiens à votre disposition pour toute précision complémentaire.
+</p>
+
+<p>Bien confraternellement.</p>
+`;
+}     
+            function renderParagraphVersion(model) {
+
+  const p = model.patient;
+  const titre = p.sexe === "femme" ? "Madame" : "Monsieur";
+  const participe = p.sexe === "femme" ? "vue" : "vu";
+                
+  const evaluationBloc = buildEvaluationAP(model);
+  const motivationBloc = buildMotivation(model);
+  const rcvBloc = buildRCV(model);
+  const prescriptionBloc = buildPrescription(model);
+
+  return `
+<p>
+${titre} _____ a été ${participe} en consultation d’activité physique.
+${evaluationBloc}
+${motivationBloc}
+${rcvBloc}
+Les objectifs principaux sont : ${model.therapeutic_plan.objectif_principal || "à préciser"}.
+${prescriptionBloc}
+</p>
+`;
+}
+            function renderMedicalRecord(model) {
+
+  const evaluationBloc = buildEvaluationAP(model);
+  const motivationBloc = buildMotivation(model);
+  const rcvBloc = buildRCV(model);
+  const prescriptionBloc = buildPrescription(model);
+
+  return `
+<p style="margin-bottom:28px;">
+<p><strong>Consultation d’activité physique – Synthèse</strong></p>
+
+<p><strong>Motif :</strong><br>
+Consultation d’activité physique sur adressage.</p>
+
+<p><strong>Évaluation de l’activité physique :</strong><br>
+${evaluationBloc}</p>
+
+<p><strong>Évaluation motivationnelle :</strong><br>
+${motivationBloc}</p>
+
+<p><strong>Risque cardiovasculaire global :</strong><br>
+${rcvBloc.replace("Le risque cardiovasculaire global est évalué comme ", "").replace(".", "")}</p>
+
+<p><strong>Objectifs :</strong><br>
+${model.therapeutic_plan.objectif_principal || "À préciser."}</p>
+
+<p><strong>Prescription :</strong><br>
+${prescriptionBloc}</p>
+`;
+}
+         function renderPatientVersion(model) {
+
+  const evaluationBloc = buildEvaluationAP(model)
+    .replace("Son niveau d’activité physique est actuellement", "Votre niveau d’activité physique est actuellement")
+    .replace("au regard des recommandations actuelles", "par rapport aux recommandations de santé");
+
+ const motivationBloc = buildMotivationPatient(model);
+
+  const rcvBloc = buildRCV(model)
+    .replace("Le risque cardiovasculaire global est évalué comme", "Votre risque cardiovasculaire est considéré comme")
+    .replace(".", "");
+
+  const prescriptionBloc = buildPrescription(model)
+    .replace("Une activité physique d’endurance est recommandée", "Votre médecin vous a prescrit une ordonnance d’activité physique d’endurance")
+    .replace("Un travail de renforcement musculaire est conseillé", "Votre médecin vous a prescrit un travail de renforcement musculaire")
+    .replace("Un travail de souplesse et de mobilité est proposé", "Votre médecin vous a prescrit un travail de souplesse et de mobilité");
+
+  // 🔹 Message progressivité seulement si insuffisamment actif ou actif depuis moins de 6 mois
+const progressiviteMessage = (() => {
+
+  if (model.evaluation.classification === "inactif") {
+    return `<p>
+Augmenter progressivement votre niveau d’activité physique est important à la fois pour votre motivation (afin que cela ne soit pas trop difficile), mais aussi pour votre cœur, vos articulations et vos tendons, afin qu’ils puissent s’adapter sans risque pour vous.
+</p>`;
+  }
+
+  if (model.motivation.stade === "action") {
+    return `<p>
+Bravo ! Vous avez réussi à être plus actif depuis plusieurs semaines ou mois. Continuez, vous êtes sur la bonne voie. 
+Augmenter progressivement votre niveau d’activité physique reste important pour votre motivation, mais aussi pour votre cœur, vos articulations et vos tendons, afin qu’ils puissent continuer à s’adapter en toute sécurité.
+</p>`;
+  }
+
+  return "";
+
+})();
+
+  return `
+<p style="margin-bottom:28px;">
+  <strong>Compte-rendu de votre consultation d’activité physique</strong>
+</p>
+
+<p>
+${evaluationBloc}
+</p>
+
+<p>
+${motivationBloc}
+</p>
+
+<p>
+${rcvBloc}.
+</p>
+
+<p>
+Lors de l’échange que vous avez eu avec votre médecin, l’objectif principal retenu en termes d’activité physique est :
+<strong>${model.therapeutic_plan.objectif_principal || "à définir progressivement ensemble"}</strong>.
+</p>
+
+<p>
+${prescriptionBloc}
+</p>
+
+<p>
+Le plus important est de réussir à augmenter votre niveau d’activité physique, même si c’est très progressivement : chaque pas compte.
+</p>
+
+${progressiviteMessage}
+
+<p>
+En cas de difficulté ou de question, n’hésitez pas à reprendre contact avec votre médecin.
+Vous pouvez également consulter les recommandations des cardiologues du sport avant chaque séance d’exercice :
+<a href="https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf" target="_blank">
+les 10 règles d’or du Club des Cardiologues du Sport
+</a>.
+</p>
+
+<div style="margin-top:20px; text-align:center;">
+  <p><strong>Accès rapide :</strong></p>
+
+  <a href="https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf"
+     target="_blank"
+     rel="noopener noreferrer">
+
+    <img 
+      src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf"
+      alt="QR code - Règles d’or cardiologie du sport"
+      width="180"
+      height="180"
+      loading="lazy"
+      style="cursor:pointer;"
+    >
+
+  </a>
+</div>
+`;
+}
+           function renderActiveMode() {
+
+  if (!clinicalModel) return;
+savedScrollPosition = window.scrollY;
+  const container = document.getElementById("outputContainer");
+
+  let html = "";
+               
+const pdfBtn = document.getElementById("downloadPdf");
+               
+  switch (activeMode) {
+    case "long":
+      html = renderLongLetterV2(clinicalModel);
+      break;
+
+    case "paragraph":
+      html = renderParagraphVersion(clinicalModel);
+      break;
+
+    case "medical":
+      html = renderMedicalRecord(clinicalModel);
+      break;
+    case "patient":
+  html = renderPatientVersion(clinicalModel);
+  break;
+  }
+
+  container.classList.add("fade-out");
+               
+// Affiche bouton PDF uniquement en mode patient
+if (activeMode === "patient") {
+  pdfBtn.classList.remove("hidden");
+} else {
+  pdfBtn.classList.add("hidden");
+}
+ container.style.opacity = "0";
+container.innerHTML = html;
+container.style.opacity = "1";
+
+  container.classList.remove("fade-out");
+  container.classList.add("fade-in");
+               
+document.getElementById("formatTabs").scrollIntoView({
+  behavior: "auto",
+  block: "start"
+});
+
+}   
+
+/* =====================================
+7. MODALES / IMPRESSION / COPIE =======
+===================================== */
+function formatName(str) {
+
+  if (!str) return "";
+
+  const particles = [
+    "de", "du", "des", "la", "le", "les",
+    "van", "von", "der", "den", "da", "dos", "das"
+  ];
+
+  return str
+    .toLowerCase()
+    .trim()
+    .split(/[\s-]+/)
+    .map((word, index) => {
+
+      // particules → minuscule sauf en début
+      if (particles.includes(word) && index !== 0) {
+        return word;
+      }
+
+      // cas McDonald / MacDonald
+      if (word.startsWith("mc") && word.length > 2) {
+        return "Mc" + word.charAt(2).toUpperCase() + word.slice(3);
+      }
+
+      if (word.startsWith("mac") && word.length > 3) {
+        return "Mac" + word.charAt(3).toUpperCase() + word.slice(4);
+      }
+
+      // normal
+      return word.charAt(0).toUpperCase() + word.slice(1);
+
+    })
+    .join(" ")
+    .replace(/\s-\s/g, "-"); // sécurité tiret
+}
+
+ function updateNamePreview(inputId, previewId) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+
+  if (!input || !preview) return;
+
+  const value = input.value;
+  const formatted = formatName(value);
+
+preview.textContent = (formatted && formatted !== value)
+  ? `→ ${formatted}`
+  : "";
+}  
+
+function openIdentityModal(action) {
+  identityAction = action;
+    
+const confirmBtn = document.getElementById("confirmPrint");
+
+if (confirmBtn) {
+  confirmBtn.textContent = action === "copy" ? "Copier" : "Imprimer";
+}
+    
+  document.getElementById("modalPrenom").value = lastPrenom || "";
+  document.getElementById("modalNom").value = lastNom || "";
+    
+// 🔥 RESET éventuel overlay fantôme
+document.body.style.pointerEvents = "auto";
+    
+  document.getElementById("identityModal").classList.remove("hidden");
+
+  // 🔥 FIX FOCUS
+  setTimeout(() => {
+    document.getElementById("modalPrenom")?.focus();
+  }, 50);
+}
+
+function closeIdentityModal() {
+  document.getElementById("identityModal").classList.add("hidden");
+}
+
+function injectIdentityIntoHTML(html, prenom, nom) {
+
+  if (!prenom && !nom) return html;
+
+  const identity = `${prenom || ""} ${nom || ""}`.trim();
+
+  return html.replace("_____", identity);
+} 
+    
+function proceedWithAction(prenom, nom, existingWin = null) {
+
+  let content = document.getElementById("outputContainer").innerHTML;
+// injection conditionnelle selon mode
+if (activeMode === "long") {
+  content = injectIdentityIntoHTML(content, prenom, nom);
+}
+
+if (activeMode === "medical" || activeMode === "patient") {
+
+  const identityLine = `<p><strong>Patient :</strong> ${prenom || ""} ${nom || ""}</p>`;
+
+  content = identityLine + content;
+
+}
+
+if (identityAction === "print") {
+
+const win = existingWin || window.open('', '_blank');
+
+if (!win) {
+  alert("Popup bloquée par le navigateur");
+  return;
+}
+    
+  win.document.write(`
+    <html>
+      <head>
+        <title>Impression</title>
+        <style>
+          body { font-family: Arial; margin: 15mm; }
+        </style>
+      </head>
+      <body>
+        ${content}
+      </body>
+    </html>
+  `);
+
+  win.document.close();
+
+  // 🔥 IMPORTANT : attendre chargement réel
+  setTimeout(() => {
+
+    win.focus();
+    win.print();
+
+    setTimeout(() => {
+      try { win.close(); } catch(e){}
+
+      window.focus();
+      document.body.focus();
+
+    }, 800);
+
+  }, 500);
+
+  // 🔥 RESET état (IMPORTANT)
+  identityAction = null;
+}
+
+  if (identityAction === "copy") {
+
+    const temp = document.createElement("div");
+    temp.innerHTML = content;
+
+    temp.querySelectorAll("a").forEach(link => {
+      const replacement = link.innerText + " : " + link.href;
+      link.replaceWith(replacement);
+    });
+
+    const text = temp.innerText
+      .replace(/\n+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Compte-rendu copié.");
+    });
+
+  }
+}
+    
 function resetFormulaireComplet() {
 
   // 🔹 reset radios / checkbox
@@ -1343,23 +2464,6 @@ if(mode === "marshall"){
 }
 }
 
- window.copyPatientComment = function(id){
-
-  const field = document.getElementById(id);
-  if(!field) return;
-
-  const text = field.value || field.innerText || "";
-
-  const temp = document.createElement("textarea");
-  temp.value = text;
-
-  document.body.appendChild(temp);
-  temp.select();
-  document.execCommand("copy");
-  document.body.removeChild(temp);
-
-};
-
 // ==========================
 // AGE + ATCD FAMILIAL
 // ==========================
@@ -1367,7 +2471,6 @@ if(mode === "marshall"){
 function initAge() {
     
 const ageInput = document.getElementById("age_input");
-const ageFallback = document.getElementById("age_fallback");
 const atcdFamilialBlock = document.getElementById("atcd_familial_block");
 
 function updateAgeUI() {
@@ -1377,21 +2480,8 @@ function updateAgeUI() {
   const value = ageInput.value;
   const age = parseInt(value);
 
-  // fallback âge
-  if (!value) {
-    ageFallback.style.display = "block";
-  } else {
-    ageFallback.style.display = "none";
-    document.querySelectorAll('input[name="age_condition"]').forEach(r => r.checked = false);
-  }
-
-  // ATCD familial
-  if (!value || age <= 35) {
-    atcdFamilialBlock.style.display = "block";
-  } else {
-    atcdFamilialBlock.style.display = "none";
-    document.querySelectorAll('input[name="atcd_familial_cv"]').forEach(r => r.checked = false);
-  }
+// 🔥 ATCD familial toujours visible
+atcdFamilialBlock.style.display = "block";
 }
 
 // écoute
@@ -1718,9 +2808,7 @@ function buildClinicalModel() {
   };
 }
 
-let savedScrollPosition = 0;
-        
-document.addEventListener("DOMContentLoaded", function () {
+function initIOSWarning() {
 
   const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
   const isFirefox = navigator.userAgent.includes("FxiOS");
@@ -1728,47 +2816,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const warning = document.getElementById("iosBrowserWarning");
 
-  // 🔒 déjà fermé → ne jamais réafficher
-let warningClosed = false;
+  let warningClosed = false;
 
-try {
-  warningClosed = localStorage.getItem("iosWarningClosed") === "true";
-} catch(e) {
-  warningClosed = false;
-}
+  try {
+    warningClosed = localStorage.getItem("iosWarningClosed") === "true";
+  } catch(e) {
+    warningClosed = false;
+  }
 
-  // 👉 condition cible
-  if (isIOS && (isFirefox || isChrome)) {
-
-  setTimeout(() => {
-    warning.classList.remove("hidden");
-  }, 800);
+  if (isIOS && (isFirefox || isChrome) && !warningClosed) {
+    setTimeout(() => {
+      warning.classList.remove("hidden");
+    }, 800);
+  }
 
 }
+function highlightMissing(el){
+  if (!el) return;
+  el.classList.add("has-missing");
+}
 
-    
-// ===== INIT GLOBAL =====
-initIMC();
-initAge();
-initGrossesse();
-initSymptomes();
-initBPCO();
-initHandicap();
-initActivitePhysique();
+function clearHighlight(el){
+  if (!el) return;
+  el.classList.remove("has-missing");
+}
 
-updateNiveauButtons("clinique");
-});
-    
+function initHASListeners() {
 
+  document.querySelectorAll('input, textarea').forEach(el => {
+    el.addEventListener("change", updateHAS);
+    el.addEventListener("input", updateHAS);
+  });
 
+  document.querySelectorAll('input[type="radio"]').forEach(el => {
+    el.addEventListener("click", updateHAS);
+  });
 
-toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup", "intensite_aerobie_block");
-toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
-toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
-    
-document.getElementById("actif-subgroup")?.classList.add("hidden");
-document.getElementById("inactif-subgroup")?.classList.add("hidden");
-document.getElementById("sixmois-subgroup")?.classList.add("hidden");
+  const refreshBtn = document.getElementById("refreshHAS");
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", updateHAS);
+  }
+
+}
+function initActionButtons() {
 
 document.getElementById("confirmPrint")?.addEventListener("click", function() {
 
@@ -1778,129 +2869,79 @@ document.getElementById("confirmPrint")?.addEventListener("click", function() {
   lastPrenom = prenom;
   lastNom = nom;
 
-  closeIdentityModal();
-  proceedWithAction(prenom, nom);
+  if (identityAction === "print") {
 
-});
+    const win = window.open('', '_blank');
 
-document.getElementById("cancelPrint")?.addEventListener("click", function() {
-  closeIdentityModal();
-});
-
-const generateBtn = document.getElementById('generateReport');
-if (generateBtn) {
-  generateBtn.addEventListener("click", handleGenerate);
-}
-
-const printBtn = document.getElementById('printReport');
-if (printBtn) {
-  printBtn.addEventListener("click", function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    openIdentityModal("print");
-  });
-}
-
-const copyBtn = document.getElementById('copyReport');
-if (copyBtn) {
-  copyBtn.addEventListener("click", function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    openIdentityModal("copy");
-  });
-}
-        
-/* =========================
-   SCANNER QR CODE
-========================= */
-
-const scanBtn = document.getElementById("scanQRBtn");
-const qrContainer = document.getElementById("qrScannerContainer");
-const closeQR = document.getElementById("closeQRScanner");
-
-let qrScanner = null;
-let qrAlreadyRead = false;   // ← AJOUT ICI
-
-if(scanBtn){
-
-  scanBtn.addEventListener("click", function(){
-
-    qrContainer.style.display = "block";
-
-    qrScanner = new Html5Qrcode("qr-reader");
-
-qrScanner.start(
-  { facingMode: "environment" },
-  { fps: 10, qrbox: 250 },
-
-  function(decodedText){
-
-    if(qrAlreadyRead) return;
-    qrAlreadyRead = true;
-
-    try{
-      importPatientJSON(decodedText);
-
-      if(qrScanner){
-        qrScanner.stop().then(() => {
-          qrContainer.style.display = "none";
-        });
-      }
-
-      setTimeout(() => {
-        qrAlreadyRead = false;
-      }, 1500);
-
-    } catch(e){
-      console.warn("QR invalide");
-      setTimeout(() => {
-        qrAlreadyRead = false;
-      }, 1000);
+    if (!win) {
+      alert("Popup bloquée par le navigateur");
+      return;
     }
 
-  },
+    closeIdentityModal();
 
-  function(error){
-    // ⚠️ obligatoire pour éviter bug syntaxique + compat iOS
-    console.warn("Scan error", error);
+    proceedWithAction(prenom, nom, win);
+
+  } else {
+
+    closeIdentityModal();
+
+    proceedWithAction(prenom, nom);
+
   }
 
-)
-.then(() => {
-  console.log("Scanner QR démarré");
-})
-.catch(err => {
-  console.error("Erreur caméra :", err);
 });
-});
+
+  document.getElementById("cancelPrint")?.addEventListener("click", function() {
+    closeIdentityModal();
+  });
+
+  const generateBtn = document.getElementById('generateReport');
+
+  if (generateBtn) {
+    generateBtn.addEventListener("click", handleGenerate);
+  }
+
+  const printBtn = document.getElementById('printReport');
+
+  if (printBtn) {
+    printBtn.addEventListener("click", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openIdentityModal("print");
+    });
+  }
+
+  const copyBtn = document.getElementById('copyReport');
+
+  if (copyBtn) {
+    copyBtn.addEventListener("click", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openIdentityModal("copy");
+    });
+  }
 }
     
-if(closeQR){
-  closeQR.addEventListener("click", function(){
+document.addEventListener("DOMContentLoaded", function () {
+  // Initialisation UI
+  initUI();
 
-    if(qrScanner){
-      qrScanner.stop().then(() => {
-        qrContainer.style.display = "none";
-      });
-    } else {
-      qrContainer.style.display = "none";
-    }
+  // Initialisation UI  
+  initImportExport();
+  
+  // Import / export / QR  
+  initIOSWarning();
+  
+  // Listeners moteur HAS 
+  initHASListeners();
+  
+  // Boutons / modales / impression 
+  initActionButtons();
 
-    qrAlreadyRead = false;
-  });
-}
-  // 🔹 IMPORT JSON (ouvre le sélecteur de fichier)
+});
+            
 
-  const importBtn = document.getElementById("importJSONBtn");
-  const importFile = document.getElementById("importJSONFile");
-
-  if(importBtn && importFile){
-
-    importBtn.addEventListener("click", function(){
-      importFile.click();
-    });
-
-  }
           
 const form = document.getElementById('consultationForm');
 if (form) {
@@ -1908,157 +2949,7 @@ if (form) {
     e.preventDefault();
     e.stopPropagation();
   });
-}
-        // =============================
-// IMPORT JSON AUTO-EVALUATION
-// =============================
-
-const importJSONInput = document.getElementById("importJSONFile");
-
-if (importJSONInput) {
-  importJSONInput.addEventListener("change", function(e){
-
-  const file = e.target.files[0];
-
-  if(!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = function(){
-
-    try{
-
-      const data = JSON.parse(reader.result);
-   importPatientJSON(JSON.stringify(data));
-        
-    // Pas moyens
-const pas = data?.resultats?.pas_moyens_jour_1_mois;
-if (pas !== undefined && pas !== null) {
-  const inputPas = document.querySelector('input[name="nombre_pas"]');
-  if(inputPas) inputPas.value = pas;
-}
-
-// Heures assises (sédentarité)
-const heuresAssises =
-  data?.questionnaires?.gpaq?.sedentarite?.heures_par_jour ??
-  data?.questionnaires?.marshall?.sedentarite?.heures_par_jour ??
-  null;
-
-if (heuresAssises !== null) {
-
-  const input = document.querySelector('input[name="heures_assises"]');
-
-if (input) input.value = Number(heuresAssises);
-
-}
-
-      // Questionnaire utilisé
-const q = data?.meta?.questionnaire;
-
-if (q !== undefined && q !== null) {
-
-  const radio = document.querySelector(`input[name="questionnaire"][value="${q}"]`);
-
-  if(radio){
-    radio.checked = true;
-    setTimeout(() => {
-      radio.dispatchEvent(new Event("change"));
-    },0);
-  }
-
-}
-
-/* ======================
-   IMPORT EVA IMPORTANCE
-====================== */
-
-const importance = data?.motivation?.importance_eva_0_10;
-
-if(importance !== undefined && importance !== null){
-  const inputImportance = document.querySelector('input[name="importance_ap"]');
-  if(inputImportance) inputImportance.value = importance;
-}    
-       const importanceComment = data?.motivation?.importance_commentaire;
-
-const block = document.getElementById("importance_patient_block");
-const field = document.getElementById("importance_patient_comment");
-
-if(block && field){
-
-if (importanceComment && importanceComment.trim() !== "") {
-
-    field.value = importanceComment;
-    block.style.display = "block";
-
-  }
- }
-/* ======================
-   IMPORT EVA CONFIANCE
-====================== */
-
-const confiance = data?.motivation?.confiance_eva_0_10;
-
-if(confiance !== undefined && confiance !== null){
-  const inputConfiance = document.querySelector('input[name="confiance_ap"]');
-  if(inputConfiance) inputConfiance.value = confiance;
-}
-const confianceComment = data?.motivation?.confiance_commentaire;
-
-const blockC = document.getElementById("confiance_patient_block");
-const fieldC = document.getElementById("confiance_patient_comment");
-
-if(blockC && fieldC){
-
-  if(confianceComment){
-
-    fieldC.value = confianceComment;
-    blockC.style.display = "block";
-
-  }
-
-  }
-
-
-alert("Données patient importées.\n\nVérifiez et complétez les champs avant de générer le compte-rendu.");
-
-    }catch(err){
-
-      alert("Fichier JSON invalide.");
-
-    }
-
-  };
-
-  reader.readAsText(file);
-
-});
-  }
-        
-function handleGenerate(e) {
-
-  e.preventDefault();
-  e.stopPropagation();
-
-    if (document.activeElement) {
-    document.activeElement.blur();
-  }
-
-  requestAnimationFrame(() => {
-    clinicalModel = buildClinicalModel();
-    activeMode = "long";
-
-    document.getElementById("formatTabs").classList.remove("hidden");
-    document.getElementById("reportOutput").classList.remove("hidden");
-    document.getElementById("generateReport").classList.add("hidden");
-
-    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-    document.querySelector('.tab-btn[data-mode="long"]').classList.add("active");
-
-    renderActiveMode();
-
-  }, 40);
-}
-            
+}          
            
             document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", function () {
@@ -2122,148 +3013,7 @@ document.addEventListener("visibilitychange", function () {
   }
 
 });
-
-let identityAction = null;
-
-function openIdentityModal(action) {
-  identityAction = action;
-
-  document.getElementById("modalPrenom").value = lastPrenom || "";
-  document.getElementById("modalNom").value = lastNom || "";
-
-  document.getElementById("identityModal").classList.remove("hidden");
-}
-
-function closeIdentityModal() {
-  document.getElementById("identityModal").classList.add("hidden");
-}
-
-function injectIdentityIntoHTML(html, prenom, nom) {
-
-  if (!prenom && !nom) return html;
-
-  const identity = `${prenom || ""} ${nom || ""}`.trim();
-
-  return html.replace("_____", identity);
-} 
-        
-function formatName(str) {
-
-  if (!str) return "";
-
-  const particles = [
-    "de", "du", "des", "la", "le", "les",
-    "van", "von", "der", "den", "da", "dos", "das"
-  ];
-
-  return str
-    .toLowerCase()
-    .trim()
-    .split(/[\s-]+/)
-    .map((word, index) => {
-
-      // particules → minuscule sauf en début
-      if (particles.includes(word) && index !== 0) {
-        return word;
-      }
-
-      // cas McDonald / MacDonald
-      if (word.startsWith("mc") && word.length > 2) {
-        return "Mc" + word.charAt(2).toUpperCase() + word.slice(3);
-      }
-
-      if (word.startsWith("mac") && word.length > 3) {
-        return "Mac" + word.charAt(3).toUpperCase() + word.slice(4);
-      }
-
-      // normal
-      return word.charAt(0).toUpperCase() + word.slice(1);
-
-    })
-    .join(" ")
-    .replace(/\s-\s/g, "-"); // sécurité tiret
-}
-
- function updateNamePreview(inputId, previewId) {
-  const input = document.getElementById(inputId);
-  const preview = document.getElementById(previewId);
-
-  if (!input || !preview) return;
-
-  const value = input.value;
-  const formatted = formatName(value);
-
-preview.textContent = (formatted && formatted !== value)
-  ? `→ ${formatted}`
-  : "";
-}
-        
-function proceedWithAction(prenom, nom) {
-
-  let content = document.getElementById("outputContainer").innerHTML;
-// injection conditionnelle selon mode
-if (activeMode === "long") {
-  content = injectIdentityIntoHTML(content, prenom, nom);
-}
-
-if (activeMode === "medical" || activeMode === "patient") {
-
-  const identityLine = `<p><strong>Patient :</strong> ${prenom || ""} ${nom || ""}</p>`;
-
-  content = identityLine + content;
-
-}
-
-  if (identityAction === "print") {
-
-    const win = window.open('', '', 'width=800,height=600');
-
-    win.document.write(`
-      <html>
-        <head>
-          <title>Impression</title>
-          <style>
-            body { font-family: Arial; margin: 15mm; }
-          </style>
-        </head>
-        <body>
-          ${content}
-        </body>
-      </html>
-    `);
-
-    win.document.close();
-    win.focus();
-
-    setTimeout(() => {
-      win.print();
-      win.close();
-    }, 300);
-
-  }
-
-  if (identityAction === "copy") {
-
-    const temp = document.createElement("div");
-    temp.innerHTML = content;
-
-    temp.querySelectorAll("a").forEach(link => {
-      const replacement = link.innerText + " : " + link.href;
-      link.replaceWith(replacement);
-    });
-
-    const text = temp.innerText
-      .replace(/\n+/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Compte-rendu copié.");
-    });
-
-  }
-}
-       
+      
         function getStadeMotivation() {
     const niveauActuel = document.querySelector('input[name="niveau_actuel"]:checked') ? document.querySelector('input[name="niveau_actuel"]:checked').value : '';
     if (niveauActuel === 'actif') {
@@ -2533,282 +3283,7 @@ if (pr.fiches_promotion === "oui") {
 
   return phrases.join(" ");
 }
-       function cleanMedicalText(text) {
-
-  return text
-    .replace(/\s+/g, " ")        // supprime espaces multiples
-    .replace(/\s+\./g, ".")      // espace avant point
-    .replace(/\s+,/g, ",")       // espace avant virgule
-    .replace(/\s+:/g, " :")      // espace correct avant :
-    .replace(/\.\s*/g, ". ")     // garantit espace après point
-    .trim();
-
-}
-      function renderLongLetterV2(model) {
-
-  const p = model.patient;
-          
-  const inputDate = document.querySelector('input[name="date_courrier"]')?.value;
-
-  const today = inputDate
-    ? new Date(inputDate).toLocaleDateString('fr-FR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      })
-    : new Date().toLocaleDateString('fr-FR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-          
-  const salutations =
-    model.meta.destinataire === "consoeur" ? "Chère consœur," :
-    model.meta.destinataire === "confrere" ? "Cher confrère," :
-    "Madame, Monsieur,";
-
-  const titre = p.sexe === "femme" ? "Madame" : "Monsieur";
-
-  const evaluationBloc = buildEvaluationAP(model);
-  const motivationBloc = buildMotivation(model);
-  const rcvBloc = buildRCV(model);
-  const prescriptionBloc = buildPrescription(model);
- 
-  return `
-<p style="text-align:right;">Le ${today}</p>
-
-<p>${salutations}</p>
-
-<p>
-Merci de m’avoir adressé ${titre} _____ en consultation d’activité physique.
-</p>
-
-<p>
-${evaluationBloc}
-</p>
-
-<p>
-${motivationBloc}
-</p>
-
-<p>
-${rcvBloc}
-</p>
-
-<p>
-Les objectifs de cette prescription d’activité physique sont : ${model.therapeutic_plan.objectif_principal || "à préciser"}.
-</p>
-
-<p>
-${prescriptionBloc}
-</p>
-
-<p>
-J’espère que cette consultation l’aidera à augmenter son niveau d’activité physique en toute sécurité et à en tirer des bénéfices perceptibles à court et moyen terme.
-Je me tiens à votre disposition pour toute précision complémentaire.
-</p>
-
-<p>Bien confraternellement.</p>
-`;
-}     
-            function renderParagraphVersion(model) {
-
-  const p = model.patient;
-  const titre = p.sexe === "femme" ? "Madame" : "Monsieur";
-  const participe = p.sexe === "femme" ? "vue" : "vu";
-                
-  const evaluationBloc = buildEvaluationAP(model);
-  const motivationBloc = buildMotivation(model);
-  const rcvBloc = buildRCV(model);
-  const prescriptionBloc = buildPrescription(model);
-
-  return `
-<p>
-${titre} _____ a été ${participe} en consultation d’activité physique.
-${evaluationBloc}
-${motivationBloc}
-${rcvBloc}
-Les objectifs principaux sont : ${model.therapeutic_plan.objectif_principal || "à préciser"}.
-${prescriptionBloc}
-</p>
-`;
-}
-            function renderMedicalRecord(model) {
-
-  const evaluationBloc = buildEvaluationAP(model);
-  const motivationBloc = buildMotivation(model);
-  const rcvBloc = buildRCV(model);
-  const prescriptionBloc = buildPrescription(model);
-
-  return `
-<p style="margin-bottom:28px;">
-<p><strong>Consultation d’activité physique – Synthèse</strong></p>
-
-<p><strong>Motif :</strong><br>
-Consultation d’activité physique sur adressage.</p>
-
-<p><strong>Évaluation de l’activité physique :</strong><br>
-${evaluationBloc}</p>
-
-<p><strong>Évaluation motivationnelle :</strong><br>
-${motivationBloc}</p>
-
-<p><strong>Risque cardiovasculaire global :</strong><br>
-${rcvBloc.replace("Le risque cardiovasculaire global est évalué comme ", "").replace(".", "")}</p>
-
-<p><strong>Objectifs :</strong><br>
-${model.therapeutic_plan.objectif_principal || "À préciser."}</p>
-
-<p><strong>Prescription :</strong><br>
-${prescriptionBloc}</p>
-`;
-}
-         function renderPatientVersion(model) {
-
-  const evaluationBloc = buildEvaluationAP(model)
-    .replace("Son niveau d’activité physique est actuellement", "Votre niveau d’activité physique est actuellement")
-    .replace("au regard des recommandations actuelles", "par rapport aux recommandations de santé");
-
- const motivationBloc = buildMotivationPatient(model);
-
-  const rcvBloc = buildRCV(model)
-    .replace("Le risque cardiovasculaire global est évalué comme", "Votre risque cardiovasculaire est considéré comme")
-    .replace(".", "");
-
-  const prescriptionBloc = buildPrescription(model)
-    .replace("Une activité physique d’endurance est recommandée", "Votre médecin vous a prescrit une ordonnance d’activité physique d’endurance")
-    .replace("Un travail de renforcement musculaire est conseillé", "Votre médecin vous a prescrit un travail de renforcement musculaire")
-    .replace("Un travail de souplesse et de mobilité est proposé", "Votre médecin vous a prescrit un travail de souplesse et de mobilité");
-
-  // 🔹 Message progressivité seulement si insuffisamment actif ou actif depuis moins de 6 mois
-const progressiviteMessage = (() => {
-
-  if (model.evaluation.classification === "inactif") {
-    return `<p>
-Augmenter progressivement votre niveau d’activité physique est important à la fois pour votre motivation (afin que cela ne soit pas trop difficile), mais aussi pour votre cœur, vos articulations et vos tendons, afin qu’ils puissent s’adapter sans risque pour vous.
-</p>`;
-  }
-
-  if (model.motivation.stade === "action") {
-    return `<p>
-Bravo ! Vous avez réussi à être plus actif depuis plusieurs semaines ou mois. Continuez, vous êtes sur la bonne voie. 
-Augmenter progressivement votre niveau d’activité physique reste important pour votre motivation, mais aussi pour votre cœur, vos articulations et vos tendons, afin qu’ils puissent continuer à s’adapter en toute sécurité.
-</p>`;
-  }
-
-  return "";
-
-})();
-
-  return `
-<p style="margin-bottom:28px;">
-  <strong>Compte-rendu de votre consultation d’activité physique</strong>
-</p>
-
-<p>
-${evaluationBloc}
-</p>
-
-<p>
-${motivationBloc}
-</p>
-
-<p>
-${rcvBloc}.
-</p>
-
-<p>
-Lors de l’échange que vous avez eu avec votre médecin, l’objectif principal retenu en termes d’activité physique est :
-<strong>${model.therapeutic_plan.objectif_principal || "à définir progressivement ensemble"}</strong>.
-</p>
-
-<p>
-${prescriptionBloc}
-</p>
-
-<p>
-Le plus important est de réussir à augmenter votre niveau d’activité physique, même si c’est très progressivement : chaque pas compte.
-</p>
-
-${progressiviteMessage}
-
-<p>
-En cas de difficulté ou de question, n’hésitez pas à reprendre contact avec votre médecin.
-Vous pouvez également consulter les recommandations des cardiologues du sport avant chaque séance d’exercice :
-<a href="https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf" target="_blank">
-les 10 règles d’or du Club des Cardiologues du Sport
-</a>.
-</p>
-
-<div style="margin-top:20px; text-align:center;">
-  <p><strong>Accès rapide :</strong></p>
-
-  <a href="https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf"
-     target="_blank"
-     rel="noopener noreferrer">
-
-    <img 
-      src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf"
-      alt="QR code - Règles d’or cardiologie du sport"
-      width="180"
-      height="180"
-      loading="lazy"
-      style="cursor:pointer;"
-    >
-
-  </a>
-</div>
-`;
-}
-           function renderActiveMode() {
-
-  if (!clinicalModel) return;
-savedScrollPosition = window.scrollY;
-  const container = document.getElementById("outputContainer");
-
-  let html = "";
-               
-const pdfBtn = document.getElementById("downloadPdf");
-               
-  switch (activeMode) {
-    case "long":
-      html = renderLongLetterV2(clinicalModel);
-      break;
-
-    case "paragraph":
-      html = renderParagraphVersion(clinicalModel);
-      break;
-
-    case "medical":
-      html = renderMedicalRecord(clinicalModel);
-      break;
-    case "patient":
-  html = renderPatientVersion(clinicalModel);
-  break;
-  }
-
-  container.classList.add("fade-out");
-               
-// Affiche bouton PDF uniquement en mode patient
-if (activeMode === "patient") {
-  pdfBtn.classList.remove("hidden");
-} else {
-  pdfBtn.classList.add("hidden");
-}
- container.style.opacity = "0";
-container.innerHTML = html;
-container.style.opacity = "1";
-
-  container.classList.remove("fade-out");
-  container.classList.add("fade-in");
-               
-document.getElementById("formatTabs").scrollIntoView({
-  behavior: "auto",
-  block: "start"
-});
-
-}   
-        
+  
  function copyPatientLink() {
 
   const url = "https://zgqwa4.short.gy/auto-eval-ap";
@@ -2863,7 +3338,7 @@ function closeIOSWarning() {
     });
 
 }
-        function closeDetails(btn) {
+function closeDetails(btn) {
 
   const details = btn.closest("details");
 
@@ -2874,9 +3349,15 @@ function closeIOSWarning() {
       details.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
   }
-
 }
-            
+
+// 🔥 TEST GLOBAL CLICK (à ajouter ici)
+document.addEventListener("click", () => {
+  console.log("GLOBAL CLICK");
+});
+            document.getElementById("confirmPrint")?.addEventListener("click", () => {
+  console.log("CONFIRM CLICK");
+});
             </script>
     
     <div id="identityModal" class="modal hidden">
