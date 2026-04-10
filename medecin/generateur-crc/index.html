@@ -372,7 +372,7 @@ button {
 <body>
 <div class="container crc-page">
         <div class="rgpd-banner">
-            Ce questionnaire, hébergé sur le site Github, ne stocke pas vos données. Vous pouvez l'imprimer pour votre usage personnel ou médical.
+            Cet outil a été réalisé par <a href="mailto:antoine.bosquet@aphp.fr?subject=Demande d'information - Générateur de CRC / Aide à la prescription d'activité physique">Antoine Bosquet</a>. Il est hébergé sur le site Github et ne stocke pas vos données. Vous pouvez l'imprimer pour votre usage personnel ou médical.
             En continuant, vous acceptez que les données saisies puissent être affichées sur votre écran ou imprimées.
             <a href="https://abbe-web.github.io/Compte-Rendu-Consultation-PAP/politique-confidentialite.html" target="_blank" rel="noopener noreferrer">Consulter la politique de confidentialité</a> |
             <a href="https://www.cnil.fr/fr/les-droits-pour-maitriser-vos-donnees-personnelles" target="_blank" rel="noopener noreferrer">Vos droits (CNIL)</a>
@@ -773,10 +773,14 @@ Importer fichier JSON
             <div class="form-group">
                 <h2>4/ Évaluation de l’Activité Physique (niveau actuel et visé, motivation)</h2>
                 <div class="sub-group">
-<h3 id="niveau-actuel-title">Niveau actuel (mesuré par 
-<label><input type="radio" name="questionnaire" value="GPAQ"> GPAQ</label>, 
-<label><input type="radio" name="questionnaire" value="Marshall"> Marshall</label>) :
+<h3 id="niveau-actuel-title">
+  Niveau actuel (mesuré par GPAQ ou Marshall) :
 </h3>
+
+<div style="margin-bottom:10px;">
+  <label><input type="radio" name="questionnaire" value="GPAQ"> GPAQ</label>
+  <label><input type="radio" name="questionnaire" value="Marshall"> Marshall</label>
+</div>
 
 <div id="niveau-container" style="display: flex; align-items: center; gap:25px; flex-wrap: wrap;">
 
@@ -799,7 +803,7 @@ Importer fichier JSON
 </div>
 
 
-<div id="actif-subgroup" class="hidden" style="display:none;">
+<div id="actif-subgroup" class="hidden">
 
 <label>
 <input type="radio" name="actif_depuis" value="plus_6_mois">
@@ -814,7 +818,7 @@ Non, depuis moins de 6 mois
 </div>
 
 
-<div id="inactif-subgroup" class="hidden" style="display:none;">
+<div id="inactif-subgroup" class="hidden">
 
 <label>
 <input type="radio" name="ap_envisagee" value="oui">
@@ -828,7 +832,7 @@ Pas d’AP envisagée dans les 30 jours
 
 </div>
 
-<div id="sixmois-subgroup" class="hidden" style="display:none;">
+<div id="sixmois-subgroup" class="hidden">
 
 <label>
 <input type="radio" name="ap_6_mois" value="oui">
@@ -872,7 +876,14 @@ Pas d’AP envisagée dans les 6 mois
 
                 </div>
                 <div class="sub-group">
-                    <h3>Niveau visé (intensité) :</h3>
+                    <h3>Niveau visé (intensité) :
+                    <span
+  class="info-icon"
+  onclick="event.preventDefault(); event.stopPropagation(); showIntensiteInfo();"
+>
+  i
+</span>
+ </h3>                   
                     <label><input type="radio" name="niveau_vise" value="faible"> Faible</label>
                     <label><input type="radio" name="niveau_vise" value="modere"> Modéré</label>
                     <label><input type="radio" name="niveau_vise" value="eleve"> Élevé</label>
@@ -882,14 +893,15 @@ Pas d’AP envisagée dans les 6 mois
         
 <div class="form-group">
     <h2>5/ Évaluation motivationnelle (complément) :</h2>
-    <div class="sub-group">
-        <h3 class="black-text">La personne adressée présente les <u>freins</u> suivants :</h3>
-        <textarea name="freins"></textarea>
-    </div>
-    <div class="sub-group">
+        <div class="sub-group">
         <h3 class="black-text">La personne présente les <u>leviers</u> suivants :</h3>
         <textarea name="leviers"></textarea>
     </div>
+        <div class="sub-group">
+        <h3 class="black-text">La personne adressée présente les <u>freins</u> suivants :</h3>
+        <textarea name="freins"></textarea>
+    </div>
+    
    <div class="sub-group">
 
 <h3 class="black-text">Importance accordée à l’AP de 0 à 10 :</h3>
@@ -1129,7 +1141,7 @@ Pas d’AP envisagée dans les 6 mois
 1. VARIABLES GLOBALES ==================
 ===================================== */
 const DEBUG = false;
-const APP_VERSION = "v0.1.3";
+const APP_VERSION = "v0.1.4";
     
 let isImporting = false;
 let clinicalModel = null;
@@ -1231,8 +1243,8 @@ function showSymptomesInfo() {
 
 function showBlessureInfo() {
   openInfoModal(
-    "Risque de blessure musculosquelettique ou cutanée",
-    "Situations à risque de blessures musculosquelettiques et cutanées :<br><br>• Pathologie osseuse ou articulaire, malformation (agénésie, scoliose…)<br>• Ostéopathie fragilisante et/ou avec antécédents de chutes<br>• Antécédents de blessures graves liées à l’activité physique<br>• Personnes âgées fragiles ou à risque de chute<br>• Neuropathie des membres inférieurs avec risque de plaie cutanée (diabète…)<br>• Certaines personnes en situation de handicap :<br>&nbsp;&nbsp;&nbsp;&nbsp;○ Physique<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▪ Amputation, troubles neuro-orthopédiques<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▪ Atteinte musculaire d’origine neurologique, dégénérative ou traumatique<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▪ Lésion médullaire<br>&nbsp;&nbsp;&nbsp;&nbsp;○ Sensoriel, visuel, auditif ou troubles de l’équilibre avec risque accru de chute<br>&nbsp;&nbsp;&nbsp;&nbsp;○ Troubles psychiques / cognitifs / psychotiques / de l’humeur avec comportements à risque ou psychotropes<br>• Personnes avec dispositif médical / aide technique : fauteuil roulant, canne, prothèse, orthèse, stomie…",
+    "Situations à risque de blessure musculosquelettique ou cutanée",
+    "• Pathologie osseuse ou articulaire, malformation (agénésie, scoliose…)<br>• Ostéopathie fragilisante et/ou avec antécédents de chutes<br>• Antécédents de blessures graves liées à l’activité physique<br>• Personnes âgées fragiles ou à risque de chute<br>• Neuropathie des membres inférieurs avec risque de plaie cutanée (diabète…)<br>• Certaines personnes en situation de handicap :<br>&nbsp;&nbsp;&nbsp;&nbsp;○ Physique<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▪ Amputation, troubles neuro-orthopédiques<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▪ Atteinte musculaire d’origine neurologique, dégénérative ou traumatique<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▪ Lésion médullaire<br>&nbsp;&nbsp;&nbsp;&nbsp;○ Sensoriel, visuel, auditif ou troubles de l’équilibre avec risque accru de chute<br>&nbsp;&nbsp;&nbsp;&nbsp;○ Troubles psychiques / cognitifs / psychotiques / de l’humeur avec comportements à risque ou psychotropes<br>• Personnes avec dispositif médical / aide technique : fauteuil roulant, canne, prothèse, orthèse, stomie…",
     "https://www.has-sante.fr/upload/docs/application/pdf/2018-10/guide_aps_vf.pdf#page=23"
   );
 }
@@ -1267,6 +1279,14 @@ function showBiologieInfo() {
     "Bilan biologique",
     "La prescription systématique d’examens biologiques n’est pas recommandée, au préalable d’une AP. Toutefois, la consultation médicale d’AP est l’occasion de vérifier le bon suivi et le contrôle des maladies chroniques et des facteurs de RCV du patient :<br><br>• Dans le cadre des recommandations de bonnes pratiques relatives à la maladie, un contrôle à jeun de la glycémie et du bilan lipidique (cholestérol total, LDL, HDL et triglycérides sériques) et de la créatininémie peut se justifier s’ils datent de plus d’un an.<br><br>• Un bilan lipidique peut aussi être prescrit pour le calcul de l’index SCORE2, si son dosage date de plus d’un an.",
     "https://www.has-sante.fr/upload/docs/application/pdf/2018-10/guide_aps_vf.pdf#page=42"
+  );
+}
+
+function showIntensiteInfo() {
+  openInfoModal(
+    "Classement des activités physiques selon l'intensité et repères",
+    "<strong>Sédentaire</strong><br>• MET : ≤ 1,5<br>• Borg : 0–2<br>• Repère : 0<br>• Type AP : Assis, TV, lecture, déplacements motorisés…<br><br><strong>Faible</strong><br>• MET : 1,6–3<br>• Borg : 3–4<br>• Repère : FC perçue<br>• Type AP : Marche < 4 km/h, s’habiller, promener chien, activités debout<br><br><strong>Modérée</strong><br>• MET : 3–6<br>• Borg : 5–6<br>• Repère : Essoufflement, conversation possible<br>• Type AP : Marche 5–6,5 km/h, montée lente escaliers, CAP < 8 km/h, vélo/nage loisir, jardinage<br><br><strong>Intense</strong><br>• MET : 6–9<br>• Borg : 7–8<br>• Repère : Conversation difficile (3 mots)<br>• Type AP : Marche > 6,5 km/h, montée rapide escaliers, CAP 8–9 km/h, vélo 20–25 km/h<br><br><strong>Très intense</strong><br>• MET : > 9<br>• Borg : 9–10<br>• Repère : Conversation impossible<br>• Type AP : CAP > 9 km/h, vélo > 25 km/h",
+    "https://www.has-sante.fr/upload/docs/application/pdf/2018-10/guide_aps_vf.pdf#page=60"
   );
 }
     
@@ -2341,7 +2361,7 @@ function resetFormulaireComplet() {
 }
             
 function importPatientJSON(jsonText) {
-
+console.count("IMPORT JSON EXECUTE");
   isImporting = true;
 
   // 🔥 AJOUT CRITIQUE
@@ -2453,7 +2473,9 @@ if (niveau) {
     }
   });
 // 🔥 appliquer motivation APRÈS mise à jour UI
-appliquerMotivation(actifDepuis, apEnvisagee, ap6Mois);    
+setTimeout(() => {
+  appliquerMotivation(actifDepuis, apEnvisagee, ap6Mois);
+}, 50);
 }
   
  if (pas !== undefined && pas !== null) {
@@ -2540,25 +2562,28 @@ if (confBlock && confField) {
 
 }
     
-alert("Données patient importées.\n\nVérifiez et complétez les champs avant de générer le compte-rendu.");          
+         
 setTimeout(() => {
   isImporting = false;
 }, 100); 
       
 }
-
 function appliquerMotivation(actifDepuis, apEnvisagee, ap6Mois){
 
   console.log("Application motivation après affichage UI");
 
-  // 🔥 RESET COMPLET
+    const actifBlock = document.getElementById('actif-subgroup');
+    const inactifBlock = document.getElementById('inactif-subgroup');
+    const sixMoisBlock = document.getElementById('sixmois-subgroup');
+ 
+    // 🔥 RESET COMPLET
   document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
   document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
   document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
 
-  document.getElementById('actif-subgroup').style.display = "none";
-  document.getElementById('inactif-subgroup').style.display = "none";
-  document.getElementById('sixmois-subgroup').style.display = "none";
+  actifBlock.classList.add("hidden");
+  inactifBlock.classList.add("hidden");
+  sixMoisBlock.classList.add("hidden");
 
   // 🔒 GARDE-FOU
   if (!document.querySelector('input[name="niveau_actuel"]:checked')) {
@@ -2566,21 +2591,24 @@ function appliquerMotivation(actifDepuis, apEnvisagee, ap6Mois){
   }
 
   // 🔹 ACTIF
-  if (actifDepuis) {
-    const r = document.querySelector(
-      `input[name="actif_depuis"][value="${actifDepuis}"]`
-    );
-    if (r) {
-      r.checked = true;
-      document.getElementById('actif-subgroup').style.display = "";
-    }
+ if (actifDepuis) {
+  const r = document.querySelector(
+    `input[name="actif_depuis"][value="${actifDepuis}"]`
+  );
+
+  if (r) {
+    actifBlock.classList.remove("hidden");
+    actifBlock.style.display = "flex";
+
+    r.checked = true;
   }
+}
 
   // 🔹 AP ENVISAGÉE
 if (apEnvisagee) {
 
-  // 🔥 AJOUT CRITIQUE → afficher bloc inactif
-  document.getElementById('inactif-subgroup').style.display = "";
+  inactifBlock.classList.remove("hidden");
+  inactifBlock.style.display = "flex";
 
   const r = document.querySelector(
     `input[name="ap_envisagee"][value="${apEnvisagee}"]`
@@ -2590,17 +2618,21 @@ if (apEnvisagee) {
     r.checked = true;
 
     if (apEnvisagee === "non") {
-      document.getElementById('sixmois-subgroup').style.display = "";
+
+      sixMoisBlock.classList.remove("hidden");
+      sixMoisBlock.style.display = "flex";
 
       if (ap6Mois) {
         const r6 = document.querySelector(
           `input[name="ap_6_mois"][value="${ap6Mois}"]`
         );
+
         if (r6) r6.checked = true;
       }
     }
   }
 }
+
 }
 
     
@@ -2811,40 +2843,61 @@ const sedentaireRadios = document.querySelectorAll('input[name="sedentaire"]');
   const inactifBlock = document.getElementById('inactif-subgroup');
   const sixMoisBlock = document.getElementById('sixmois-subgroup');
 
-  function resetMotivation() {
-    document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
-    document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
-    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+function resetMotivation() {
 
-    actifBlock.style.display = "none";
-    inactifBlock.style.display = "none";
-    sixMoisBlock.style.display = "none";
+  document.querySelectorAll('input[name="actif_depuis"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="ap_envisagee"]').forEach(r => r.checked = false);
+  document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
+
+  actifBlock.classList.add("hidden");
+  inactifBlock.classList.add("hidden");
+  sixMoisBlock.classList.add("hidden");
+
+}
+
+function updateNiveauUI(value) {
+
+  console.log("updateNiveauUI appelée avec :", value);
+
+  resetMotivation();
+
+  if (
+    value === 'actif' ||
+    value === 'tres_actif' ||
+    value === 'moyennement_actif'
+  ) {
+
+    actifBlock.classList.remove("hidden");
+    actifBlock.style.display = "flex";
+
   }
 
-  function updateNiveauUI(value) {
+  if (value === 'inactif') {
 
-    resetMotivation();
+    inactifBlock.classList.remove("hidden");
+    inactifBlock.style.display = "flex";
 
-    if (value === 'actif' || value === 'tres_actif' || value === 'moyennement_actif') {
-      actifBlock.style.display = "";
-    }
-
-    if (value === 'inactif') {
-      inactifBlock.style.display = "";
-    }
   }
+
+}
 
  function updateAP(value) {
 
-  if (isImporting) return; // 🔥 AJOUT
+  if (isImporting) return;
 
-    document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
-    sixMoisBlock.style.display = "none";
+  document.querySelectorAll('input[name="ap_6_mois"]').forEach(r => r.checked = false);
 
-    if (value === "non") {
-      sixMoisBlock.style.display = "block";
-    }
+  sixMoisBlock.classList.add("hidden");
+  sixMoisBlock.style.display = "none";
+
+  if (value === "non") {
+
+    sixMoisBlock.classList.remove("hidden");
+    sixMoisBlock.style.display = "flex";
+
   }
+
+}
             
 function updateSedentariteAuto() {
 
