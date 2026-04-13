@@ -1,119 +1,123 @@
-# # PAP-Plateforme
+# PAP-Plateforme
 
 Outil de pré-consultation et d’aide à la prescription d’activité physique
 
 ---
 
-## Description
+## 🎯 Objectif
 
-PAP-Plateforme est un outil mono-fichier HTML destiné :
+PAP-Plateforme est un outil conçu pour :
 
-- aux patients, pour l’auto-évaluation de leur niveau d’activité physique
-- aux professionnels de santé, comme support d’aide à la consultation
+* préparer la consultation médicale
+* structurer l’évaluation de l’activité physique
+* faciliter la prescription d’activité physique
 
-Il permet :
+Il s’adresse :
 
-- L’évaluation du niveau d’activité physique (GPAQ – OMS / Marshall)
-- Le calcul des MET-min/semaine
-- La détermination du stade motivationnel
-- L’auto-évaluation de l’importance et de la confiance (EVA 0–10)
-- L’aide à la structuration de la consultation
-- L’assistance à la rédaction de comptes rendus de consultation (CRC)
+* aux patients (auto-évaluation)
+* aux professionnels de santé (aide à la décision et à la rédaction)
+
+---
+
+## 🧩 Fonctionnalités
+
+L’outil permet :
+
+* Évaluation du niveau d’activité physique (GPAQ – OMS / Marshall)
+* Calcul des MET-min/semaine
+* Détermination du stade motivationnel
+* Évaluation de l’importance et de la confiance (EVA 0–10)
+* Structuration de la consultation
+* Génération de comptes rendus de consultation (CRC)
 
 Les résultats sont destinés à être utilisés en consultation médicale.
 
-Aucune donnée n’est stockée.
+---
+
+## 🔒 Données & confidentialité
+
+* Aucune donnée n’est stockée
+* Aucune transmission automatique
+* Aucune base de données
+* Exécution locale uniquement
+
+Les données restent sous le contrôle exclusif de l’utilisateur.
 
 ---
 
-## Architecture du projet
+## 🏗️ Architecture du projet
 
-Le projet repose sur trois niveaux distincts :
+Le projet repose sur trois niveaux :
 
 ### 1. Logique clinique (gelée)
 
-Les éléments suivants sont strictement verrouillés :
+* Questionnaires (GPAQ, Marshall)
+* Calculs et seuils
+* Logique motivationnelle
+* Ordre des étapes
+* Données cliniques fondamentales
 
-- Questionnaires (GPAQ, Marshall)
-- Calculs et seuils
-- Logique motivationnelle
-- Ordre des étapes
-- Structure des résultats
-
-Voir :
-**PROTOCOLE_STABILITE_CLINIQUE_PAP.md**
+→ Voir : `PROTOCOLE_STABILITE_CLINIQUE_PAP.md`
 
 ---
 
-### 2. Stabilité technique (anti-régression)
+### 2. Stabilité technique (DSR)
 
-Toute modification technique suit un protocole DSR (Debug Sans Régression) visant à :
+Toute modification suit un protocole visant à :
 
-- Corriger sans perte fonctionnelle
-- Éviter toute régression visible ou invisible
-- Maintenir l’intégrité des parcours validés
+* éviter les régressions
+* maintenir l’intégrité fonctionnelle
+* garantir la cohérence du système
 
-Voir :
-**PROTOCOLE_DSR_PAP.md**
-
----
-
-### 3. Évolutions
-
-Les évolutions nécessitent une validation explicite afin de garantir la cohérence clinique et technique du projet.
+→ Voir : `PROTOCOLE_DSR_PAP.md`
 
 ---
 
-## Caractéristiques techniques
+### 3. Architecture clinique
 
-- Application mono-fichier HTML
-- Exécution locale dans le navigateur
-- Aucune base de données
-- Aucun stockage persistant
+Les modules sont structurés selon une logique décisionnelle (conditions → actions).
+
+→ Voir : `ARCHITECTURE.md`
 
 ---
 
-## Positionnement
+## ⚙️ Caractéristiques techniques
+
+* Application HTML (exécution navigateur)
+* Fonctionnement local
+* Sans base de données
+* Sans stockage persistant
+
+---
+
+## 🧠 Positionnement
 
 PAP-Plateforme est :
 
-- un outil d’évaluation
-- un support d’aide à la décision clinique
-- un outil d’accompagnement à la consultation
-- un support de structuration et de rédaction
+* un outil d’évaluation
+* un support d’aide à la décision clinique
+* un outil de structuration de la consultation
 
 Il ne remplace pas le jugement clinique du professionnel de santé.
 
 ---
 
-## Licence
+## 📜 Licence
 
 ### Code source
-Ce projet est distribué sous licence GNU GPL v3.
 
-Toute réutilisation, modification ou distribution doit :
-- conserver cette licence
-- mentionner l’auteur original
+Licence GNU GPL v3
 
-### Contenu médical (guide, fiches, documents associés)
-Le contenu est distribué sous licence Creative Commons CC BY-NC-SA 4.0.
+### Contenu médical
 
-Vous êtes autorisé à :
-- partager
-- adapter
+Licence Creative Commons CC BY-NC-SA 4.0
 
-À condition de :
-- citer l’auteur
-- ne pas en faire un usage commercial
-- partager les modifications sous les mêmes conditions
+Conditions :
+
+* attribution obligatoire
+* usage non commercial
+* partage dans les mêmes conditions
 
 ---
 
-© Antoine Bosquet – 2026 – Tous droits réservés
-
----
-
-
-
-
-
+© Antoine Bosquet – 2026
