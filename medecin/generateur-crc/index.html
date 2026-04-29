@@ -5,20 +5,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="manifest" href="/PAP-Plateforme/manifest.json">
+    <!-- PWA -->
+    <link rel="manifest" href="/PAP-Plateforme-dev/manifest.json">
 
-<link rel="icon" href="/PAP-Plateforme/assets/icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/PAP-Plateforme/assets/icons/icon-192.png">
-    
-<meta name="theme-color" content="#2b7cff">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
- <meta name="apple-mobile-web-app-title" content="CRC Pro">  
-    
+    <!-- Favicons navigateur -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/PAP-Plateforme-dev/assets/icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes=paty"16x16" href="/PAP-Plateforme-dev/assets/icons/favicon-16.png">
+
+    <!-- Android / PWA -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/PAP-Plateforme-dev/assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/PAP-Plateforme-dev/assets/icons/icon-512.png">
+
+    <!-- iPhone / iPad -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/PAP-Plateforme-dev/assets/icons/apple-touch-icon.png">
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#2b7cff">
+
+    <!-- iOS standalone -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CRC Pro">
+
     <title>PAP – Générateur de compte-rendu médical</title>
 
-        <link rel="stylesheet" href="../../css/style-global.css">
-<style>
+    <link rel="stylesheet" href="../../css/style-global.css">
+
+    <style>
+        .crc-container label {
+            font-size: 0.95em !important;
+            margin-bottom: 2px;
+        }
+
+.crc-container input {
+  transform: scale(0.95);
+}
+
+.crc-container {
+  line-height: 1.35;
+  margin-top: 6px;
+}
+    
 .modal {
   position: fixed;
   inset: 0;
@@ -326,11 +353,26 @@ button {
   max-width: 180px;
   margin-top: 10px;
 }
-#niveau-container label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}  
+    
+label:has(input[type="checkbox"]),
+label:has(input[type="radio"]){
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  line-height:1.35;
+  vertical-align:top;
+}
+
+label:has(input[type="checkbox"]) input[type="checkbox"],
+label:has(input[type="radio"]) input[type="radio"]{
+  margin:0;
+  flex-shrink:0;
+}
+
+label:has(input[type="checkbox"]) .info-icon,
+label:has(input[type="radio"]) .info-icon{
+  display:inline-flex;
+}
     
  .has-missing {
   outline: 2px solid #f59e0b;
@@ -339,31 +381,148 @@ button {
   transition: all 0.2s ease;
 }   
     
-.info-icon {
+.info-trigger{
+  position:relative;
+  display:inline-block;
+
+  width:16px;
+  height:16px;
+
+  margin:0 6px 0 4px;
+  padding:0;
+
+  border:none;
+  background:transparent;
+
+  vertical-align:middle;
+  cursor:pointer;
+
+  touch-action:manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* zone tactile élargie */
+.info-trigger::after{
+  content:"";
+  position:absolute;
+  top:-12px;
+  bottom:-12px;
+  left:-12px;
+  right:-12px;
+}
+
+/* anciens spans : afficher automatiquement le i */
+.info-trigger:not(button)::before{
+  content:"i";
+  display:block;
+
+  width:16px;
+  height:16px;
+  line-height:16px;
+
+  border-radius:50%;
+  background:#bfdbfe;
+  color:#1d4ed8;
+
+  text-align:center;
+  font-size:11px;
+  font-weight:700;
+}
+
+/* focus propre */
+.info-trigger:focus{
+  outline:none;
+}
+
+/* nouveau système bouton + span interne */
+.info-icon{
   display:inline-flex;
   align-items:center;
   justify-content:center;
 
-  width:22px;
-  height:22px;
-  min-width:22px;
-  min-height:22px;
+  width:16px;
+  height:16px;
+  min-width:16px;
+  min-height:16px;
 
-  margin-left:6px;
+  margin-left:3px;
+  margin-right:0px;
 
   border-radius:50%;
-  background:#dbeafe;
+  background:#bfdbfe;
   color:#1d4ed8;
 
-  font-size:14px;
-  font-weight:bold;
+  text-align:center;
+  font-size:11px;
+  font-weight:700;
   line-height:1;
 
-  flex-shrink:0;
-
+  vertical-align:middle;
   cursor:pointer;
+
+  user-select:none;
+  -webkit-user-select:none;
 }
-    
+
+ .form-group label:has(.patho){
+  display:block;
+  line-height:1.35;
+}
+        
+/* rapproche uniquement les "i" dans les blocs générés */
+.crc-page #pathoHelpContainer .info-icon{
+  margin-left:2px;
+  margin-right:0;
+}
+        
+.form-group label:has(.patho) input[type="checkbox"]{
+  margin:0 6px 0 0;
+  vertical-align:middle;
+  position:static;
+  top:auto;
+}
+
+/* =========================
+   PATHOLOGIES CHRONIQUES
+========================= */
+
+.pathologies-grid{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:16px 24px;
+  width:100%;
+  align-items:start;
+}
+
+.pathologies-grid > div{
+  min-width:0;
+}
+
+.pathologies-grid strong{
+  display:block;
+  margin-bottom:8px;
+}
+
+.pathologies-grid label{
+  margin-bottom:4px;
+  overflow-wrap:anywhere;
+}
+
+/* Tablette + téléphones portrait */
+@media (max-width: 900px) and (orientation: portrait){
+  .pathologies-grid{
+    grid-template-columns:repeat(2, minmax(0,1fr));
+  }
+}
+
+/* Très petits écrans uniquement */
+@media (max-width: 350px) and (orientation: portrait){
+  .pathologies-grid{
+    grid-template-columns:1fr;
+    gap:18px;
+  }
+}
+  
 </style>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -372,12 +531,8 @@ button {
 <body>
 <div class="container crc-page">
         <div class="rgpd-banner">
-            Cet outil a été réalisé par <a href="mailto:antoine.bosquet@aphp.fr?subject=Demande d'information - Générateur de CRC / Aide à la prescription d'activité physique">Antoine Bosquet</a>. Il est hébergé sur le site Github et ne stocke pas vos données. Vous pouvez l'imprimer pour votre usage personnel ou médical.
-            En continuant, vous acceptez que les données saisies puissent être affichées sur votre écran ou imprimées.
-   <a href="privacy.html" target="_blank" rel="noopener noreferrer">
-  Consulter la politique de confidentialité
-</a>
-            <a href="https://www.cnil.fr/fr/les-droits-pour-maitriser-vos-donnees-personnelles" target="_blank" rel="noopener noreferrer">Vos droits (CNIL)</a>
+            Outil réalisé par <a href="mailto:antoine.bosquet@aphp.fr?subject=Demande d'information - Générateur de CRC / Aide à la prescription d'activité physique">Antoine Bosquet</a> et hébergé sur Github. Les données saisies restent sur votre appareil et ne sont pas conservées (hors impression volontaire). <a href="https://abbe-web.github.io/Compte-Rendu-Consultation-PAP/politique-confidentialite.html" target="_blank" rel="noopener noreferrer">Consulter la politique de confidentialité</a> |
+            <a href="https://www.cnil.fr/fr/les-droits-pour-maitriser-vos-donnees-personnelles" target="_blank" rel="noopener noreferrer">Vos droits (CNIL)</a> Logiciel libre sous licence GNU GPL v3.
         </div>
     
 <div id="iosBrowserWarning" class="ios-warning hidden">
@@ -505,8 +660,15 @@ Importer fichier JSON
 
 <input type="file" id="importJSONFile" accept=".json" style="display:none;">
 <div id="qrScannerContainer" style="display:none;margin-top:15px;">
-  <div id="qr-reader" style="width:300px;"></div>
-  <button type="button" id="closeQRScanner" class="btn">Fermer scanner</button>
+
+  <div style="text-align:center; margin-bottom:10px;">
+    <button type="button" id="closeQRScanner" class="btn secondary">
+      Fermer scanner
+    </button>
+  </div>
+
+  <div id="qr-reader" style="width:300px; margin:auto;"></div>
+
 </div>
     
 <p>Veuillez ensuite vérifier et compléter les informations avant de générer le compte-rendu.</p>
@@ -679,8 +841,8 @@ Importer fichier JSON
 </label>
 
     <label>
-  <input type="checkbox" id="cancer_suivi_checkbox">
-  Patient actuellement suivi pour un cancer
+  <input type="checkbox" id="_suivi_checkbox">
+  Suivi actuel pour un cancer
 </label>
     
   <!-- BPCO -->
@@ -756,6 +918,82 @@ Importer fichier JSON
 </div>
         
     <div class="form-group">
+
+<!-- ========================= -->
+<!-- 🔹 PATHOLOGIES CHRONIQUES -->
+<!-- ========================= -->
+
+<div class="form-group">
+
+<h2>🩺 Maladies chroniques (aide à la prescription)</h2>
+
+<div class="pathologies-grid">
+
+<div>
+<strong style="display:block; margin-bottom:6px;">Cardio</strong>
+<label><input type="checkbox" class="patho" value="hta"> HTA</label>
+<label><input type="checkbox" class="patho" value="coronaropathie"> Coronaropathie</label>
+<label><input type="checkbox" class="patho" value="icc"> Insuf. cardiaque chronique</label>
+<label><input type="checkbox" class="patho" value="aomi"> AOMI</label>
+</div>
+
+<div>
+<strong style="display:block; margin-bottom:6px;">Métabolique</strong>
+<label><input type="checkbox" class="patho" value="dt1"> Diabète type 1</label>
+<label><input type="checkbox" class="patho" value="dt2"> Diabète type 2</label>
+<label><input type="checkbox" class="patho" value="obesite"> Surpoids / Obésité</label>
+</div>
+
+<div>
+<strong style="display:block; margin-bottom:6px;">Respiratoire</strong>
+<label><input type="checkbox" class="patho" value="bpco"> BPCO</label>
+<label><input type="checkbox" class="patho" value="asthme"> Asthme</label>
+</div>
+
+<div>
+<strong style="display:block; margin-bottom:6px;">Neurologique</strong>
+<label><input type="checkbox" class="patho" value="avc"> AVC</label>
+<label><input type="checkbox" class="patho" value="parkinson"> Parkinson</label>
+<label><input type="checkbox" class="patho" value="sep"> SEP</label>
+</div>
+
+<div>
+<strong style="display:block; margin-bottom:6px;">Locomoteur</strong>
+<label><input type="checkbox" class="patho" value="lombalgie"> Lombalgie chronique</label>
+<label><input type="checkbox" class="patho" value="arthrose"> Arthrose</label>
+<label><input type="checkbox" class="patho" value="pr"> Polyarthrite rhumatoïde</label>
+<label><input type="checkbox" class="patho" value="spa"> Spondyloarthrite</label>
+</div>
+
+<div>
+<strong style="display:block; margin-bottom:6px;">Psychique</strong>
+<label><input type="checkbox" class="patho" value="depression"> Dépression</label>
+<label><input type="checkbox" class="patho" value="schizophrenie"> Schizophrénie</label>
+</div>
+
+<div>
+<strong style="display:block; margin-bottom:6px;">Oncologie</strong>
+<label><input type="checkbox" class="patho" value="cancer"> Cancer</label>
+</div>
+
+<div>
+<strong style="display:block; margin-bottom:6px;">Personnes âgées</strong>
+<label><input type="checkbox" class="patho" value="pa_maintien"> Maintien capacités</label>
+<label><input type="checkbox" class="patho" value="pa_chute"> Risque de chute</label>
+</div>
+
+<div>
+<strong style="display:block; margin-bottom:6px;">Spécifiques</strong>
+<label><input type="checkbox" class="patho" value="grossesse"> Grossesse</label>
+</div>
+
+</div>
+
+</div>
+
+<div id="pathoHelpContainer" style="margin-top:10px;"></div>
+<div id="pathoCRContainer" style="margin-top:10px;"></div>
+        
 <h2>
   3/ Évaluation du RCV (tableau 3) :
 
@@ -766,10 +1004,22 @@ Importer fichier JSON
     i
   </span>
 </h2>
-        
-    <label><input type="radio" name="rcv" value="faible"> Faible</label>
-    <label><input type="radio" name="rcv" value="modere"> Modéré</label>
-    <label><input type="radio" name="rcv" value="eleve_tres_eleve"> Élevé/très élevé</label>
+
+<div id="rcv-container"
+style="display:flex; align-items:center; gap:25px; flex-wrap:wrap; margin-bottom:10px;">
+
+  <label>
+    <input type="radio" name="rcv" value="faible"> Faible
+  </label>
+
+  <label>
+    <input type="radio" name="rcv" value="modere"> Modéré
+  </label>
+
+  <label>
+    <input type="radio" name="rcv" value="eleve_tres_eleve"> Élevé / très élevé
+  </label>
+
 </div>
         
             <div class="form-group">
@@ -998,6 +1248,23 @@ Pas d’AP envisagée dans les 6 mois
 </div>
 
 <div class="form-group">
+    
+<div id="pathoRulesBlock" style="
+  margin:20px 0;
+  padding:12px;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  background:#fefce8;
+">
+
+  <strong>⚙️ Pathologies : repères pour l'activité physique</strong>
+
+  <div id="pathoRulesContainer" style="margin-top:10px; font-size:0.9rem;">
+    Aucune pathologie sélectionnée.
+  </div>
+
+</div>
+    
     <h2>8/ Les objectifs principaux en termes d’activité physique sont :</h2>
     <textarea name="objectifs_ap"></textarea>
 </div>
@@ -1091,10 +1358,21 @@ Pas d’AP envisagée dans les 6 mois
 <!-- ================= FICHES ================= -->
 <div class="sub-group">
   <h3 class="black-text">Des fiches de promotion d'activité physique :</h3>
-  <label class="inline-option"><input type="radio" name="fiches_promotion" value="oui"> Oui</label>
-  <label class="inline-option"><input type="radio" name="fiches_promotion" value="non"> Non</label>
-</div>
 
+  <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+
+    <label class="inline-option" style="display:flex; align-items:center; gap:6px;">
+      <input type="radio" name="fiches_promotion" value="oui">
+      Oui
+    </label>
+
+    <label class="inline-option" style="display:flex; align-items:center; gap:6px;">
+      <input type="radio" name="fiches_promotion" value="non">
+      Non
+    </label>
+
+  </div>
+</div>
 </div>
 
             <div class="form-group">
@@ -1105,12 +1383,17 @@ Pas d’AP envisagée dans les 6 mois
             <div class="form-group">
   <h2>11/ Date du courrier (facultatif, si laissée vide = aujourd'hui) :</h2>
   <input type="date" name="date_courrier">
-</div>
-        </form>
+            </div>
     
-<button type="button" id="generateReport" class="btn">
-  Générer le compte-rendu
-</button>
+</form>
+
+<div class="action-buttons">
+
+  <button type="button" id="generateReport" class="btn">
+    Générer le compte-rendu
+  </button>
+
+  </div>
     
     <div id="reportOutput" class="hidden">
 
@@ -1131,19 +1414,1201 @@ Pas d’AP envisagée dans les 6 mois
 <button type="button" id="copyReport" class="btn">Copier</button>
 <button type="button" id="downloadPdf" class="btn hidden">Télécharger PDF</button>
   </div>
-
+        
+<div id="resetSection" class="hidden" style="margin-top:12px; text-align:center;">
+<button 
+  type="button" 
+  id="resetConsultationBtn" 
+  class="btn secondary-btn"
+  style="width:100%;">
+    Nouvelle consultation
+  </button>
 </div>
-
-    </div>
-
+</div>
 
 <script>
     
 /* =====================================
 1. VARIABLES GLOBALES ==================
 ===================================== */
+
+const PATHO_DATA = {
+
+hta: {
+  titre: "Hypertension artérielle",
+
+  contraintes: [
+    "HTA non équilibrée symptomatique + PAS ≥ 200 mmHg ou PAD ≥ 115 mmHg → CI absolue à AP ≥ modérée",
+    "HTA non équilibrée symptomatique + PAS ≥ 180 mmHg ou PAD ≥ 105 mmHg → CI relative à AP ≥ modérée (à réévaluer)",
+    "HTA mal équilibrée et/ou symptomatique et/ou atteinte d’organe → précautions si AP très élevée (90-100% VO2 max) ou renforcement musculaire élevé (avis cardio, CI parfois)"
+  ],
+
+  adaptations: [
+    "Privilégier les activités d’endurance et le renforcement musculaire modéré",
+    "En cas d'AP intense, bien s'échauffer",
+    "Éviter le renforcement musculaire intense en glotte fermée (Valsalva)"
+  ],
+
+  situations: [
+    "Hypotension post-effort, notamment sous traitement antihypertenseur"
+  ],
+
+  regles: [
+    "SI PAS ≥ 200 mmHg ou PAD ≥ 115 mmHg → ALORS différer l’AP d’intensité ≥ modérée",
+    "SI HTA non contrôlée → ALORS stabilisation préalable à envisager avant reprise ou progression de l’AP",
+    "SI traitement antihypertenseur → ALORS risque d’hypotension post-effort à surveiller (parfois plusieurs heures après)",
+    "SI traitement diurétique → ALORS risque de déshydratation ou de troubles ioniques, notamment en cas d’effort prolongé ou de chaleur",
+    "SI symptômes à ou post effort (vertiges, malaise) → ALORS réévaluation clinique (adaptation posologie tt anti HTA à discuter avant les séances d’AP)"
+  ],
+
+  crc: [
+    "éviter les efforts en glotte fermée",
+    "privilégier les activités d’endurance régulières",
+    "surveiller la tolérance tensionnelle à l’effort"
+  ],
+
+  crc_default: [
+    "privilégier les activités d’endurance régulières",
+    "surveiller la tolérance tensionnelle à l’effort"
+  ]
+},
+
+coronaropathie: {
+  titre: "Coronaropathie / Syndrome coronarien chronique",
+
+  contraintes: [
+    "Syndrome coronarien aigu récent/non stabilisée",
+    "Sport/AP intense : CI si 1/revascularisation incomplète ou 2/FEVG <50% ou cinétique segmentaire aN, 3/∑ et/ou ischémie et/ou arythmie sévère à l’effort, 4/ SCA ± angioplastie ≤ 3 mois ou pontage < 12 mois"
+  ],
+
+  adaptations: [
+    "Insister sur respect des règles habituelles de précaution (progressivité, AP modérée, début et fin progressif, connaissance des signes d’alerte)",
+    "Associer renforcement musculaire modéré avec respiration libre, sans blocage ventilatoire",
+    "Traitement bradycardisant (bêtabloquant, vérapamil/diltiazem) : Utiliser perception d’effort (Borg)"
+  ],
+
+  situations: [
+    "freins à l’AP : déconditionnement physique et anxiété de reprise fréquents après événement coronarien",
+    "Facteurs de risque associés fréquents : HTA, diabète, dyslipidémie, tabagisme",
+    "Traitements pouvant modifier tolérance à l’effort ou consignes pratiques (voir points de vigilance)",
+    "Autorisation AP intense (sport)= si 1/revascularisation complète ou pas de sténose coronaire significative ET 2/FEVG ≥50% ET absence /∑, ischémie, arythmie à l’effort ET 3/capacité physique ≥100% théorique ET 4/bonne observance tt et bon équilibre FdR CV"
+  ],
+
+  regles: [
+    "SI reprise après syndrome coronarien aigu récent → ALORS privilégier réadaptation cardiaque puis progression encadrée",
+    "SI AP interrompue plusieurs semaines → ALORS reprendre à niveau inférieur puis progresser",
+    "SI signes d’alerte à l’effort (« i » avec : douleur thoracique, essoufflement inhabituel ou malaise ») → ALORS avis cardiologique",
+    "SI activité intense ou compétition souhaitée → ALORS avis cardiologique",
+    "SI patient sous bêtabloquant ou vérapamil/diltiazem → ALORS guider l’intensité par ressenti d’effort",
+    "SI antiagrégant plaquettaire → ALORS prudence pour sports de contact ou à chute"
+  ],
+
+  crc: [
+    "Prise des traitements aux heures habituelles même en cas de séance d’AP",
+    "Respect important des règles habituelles de précaution (échauffement et retour au calme progressif, connaitre les 10 règles du club des cardiologues du sport)",
+    "Arrêtez l’effort si douleur thoracique, malaise ou essoufflement inhabituel",
+    "Eviter de faire des exercices de renforcement musculaires intenses bouche fermée",
+    "Bougez régulièrement chaque semaine plutôt qu’efforts intenses occasionnels",
+    "Nécessité d’un avis cardiologique si activité physique intense et/ou sportive voire en compétition souhaitée"
+  ],
+
+  crc_default: [
+    "Prise des traitements aux heures habituelles même en cas de séance d’AP",
+    "Respect important des règles habituelles de précaution (échauffement et retour au calme progressif, connaitre les 10 règles du club des cardiologues du sport)",
+    "Arrêtez l’effort si douleur thoracique, malaise ou essoufflement inhabituel"
+  ]
+},
+    
+aomi: {
+  titre: "AOMI / Artériopathie oblitérante des membres inférieurs",
+
+  contraintes: [
+    "Ischémie chronique sévère, douleur de repos ou lésion tissulaire → avis vasculaire préalable",
+    "Sténose serrée fémorale commune ou lésions fémorales associées avant revascularisation → prudence pour AP sollicitant les membres inférieurs"
+  ],
+
+  adaptations: [
+    "Débuter idéalement par programme supervisé de réadaptation vasculaire ou APA",
+    "Privilégier la marche intermittente avec alternance effort / récupération",
+    "Limiter l’intensité au seuil de douleur sous-maximale permettant de poursuivre",
+    "Objectif pratique : au moins 3 séances/semaine de 30 à 60 minutes pendant 12 semaines puis poursuite autonome",
+    "Si marche difficile : vélo, ergomètre bras/jambes, exercices des membres supérieurs ou renforcement adapté",
+    "Chaussage de qualité, surtout si diabète ou fragilité cutanée"
+  ],
+
+  situations: [
+    "Comorbidités fréquentes à rechercher : tabagisme, HTA, diabète, coronaropathie",
+    "Douleurs musculaires possibles sous statines",
+    "Antiagrégant plaquettaire : risque d’hématome si choc",
+    "Déconditionnement physique fréquent",
+    "Claudication intermittente avec limitation du périmètre de marche fréquente"
+  ],
+
+  regles: [
+    "SI douleur devient intense ou récupération anormalement longue → ALORS réduire intensité et réévaluer",
+    "SI marcher trop difficile → ALORS proposer activité alternative (vélo, ergomètre, renforcement)",
+    "SI douleur thoracique ou malaise à l’effort → ALORS arrêt immédiat et avis médical",
+    "SI myalgie à l’effort sous statine → ALORS évaluer imputabilité et discuter adaptation du traitement sans arrêter l’AP",
+    "SI antiagrégant → ALORS prévenir du risque d’hématome en cas de choc"
+  ],
+
+  crc: [
+    "L’activité physique régulière aide à reculer le seuil d’apparition de la douleur à la marche",
+    "Marcher jusqu’à une douleur supportable n’obligeant pas à s’arrêter puis récupérer avant de repartir",
+    "Importance de la marche régulière même fractionnée",
+    "Respecter l’échauffement et le retour au calme en fin d’activité",
+    "Porter de bonnes chaussures et surveiller ses pieds",
+    "Chaque période assise prolongée mérite d’être interrompue"
+  ],
+
+  crc_default: [
+    "La marche régulière est importante",
+    "Marcher jusqu’à une douleur supportable puis récupérer avant de repartir",
+    "Respecter échauffement et retour au calme",
+    "Porter de bonnes chaussures et surveiller ses pieds",
+    "Bouger régulièrement aide à améliorer la marche"
+  ]
+},
+
+dt1: {
+  titre: "Diabète de type 1",
+
+  contraintes: [
+    "G > 2,5 g/L (13.9 mM) ou cétonémie > 0.5 mM/L en début d’exercice → éviter séance et corriger",
+    "Cétonémie > 0,5 mmol/L ou cétonurie positive → différer activité",
+    "Hypoglycémie sévère (≤2.8 mM, 0.5 g ou intervention autre personne) récente (<24 h) → contre-indication temporaire",
+    "Hypoglycémie légère récente (2.9-3.9 mM, 0.5-0.7 g) → prudence renforcée, éviter sports à risque isolé <button type='button' class='info-trigger info-hitbox' data-info='ski alpin, escalade, natation, randonnée en solitaire'><span class='info-icon'>i</span></button>",
+    "DT1 déséquilibré (HbA1C ↑) ou ancien ± compliqué <button type='button' class='info-trigger info-hitbox' data-info='rétinopathie proliférative instable, dysautonomie sévère, néphropathie, pathologie CV dont HTA'><span class='info-icon'>i</span></button> → CI AP intense (aérobie ou RM avec fortes charges)",
+    "Rétinopathie proliférante sévère <button type='button' class='info-trigger info-hitbox' data-info='polycoagulée ou non stabilisée'><span class='info-icon'>i</span></button> → éviter efforts violents et force intense (RM avec Valsalva)",
+    "Mal perforant plantaire → CI temporaire aux activités des membres inférieurs"
+  ],
+
+  adaptations: [
+    "Coordination diabétologue +++",
+    "Anticiper AP (si possible) pour adapter dose insuline et/ou apport glucides",
+    "Prendre glycémie avant AP : viser 1.3-1.9 g (7.2-10.5 mM) si AP aérobie modérée, 0.9-1.3 g (5-7.2 mM) avant AP anaérobie/intense",
+    "Avoir matériel + collations pour surveillance glycémique et correction hypoglycémie",
+    "Renforcement musculaire avant aérobie possible pour limiter risque hypoglycémie",
+    "Vigilance particulière si effort inhabituel",
+    "Chaussage adapté + contrôle quotidien des pieds"
+  ],
+
+  situations: [
+    "Respect des CI/limitations",
+    "Neuropathie autonome à risque accru d’hypoglycémie, d’hypotension orthostatique, de thermorégulation réduite et de pathologie coronarienne",
+    "Risque d’hypoglycémie retardée jusqu’à 24 h, surtout nocturne",
+    "Complications microvasculaires/CV fréquentes",
+    "MCG (capteur SC) ou pompe à insuline peut faciliter la gestion de l’effort"
+  ],
+
+  regles: [
+    "SI activité aérobie prolongée prévue → anticiper glucides et/ou réduction insuline (hypogly)",
+    "SI activité intense ou anaérobie → surveiller possible hyperglycémie transitoire",
+    "SI glycémie basse ou tendance descendante → resucrer avant de débuter",
+    "SI symptômes d’hypoglycémie pendant AP → arrêter, contrôler glycémie, resucrer",
+    "SI séance l’après-midi ou importante → vigilance nocturne renforcée",
+    "SI neuropathie ou problème podologique → renforcer soins des pieds et choix activités"
+  ],
+
+  crc: [
+    "Importance de surveiller sa glycémie avant, pendant et après l’effort",
+    "Gardez toujours une source de sucre rapide avec soi",
+    "Chaque activité nouvelle peut nécessiter d’adapter différemment la glycémie",
+    "Après une grosse séance, surveillez la glycémie également le soir et la nuit",
+    "Bon chaussage et contrôle quotidien des pieds recommandés",
+    "Bouger régulièrement apporte plus de bénéfices que rester inactif"
+  ],
+
+  crc_default: [
+    "Importance de surveiller sa glycémie avant, pendant et après l’effort",
+    "Gardez toujours une source de sucre rapide avec soi",
+    "Après une grosse séance, surveillez la glycémie également le soir et la nuit",
+    "Bon chaussage et contrôle quotidien des pieds recommandés",
+    "Bouger régulièrement apporte plus de bénéfices que rester inactif"
+  ]
+},
+
+    dt2: {
+  titre: "Diabète de type 2",
+
+  contraintes: [
+    "Glycémie > 2,5 g/L en début d’exercice → AP déconseillée tant que > 2 g/L (objectif < 2 g/L)",
+    "Activité physique d’intensité élevée si glycémie mal contrôlée → à éviter",
+    "Activité physique intense ou avec manœuvre de Valsalva (ex : renforcement musculaire avec charges lourdes) → CI si diabète compliqué (rétinopathie sévère, néphropathie sévère, dysautonomie sévère, HTA non contrôlée associée)",
+    "Mal perforant plantaire → contre-indication temporaire aux activités des membres inférieurs"
+  ],
+
+  adaptations: [
+    "Privilégier une progressivité : AP d’intensité faible et courte durée au début (ne pas décourager)",
+"Anticiper le risque d’hypoglycémie en cas de traitement hypoglycémiant <button type='button' class='info-trigger info-hitbox' data-info='Insuline, glinides, sulfamides hypoglycémiants'><span class='info-icon'>i</span></button> (auto-surveillance, adaptation posologie, collation possible)",
+    "Surveiller et protéger les pieds",
+    "Possibilité de conseiller AP en post-prandial pour profiter de l’effet hypoglycémiant de l’AP",
+    "Possibilité d’AP séquentielle ou fractionnée si déconditionnement"
+  ],
+
+  situations: [
+    "Risque d’hypoglycémie sous insuline ou traitement insulinosécréteur",
+    "Risque accru de pied diabétique",
+    "Complications microvasculaires ou macrovasculaires associées fréquentes"
+  ],
+
+  regles: [
+"SI traitement hypoglycémiant <button type='button' class='info-trigger info-hitbox' data-info='Insuline, glinides, sulfamides hypoglycémiants'><span class='info-icon'>i</span></button> → ALORS auto-surveillance glycémique avant et après effort, prévoir collation avec soi",
+    "SI activité inhabituelle ou prolongée → ALORS adaptation des apports glucidiques et éventuellement du traitement",
+    "SI lésion du pied → ALORS adapter ou éviter certaines activités",
+    "SI absence de bilan récent → ALORS envisager recherche de complications et facteurs de risque cardiovasculaire"
+  ],
+
+  crc: [
+    "surveillance glycémique recommandée",
+    "surveillance glycémie avant et après l’effort, avoir une collation avec soi",
+    "vigilance pour les pieds (chaussage adapté, surveillance)",
+    "adapter les apports alimentaires à l’activité",
+    "progressivité recommandée en début de programme"
+  ],
+
+  crc_default: [
+    "surveillance glycémique recommandée",
+    "vigilance pour les pieds (chaussage adapté, surveillance)",
+    "adapter les apports alimentaires à l’activité"
+  ]
+},
+
+obesite: {
+  titre: "Surpoids / Obésité de l’adulte",
+
+  contraintes: [
+    "Limitations des activités physiques en charge (rachis, hanches, genoux, chevilles)",
+    "Pas de contre-indication spécifique"
+  ],
+
+  adaptations: [
+    "Privilégier les activités physiques en décharge (natation, aquagym) ou à faible impact (vélo ± électrique, marche nordique)",
+    "Définir des objectifs initiaux réalistes",
+    "Progressivité ++ (fractionner l’activité physique au début)",
+    "Associer endurance et renforcement musculaire",
+    "Valoriser l’augmentation de l’activité physique quotidienne"
+  ],
+
+  situations: [
+    "Dépister les comorbidités +++ (cardiovasculaires, pulmonaires, ostéoarticulaires)",
+    "Déconditionnement fréquent à l’effort",
+    "Freins psychologiques ou expériences négatives antérieures possibles"
+  ],
+
+  regles: [
+    "SI apparition de douleurs des membres inférieurs → ALORS adapter et poursuivre l’activité physique",
+    "SI lombalgie (redistribution des charges lombaires) → ALORS rassurer (souvent transitoire), adapter et poursuivre l’activité physique",
+    "SI essoufflement inhabituel ou mauvaise tolérance → ALORS réévaluation clinique à considérer",
+    "SI découragement rapide → ALORS privilégier objectifs simples et progressifs"
+  ],
+
+  crc: [
+    "privilégier les activités en décharge (aquatiques) ou à faible impact (marche nordique, vélo ± électrique)",
+    "être progressif dans la durée et l’intensité",
+    "chaque pas en plus est bénéfique",
+    "le renforcement musculaire est important pour prévenir la perte musculaire",
+    "les effets positifs de l’activité physique existent même en l’absence de diminution du poids"
+  ],
+
+  crc_default: [
+    "privilégier les activités en décharge (aquatiques) ou à faible impact (marche nordique, vélo ± électrique)",
+    "être progressif dans la durée et l’intensité",
+    "chaque pas en plus est bénéfique"
+  ]
+},
+    
+icc: {
+  titre: "Insuffisance cardiaque chronique",
+
+  contraintes: [
+    "SI IC décompensée, HTA sévère non contrôlée, HTAP sévère symptomatique, tr rythmique ventriculaire complexe → CI à l’AP",
+    "SI syndrome coronarien instable, obstacle symptomatique et/ou sévère sur la chambre de chasse du VG, thrombus intracardiaque à haut risque → CI AP",
+    "SI TVP ± EP récente → CI AP",
+    "SI pathologie aiguë inflammatoire ou infectieuse, incapacité à pratique AP liée à handicap moteur (ostéoarticulaire ou neurologique) ou autre cause → CI AP",
+    "SI dysfonction myocardique sévère, péricardite chronique constrictive, faible capacité d’effort (<5-6 METs), anomalies ETT (ischémie, majoration fuite mitrale, asynchronisme de contraction et/ou HTAP) → CI pratique sportive"
+  ],
+
+  adaptations: [
+    "Prescription AP après idéalement séjour en réadaptation cardiaque et avis cardiologique",
+    "Intensité AP à adapter au seuil d’apparition ischémie/angor/arythmie (ETT, avis cardiologique)",
+    "Intensité modérée (≈ Borg 3–5) avec progressivité",
+    "Respect des recommandations habituelles (pollution, règles du club des cardiologues du sport)",
+    "Adapter/éviter AP si altitude > 2500 m, dans eau < 25°"
+  ],
+
+  situations: [
+    "Traitement bêtabloquant → fréquence cardiaque peu fiable → utiliser échelle de Borg",
+    "Traitement diurétique → risque de déshydratation et troubles ioniques"
+  ],
+
+  regles: [
+    "SI fatigue excessive ou intolérance à l’effort → ALORS adapter l’intensité",
+    "SI symptômes cardiaques (dyspnée inhabituelle, palpitations, malaise) → ALORS avis spécialisé",
+    "SI environnement extrême (chaleur, froid, altitude > 2500 m) → ALORS adapter ou éviter",
+    "SI symptômes musculaires → ALORS recherche hypokaliémie sous diurétique, statines (rare)"
+  ],
+
+  crc: [
+    "Respect particulièrement important des règles de précaution (selon pollution et conditions météo, 10 règles du club des cardiologues du sport)",
+    "Connaitre le seuil d’intensité de l’activité physique à respecter",
+    "savoir surveiller sa tolérance à l’effort (essoufflement, fatigue)"
+  ],
+
+  crc_default: [
+    "Respect particulièrement important des règles de précaution (selon pollution et conditions météo, 10 règles du club des cardiologues du sport)",
+    "Connaitre le seuil d’intensité de l’activité physique à respecter",
+    "savoir surveiller sa tolérance à l’effort (essoufflement, fatigue)"
+  ]
+},
+
+bpco: {
+  titre: "BPCO",
+
+  contraintes: [
+    "BPCO sévère avec désaturation à l’effort ou insuffisance respiratoire chronique sous OLD → CI relative des AP d’intensité élevée",
+    "Insuffisance respiratoire non contrôlée ou comorbidité décompensée → CI temporaire"
+  ],
+
+  adaptations: [
+    "Toujours : limiter la sédentarité, augmenter l’AP d’intensité faible, être très progressif (déconditionnement fréquent)",
+    "Privilégier les activités d’endurance (marche, vélo)",
+    "Fractionner les séances (périodes de 5 à 10 minutes si besoin)",
+    "Adapter l’intensité selon dyspnée (Borg 3 à 6)"
+  ],
+
+  situations: [
+    "<a href='http://medicalcul.free.fr/goldbpco.html' target='_blank' rel='noopener noreferrer'>GOLD</a> 3-4 et/ou insuffisance respiratoire chronique sous OLD et/ou ventilation non invasive (= ≥ 1 des critères suivants : <button type='button' class='info-trigger info-hitbox' data-info='Persistance dyspnée invalidante malgré traitement optimal, mMRC ≥2, VEMS <50%, exacerbateur fréquent >1/an, désaturation en O2 mal contrôlée, HTAP, comorbidité cardiovasculaire ou métabolique'><span class='info-icon'>i</span></button>) : réadaptation respiratoire puis APA",
+
+    "Critères orientant vers réadaptation : persistance d’une dyspnée invalidante malgré traitement optimal (mMRC ≥2), VEMS <50 %, exacerbations fréquentes (>1/an), désaturation mal contrôlée, HTAP, comorbidité cardiovasculaire ou métabolique",
+
+    "<a href='http://medicalcul.free.fr/goldbpco.html' target='_blank' rel='noopener noreferrer'>GOLD</a> 2 sans ces critères : avec comorbidités stabilisées → réadaptation, APA ou section sport santé selon situation ; sans comorbidités → idem <a href='http://medicalcul.free.fr/goldbpco.html' target='_blank' rel='noopener noreferrer'>GOLD</a> 1",
+
+    "<a href='http://medicalcul.free.fr/goldbpco.html' target='_blank' rel='noopener noreferrer'>GOLD</a> 1 : pratique d’activité physique en club sport santé ou en autonomie",
+
+    "Comorbidités fréquentes (cardio, anxiété, dépression)"
+  ],
+
+  regles: [
+    "SI dyspnée importante → ALORS réduire l’intensité ou fractionner",
+    "SI exacerbation récente → ALORS éviter sédentarité et reprise progressive de l’AP sur 4 semaines",
+    "SI BPCO sévère (<a href='http://medicalcul.free.fr/goldbpco.html' target='_blank' rel='noopener noreferrer'>GOLD</a> 3-4) → ALORS réadaptation respiratoire à privilégier",
+    "SI désaturation à l’effort → ALORS adaptation ou encadrement spécialisé"
+  ],
+
+  crc: [
+    "être actif régulièrement même à faible intensité",
+    "adapter l’effort en fonction de l’essoufflement",
+    "fractionner les activités si nécessaire",
+    "éviter de rester trop longtemps inactif"
+  ],
+
+  crc_default: [
+    "être actif régulièrement même à faible intensité",
+    "adapter l’effort en fonction de l’essoufflement",
+    "éviter de rester trop longtemps inactif"
+  ]
+},
+    
+asthme: {
+  titre: "Asthme",
+
+  contraintes: [
+    "CI = Asthme non contrôlé / symptômes fréquents / crise récente",
+    "CI = Comorbidité non stabilisée (CV notamment)",
+    "CI = Plongée sous-marine en bouteille si ≥6 crises/an, asthme d’effort ou au froid, syndrome obstructif associé même mineur, crise récente (<48h-7j) (avis pneumologique indispensable)",
+    "L = Allergie selon sport choisi (AP plein air en pleine saison pollinique…)",
+    "L = Natation dans piscine chlorée et sports d’endurance dans le froid ou si pic de pollution, ce qui peut déclencher une BIE <button type='button' class='info-trigger info-hitbox' data-info='Bronchoconstriction Induite par l’Exercice'><span class='info-icon'>i</span></button>"
+  ],
+
+  adaptations: [
+    "Importance du respect de : progressivité, régularité, échauffement et retour au calme",
+    "Avoir son bronchodilatateur sur soi + connaître CAT en cas de crise (tt, alerte, appli 114)",
+    "Privilégier respiration nasale si effort modéré",
+    "Si natation en piscine : idéalement dans piscine non chlorée",
+    "Fractionner en blocs de 10 min si faible tolérance",
+    "Adapter l’AP (lieu/moment) selon météo, pollution, pollen"
+  ],
+
+  situations: [
+    "Dyspnée d’effort : avis pneumologique pour analyse du mécanisme <button type='button' class='info-trigger info-hitbox' data-info='Asthme insuffisamment contrôlé, bronchoconstriction induite par l’exercice (BIE), syndrome d’hyperventilation, dyskinésie des cordes vocales'><span class='info-icon'>i</span></button>",
+    "Peur de l’effort fréquente",
+    "Obésité ou tabagisme pouvant aggraver contrôle à prendre en charge"
+  ],
+
+  regles: [
+    "SI symptômes à l’effort → analyser le mécanisme et PEC adaptée",
+    "SI asthme mal contrôlé → optimiser PEC avant intensification sportive (↑ tt et/ou observance)",
+    "SI symptômes après 3-8 min (<18) d’effort intense → évoquer BIE <button type='button' class='info-trigger info-hitbox' data-info='Bronchoconstriction induite par l’exercice'><span class='info-icon'>i</span></button> et adapter séance (échauffement et/ou ꞵ2 15 min avant effort)",
+    "SI dyspnée très rapide avec examen habituel rassurant → évoquer hyperventilation/déconditionnement",
+    "SI froid/pollution/pollen élevé → privilégier intérieur ou intensité réduite",
+    "SI peur de l’effort avec bilan négatif et/ou déconditionnement +++ → rassurer et informer, progressivité/fractionnement (≤10 min)",
+    "SI stabilité clinique → progression graduelle vers recommandations générales"
+  ],
+
+  crc: [
+    "L’activité physique régulière aide souvent à mieux contrôler l’asthme",
+   "Adaptez vos sorties à la météo, la pollution, les pollens (pas d’AP intense si pic de pollution, <a href='https://www.atmo-france.org/indiceatmo' target='_blank' rel='noopener noreferrer'>indice ATMO</a>)",
+    "Commencer progressivement et bien s’échauffer avant l’effort",
+    "Faire sa sortie d’AP avec son inhalateur et savoir quoi faire en cas de crise",
+    "Refaire le point avec mon médecin en cas de gêne respiratoire inhabituelle à l’effort"
+  ],
+
+  crc_default: [
+    "L’activité physique régulière aide souvent à mieux contrôler l’asthme",
+   "Adaptez vos sorties à la météo, la pollution, les pollens (pas d’AP intense si pic de pollution, <a href='https://www.atmo-france.org/indiceatmo' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>indice&nbsp;ATMO</a>)",
+      "Commencer progressivement et bien s’échauffer avant l’effort",
+    "Faire sa sortie d’AP avec son inhalateur et savoir quoi faire en cas de crise"
+  ]
+},
+    
+    avc: {
+  titre: "Accident vasculaire cérébral",
+
+  contraintes: [
+    "Traitement anticoagulant CI AP et sportives à risque de chocs"
+  ],
+
+  adaptations: [
+    "Idéal : Rééducation à la phase aigüe (<14j) et kiné et/ou APA phase subaigüe (14j-6 mois)",
+    "Selon le bilan fonctionnel à faire avant prescription AP",
+    "Privilégier les activités d’endurance (marche +++)",
+    "Associer renforcement musculaire (pas de risque de majoration de spasticité)",
+    "Proposer activité continue ou fractionnée selon tolérance",
+    "Encourager les activités de la vie quotidienne en complément",
+    "Progressivité ++ (fatigue fréquente)"
+  ],
+
+  situations: [
+    "Mesure tensionnelle préalable à prescription AP ++ (MAPA, automesure)",
+    "Anticoagulant : adapter type d’AP (pas de chocs)",
+    "État motivationnel (fatigue, dépression post-AVC fréquentes)",
+    "Handicap fonctionnel variable"
+  ],
+
+  regles: [
+    "SI déficit neurologique important → ALORS encadrement recommandé (rééducation)",
+    "SI fatigue importante → ALORS fractionner les séances",
+    "SI facteurs de risque cardiovasculaire non contrôlés → ALORS réévaluation à considérer",
+    "SI anticoagulant → ALORS pas d’AP à risque de chocs"
+  ],
+
+  crc: [
+    "privilégier la marche régulière",
+    "être progressif dans la durée et l’intensité",
+    "ajouter de l’activité physique dans la vie quotidienne",
+    "ne pas se décourager malgré une progression lente"
+  ],
+
+  crc_default: [
+    "privilégier la marche régulière",
+    "être progressif dans la durée et l’intensité",
+    "ajouter de l’activité physique dans la vie quotidienne",
+    "ne pas se décourager malgré une progression lente"
+  ]
+},
+
+parkinson: {
+  titre: "Maladie de Parkinson",
+
+  contraintes: [
+    "Pas de CI spécifique si activité adaptée",
+    "Risque de chute élevé → sécuriser environnement et activités",
+    "Hypotension orthostatique / dysautonomie → prudence changements rapides de position",
+    "Atteinte axiale sévère, freezing majeur ou instabilité importante → réévaluation fonctionnelle préalable",
+    "Troubles cognitifs significatifs → simplifier consignes et supervision renforcée"
+  ],
+
+  adaptations: [
+    "Prescrire l’AP dès le diagnostic en lien avec neurologue (± kiné)",
+    "Associer endurance, renforcement, équilibre, mobilité et coordination",
+    "Programme d’APA idéal si disponible",
+    "Privilégier séances pendant phases ON si fluctuations motrices",
+    "Utiliser indiçage auditif ou visuel si troubles de la marche ou freezing (tempo cadence ±10%)",
+    "Activités utiles : marche, marche nordique, vélo, tai-chi, yoga, danse",
+    "Exercices orientés tâches du quotidien utiles (marche, équilibre, tai-chi, danse)",
+    "Activités de la vie quotidienne à augmenter",
+    "Proposer mesures suivi AP (podomètre, smartphone)"
+  ],
+
+  situations: [
+    "Troubles cognitifs : privilégier consignes simples et AP d’endurance",
+    "Dysautonomie : prudence dans AP avec changement de positions (HTO)",
+    "Risque de chute élevé → privilégier activité supervisée ou appui sécurisé",
+    "Fluctuations ON/OFF connues → programmer séance en phase ON",
+    "Freezing à la marche → utiliser repères visuels ou rythme sonore"
+  ],
+
+  regles: [
+    "SI bonne tolérance → augmenter progressivement fréquence puis durée",
+    "SI aggravation brutale motrice ou chutes répétées → réévaluation médicale",
+    "SI malaise/pseudo-vertige → rechercher HTO"
+  ],
+
+  crc: [
+    "Bouger régulièrement aide la marche, l’équilibre et l’autonomie",
+    "L’activité physique régulière peut ralentir l’évolution fonctionnelle de la maladie",
+    "Choisir les moments où l’on est le plus mobile pour pratiquer son activité physique",
+    "Même de courtes séances sont utiles",
+    "Marchez avec musique rythmée ou repères au sol si cela aide",
+    "Importance de travailler aussi l’équilibre et la force"
+  ],
+
+  crc_default: [
+    "Bouger régulièrement aide la marche, l’équilibre et l’autonomie",
+    "L’activité physique régulière peut ralentir l’évolution fonctionnelle de la maladie",
+    "Choisir les moments où l’on est le plus mobile pour pratiquer son activité physique",
+    "Même de courtes séances sont utiles"
+  ]
+},
+    
+sep: {
+  titre: "Sclérose en plaques",
+
+  contraintes: [
+    "Poussée aiguë de SEP → CI temporaire",
+    "AP intense en ambiance chaude ± humide → prudence (aggravation transitoire possible)"
+  ],
+
+  adaptations: [
+    "Rassurer contre fausses croyances : AP n’augmente pas le risque de poussée",
+    "Associer endurance + renforcement + équilibre + mobilité",
+    "Progressivité, fractionnement si besoin, adaptation à l’état du jour",
+    "Si chaleur/humidité : intérieur frais, ↓ intensité, pauses régulières, hydratation",
+    "Activités utiles : marche ± nordique, vélo, aquagym, Pilates, yoga, tai-chi, kickboxing selon capacités",
+"Cadre selon <a href='http://medicalcul.free.fr/edssech.html' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>EDSS</a> : kiné ± APA si >6 (confort/fonctionnel), APA ± kiné si 3.5–6 (autonomie), ES ou autonomie si <3.5 (↓ fatigue, ↑ QDV)"
+  ],
+
+  situations: [
+    "Troubles vésico-sphinctériens : précautions pour AP aquatique",
+    "Risque de chute : activité supervisée ou avec appui sécurisé",
+"Handicap évalué par <a href='http://medicalcul.free.fr/edssech.html' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>EDSS</a> → objectifs/programmes différents"
+  ],
+
+  regles: [
+    "SI poussée aiguë en cours → différer activité structurée et réévaluer ensuite",
+    "SI aggravation des symptômes pendant effort → arrêter, refroidir, récupérer puis réévaluer",
+    "SI bonne tolérance → augmenter progressivement durée puis fréquence"
+  ],
+
+  crc: [
+    "Bouger régulièrement améliore fatigue, mobilité, équilibre et qualité de vie",
+    "L’activité physique ne déclenche pas les poussées, même si une aggravation transitoire des symptômes est possible",
+    "Privilégiez un environnement frais"
+  ],
+
+  crc_default: [
+    "Bouger régulièrement améliore fatigue, mobilité, équilibre et qualité de vie",
+    "L’activité physique ne déclenche pas les poussées",
+    "Privilégiez un environnement frais"
+  ]
+},
+    
+arthrose: {
+  titre: "Arthrose périphérique",
+
+  contraintes: [
+    "Poussée congestive <button type='button' class='info-trigger info-hitbox' data-info='augmentation en quelques jours des douleurs, douleurs nocturnes, raideur matinale >15 min, gonflement ou chaleur locale'><span class='info-icon'>i</span></button> → CI temporaire articulation concernée"
+  ],
+
+  adaptations: [
+    "Rechercher comorbidités modifiant l’AP : surpoids/obésité, diabète, RCV élevé",
+    "Si déconditionnement ++ et/ou surpoids → début faible/modéré puis progression selon tolérance",
+    "Associer RM ciblé articulation atteinte + exercices généraux (endurance, RM, mobilité)",
+    "Arthrose MI → activités faible impact : marche adaptée (± bâtons), vélo, natation, aquagym",
+    "Chaussage adapté si atteinte MI",
+    "Rechercher kinésiophobie (fréquente)",
+    "Éduquer sur adaptation AP en cas de poussée ou douleur post-exercice"
+  ],
+
+  situations: [
+    "SI raideur, déficit moteur ou instabilité marqués → ALORS kinésithérapie préalable",
+    "SI motivation faible et/ou déconditionnement ++ → ALORS activités du quotidien en 1ère étape",
+    "SI comorbidités → ALORS adapter AP"
+  ],
+
+  regles: [
+    "SI poussée congestive → ALORS repos relatif ± avis médical",
+    "SI douleur durable après séance → ALORS diminuer charge",
+    "SI impact mal toléré → ALORS vélo/natation/aquatique/marche avec bâtons",
+    "SI arrêt plusieurs semaines → ALORS reprise à niveau inférieur puis progression"
+  ],
+
+  crc: [
+    "L’exercice est un traitement de 1ère intention à tous les stades : il n’use pas l’articulation",
+    "Associer exercices ciblés (RM/mobilité) + exercices généraux",
+    "Reconnaître une poussée congestive et adapter l’AP",
+    "Différencier douleur articulaire et courbatures après effort inhabituel",
+    "Si douleur durable après séance → diminuer intensité",
+    "Chaussage adapté si atteinte MI",
+    "Contrôle du poids utile pour les articulations des MI"
+  ],
+
+  crc_default: [
+    "L’exercice est un traitement de 1ère intention : il n’use pas l’articulation",
+    "Reconnaître une poussée congestive",
+    "Contrôle du poids utile pour les articulations des MI"
+  ]
+},
+    
+lombalgie: {
+  titre: "Lombalgie chronique",
+
+  contraintes: [
+    "Lombalgie aiguë ou radiculalgie aiguë → contre-indication temporaire",
+    "Suite opératoire récente rachidienne → adaptation nécessaire"
+  ],
+
+  adaptations: [
+    "Maintenir une activité physique (traitement principal)",
+    "Adapter les exercices selon la douleur (éviter aggravation & propagation)",
+    "Associer endurance, renforcement et mobilité (objectifs = personne normale)",
+    "Intégrer exercices de contrôle moteur (gainage, proprioception)",
+    "Progressivité ++"
+  ],
+
+  situations: [
+"Drapeaux jaunes <button type='button' class='info-trigger info-hitbox' data-info='Indicateurs psychosociaux d’un risque accru de passage à la chronicité'><span class='info-icon'>i</span></button>, bleus <button type='button' class='info-trigger info-hitbox' data-info='Facteurs de pronostic liés aux représentations perçues du travail et de l’environnement par le travail'><span class='info-icon'>i</span></button>, noirs <button type='button' class='info-trigger info-hitbox' data-info='Facteurs de pronostic liés à la politique de l’entreprise, au système de soins et d’assurance'><span class='info-icon'>i</span></button>",
+    "Déconditionnement à l’effort",
+    "Radiculalgies, signes neurologiques, poussées aiguës"
+  ],
+
+  regles: [
+    "SI douleur augmente fortement → ALORS adapter ou modifier l’exercice",
+    "SI peur du mouvement → ALORS rassurer (douleur ≠ lésion)",
+    "SI inactivité → ALORS encourager reprise progressive",
+    "SI retentissement biopsychosocial → ALORS prise en charge globale à considérer"
+  ],
+
+  crc: [
+    "rester actif malgré la douleur (activité physique = traitement)",
+    "être progressif dans les exercices",
+    "choisir des exercices n’aggravant pas les symptômes",
+    "éviter le repos prolongé (repos = néfaste)",
+    "l’efficacité du traitement se mesure par la douleur ET par le niveau d’activité physique et les activités quotidiennes"
+  ],
+
+  crc_default: [
+    "rester actif malgré la douleur (activité physique = traitement)",
+    "choisir des exercices n’aggravant pas les symptômes",
+    "éviter le repos prolongé (repos = néfaste)",
+  ]
+},
+
+pr: {
+  titre: "Polyarthrite rhumatoïde",
+
+  contraintes: [
+    "Poussée articulaire → CI temporaire pour articulations concernées",
+    "Diastasis C1-C2 → CI AP cervicale",
+    "Poussée extra articulaire (cœur, poumon, vascularite) → CI le plus souvent relative",
+    "Limitations : arthropathie destructrice (articulations concernées), atteinte sévère MI (sport d’impact), corticothérapie prolongée (risque tendineux et osseux)"
+  ],
+
+  adaptations: [
+    "Dépister/traiter comorbidités, surtout CV (<a href='https://ard.bmj.com/content/annrheumdis/early/2016/10/03/annrheumdis-2016-209775.full.pdf' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>RCV&nbsp;x1.5&nbsp;si&nbsp;PR selon Eular</a>)",
+    "Progressivité (AP faible puis ↑), ± fractionnement selon état du jour",
+    "Évaluer besoin de semelles, orthèses ou aides techniques",
+"Adapter AP à évolutivité (<a href='https://www.4s-dawn.com/DAS28/' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>DAS28</a>) + état fonctionnel (<a href='http://medicalcul.free.fr/haq.html' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>HAQ</a>) : APA voire sport santé si DAS28 + HAQ ↓, sinon kiné ± APA",
+    "Associer endurance, renforcement musculaire, mobilité et équilibre",
+    "Si atteinte MI : marche adaptée ± bâtons, vélo, aquatique, yoga doux, tai-chi",
+    "Projet AP intense → évaluation RCV ++ et avis rhumatologique"
+  ],
+
+  situations: [
+    "Poussée articulaire → repos relatif articulations concernées",
+    "Atteinte structurelle marquée : envisager kinésithérapie",
+    "Prothèse articulaire : idéal programme APA avant et post chirurgie ± kiné ciblée",
+    "Dépister kinésiophobie + rassurer sur bénéfices de l’AP"
+  ],
+
+  regles: [
+    "SI poussée inflammatoire localisée → repos relatif des articulations concernées",
+    "SI douleur durable après exercice → diminuer charge ou changer modalité",
+    "SI atteinte douloureuse des pieds → privilégier vélo, aquatique ou marche adaptée",
+    "SI maladie stabilisée et patient motivé → envisager progression vers activité autonome sécurisée"
+  ],
+
+  crc: [
+    "Bouger régulièrement est un traitement utile de la polyarthrite sans l’aggraver si elle est adaptée",
+    "Commencer doucement puis progressez progressivement",
+    "Savoir sauter/adapter une séance si majoration des douleurs articulaires ou poussée",
+    "Porter le matériel conseillé par son médecin (semelles, orthèse)",
+    "Le renforcement musculaire protège les articulations",
+    "Signaler toute douleur inhabituelle persistante"
+  ],
+
+  crc_default: [
+    "Bouger régulièrement est un traitement utile de la polyarthrite sans l’aggraver si elle est adaptée",
+    "Commencez doucement puis progressez progressivement",
+   "Savoir sauter/adapter une séance si majoration des douleurs articulaires",
+    "Le renforcement musculaire protège les articulations"
+  ]
+},
+
+spa: {
+  titre: "Spondylarthrite axiale",
+
+  contraintes: [
+    "Colonne bambou → CI sports violents à risque de fracture vertébrale",
+    "Poussée ou douleur → adapter AP et charge mécanique de la zone concernée"
+  ],
+
+  adaptations: [
+    "Dépister/traiter comorbidités, surtout CV (<a href='https://ard.bmj.com/content/annrheumdis/early/2016/10/03/annrheumdis-2016-209775.full.pdf' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>RCV&nbsp;x1.5&nbsp;si&nbsp;SPA</a>)",
+    
+"Adapter AP selon <a href='http://medicalcul.free.fr/basdai.html' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>BASDAI</a> + <a href='http://medicalcul.free.fr/basfi.html' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>BASFI</a> : kiné ± APA si maladie active (BASDAI ↑), sinon APA (inactivité/comorbidités/déconditionnement) ou sport santé",
+
+    "Privilégier exercices simples et intégrables à la vie quotidienne",
+
+    "Ajouter travail respiratoire et ouverture thoracique si raideur costo-vertébrale",
+
+    "Vélo, marche, natation, aquatique souvent utiles"
+  ],
+
+  situations: [
+    "Atteinte sacro-iliaques/MI → limiter AP avec impact",
+    "Colonne bambou : CI sport violent à risque de chute ou de chocs",
+    "Ankylose sévère : adapter AP au risque osseux (fracture), prévenir professionnel AP",
+    "Dépister kinésiophobie + rassurer sur bénéfices AP"
+  ],
+
+  regles: [
+    "SI poussée inflammatoire localisée → repos relatif local + adaptation charge/volume",
+    "SI douleur durable après exercice → diminuer charge ou changer modalité",
+    "SI aggravation inhabituelle des symptômes → interrompre et réévaluer",
+    "SI maladie stabilisée et patient motivé → envisager progression vers activité autonome sécurisée"
+  ],
+
+  crc: [
+    "Bouger régulièrement aide à limiter l’enraidissement",
+    "L’activité physique a des effets bénéfiques sur les symptômes, la santé osseuse et cardiovasculaire",
+    "Une activité adaptée n’augmente pas le risque de poussée",
+    "Signaler toute douleur inhabituelle persistante"
+  ],
+
+  crc_default: [
+    "Bouger régulièrement aide à limiter l’enraidissement",
+    "L’activité physique a des effets bénéfiques sur les symptômes",
+    "Une activité adaptée n’augmente pas le risque de poussée"
+  ]
+},
+
+depression: {
+  titre: "Dépression",
+
+  contraintes: [
+    "Pas de CI spécifique hors désordres majeurs de l’alimentation",
+    "L : risque d’hypotension orthostatique et sédation sous antidépresseurs et autres psychotropes"
+  ],
+
+  adaptations: [
+    "APA supervisée 3 mois (≥3 séances/sem) : traitement possible de l’EDC <button type='button' class='info-trigger info-hitbox' data-info='Épisode dépressif caractérisé'><span class='info-icon'>i</span></button> seul si intensité légère à modérée ou associé à psychotrope et/ou psychothérapie si intensité modérée à sévère",
+    "Marche = option simple, accessible et efficace",
+    "Yoga / Qi Gong : efficacité prouvée sur anxiété et dépression",
+    "Même recommandations que population générale, accompagnement souvent utile (motivation, progressivité, maintien)"
+  ],
+
+  situations: [
+    "Traitement par AD tricyclique : ECG de repos (allongement du QT ?)",
+    "Rechercher hypotension orthostatique : si + → PEC",
+    "Importance de l’évaluation du RCV (comorbidités fréquentes)",
+    "Idées suicidaires aiguës / agitation sévère → priorité PEC psychiatrique"
+  ],
+
+  regles: [
+    "SI psychotrope → surveillance signes d’hypotension orthostatique",
+    "SI observance difficile → adapter format (groupe, accompagnement si souhaité et possible)"
+  ],
+
+  crc: [
+    "Bouger un peu est déjà utile",
+    "Bouger peut améliorer l’humeur, l’anxiété et le sommeil"
+  ],
+
+  crc_default: [
+    "Bouger un peu est déjà utile",
+    "Bouger peut améliorer l’humeur, l’anxiété et le sommeil"
+  ]
+},
+    
+schizophrenie: {
+  titre: "Troubles schizophréniques",
+
+  contraintes: [
+    "Pas de CI spécifique liée au trouble schizophrénique",
+    "QT allongé sous neuroleptique → ECG de repos avant AP",
+    "Limitations : risque d’hypotension orthostatique et sédation sous psychotropes"
+  ],
+
+  adaptations: [
+    "Dépister comorbidités dont CV (fréquentes)",
+    "Population souvent déconditionnée, sédentaire, peu motivée",
+    "Progressivité + ↑ activités quotidiennes + réduction sédentarité",
+    "Idéal = programme APA de 3 mois, 2-3 séances/sem avec personnel formé à la PEC de personnes atteintes de troubles psychiatriques",
+    "Choisir individuel ou groupe selon stabilité clinique et préférences"
+  ],
+
+  situations: [
+    "Hypotension orthostatique / sédation liée aux psychotropes : éviter sports à risque",
+    "Symptômes négatifs marqués → objectifs simples et très progressifs"
+  ],
+
+  regles: [
+    "SI hypotension orthostatique → transitions lentes et hydratation adaptée",
+    "SI bonne tolérance sur plusieurs semaines → augmenter progressivement durée puis intensité",
+    "SI aggravation psychiatrique nette → réévaluation médicale rapide"
+  ],
+
+  crc: [
+    "Bouger régulièrement aide le moral, le sommeil et la santé physique",
+    "Bouger peut aider à réduire fatigue et stress avec le temps",
+    "L’activité physique peut réduire anxiété et dépression parfois associées à la schizophrénie",
+  ],
+
+  crc_default: [
+    "Bouger régulièrement aide le moral, le sommeil et la santé physique",
+    "Bouger peut aider à réduire fatigue et stress",
+  ]
+},
+    
+cancer: {
+  titre: "Cancer (pendant ou après traitement)",
+
+  contraintes: [
+    "CI temporaire AP ≥ modérée si :",
+    "Fatigue extrême / dénutrition sévère / altération majeure de l’état général",
+    "Syndrome infectieux sévère en cours",
+    "Cytopénies marquées (Hb <8 gr/L, Pl <50 G/L, GB <1.5 G/L)",
+    "Suites précoces de chirurgie / cicatrisation non acquise",
+    "Métastases osseuses lytiques (pour zone concernée)"
+  ],
+
+  adaptations: [
+    "Individualiser selon cancer, traitements, phase thérapeutique, symptômes (parfois uniquement AVQ <button type='button' class='info-trigger info-hitbox' data-info='Activités de la vie quotidienne'><span class='info-icon'>i</span></button>)",
+    "Début possible par blocs de 5–10 min puis progression",
+    "Intensité relative (ressenti/Borg) plutôt que repères fixes",
+    "Risque fracturaire ↑ <button type='button' class='info-trigger info-hitbox' data-info='Métastases osseuses, hormonothérapie, ostéoporose'><span class='info-icon'>i</span></button> : éviter AP à risque de chute, ↑ encadrement",
+    "Déficit immunitaire : éviter gymnases et piscines publiques (pendant 1 an post greffe)",
+    "RTE <button type='button' class='info-trigger info-hitbox' data-info='Radiothérapie externe'><span class='info-icon'>i</span></button> : pas d’AP aquatique pendant et jusque 2-3 mois après selon avis spécialisé",
+    "Post-chirurgie : attendre cicatrisation (jusqu’à 8 sem)",
+    "Stomies digest/urinaires : pas CI AP si patient autonome (/stomie), avis médical avant RM <button type='button' class='info-trigger info-hitbox' data-info='Renforcement musculaire'><span class='info-icon'>i</span></button> (risque hernie) ou sport de contact (risque coups), arrêt AP si complications (hernie, infection)",
+    "Cathéter / sonde digestive : éviter piscine, lac, mer (risque infectieux) et RM <button type='button' class='info-trigger info-hitbox' data-info='Renforcement musculaire'><span class='info-icon'>i</span></button> dans la zone de la sonde (risque délogement)",
+  "Possibilité d’utiliser <a href='https://www.vidal.fr/sante/sport/infos-sport-medicosport-sante/quel-sport-patient/' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>MEDICOSPORT&nbsp;SANTE</a>"
+  ],
+
+  situations: [
+    "Traitement cardiotoxique <button type='button' class='info-trigger info-hitbox' data-info='Anthracyclines (doxo-dauno-épi-ida-rubicine), mitoxantrone, trastuzumab, RTE thoracique'><span class='info-icon'>i</span></button> : ETT ± avis cardio si doute",
+    "Morbidités MS <button type='button' class='info-trigger info-hitbox' data-info='Musculosquelettiques'><span class='info-icon'>i</span></button> et neuropathie périphérique (force, équilibre) : voir si adaptation AP utile",
+    "Métastases osseuses / traitement hormonal : évaluer risque fracturaire ± PEC",
+    "Cancer du sein : évaluer morbidités épaules et bras pour AP membres supérieurs (kiné ?)",
+    "Cancer de prostate : évaluer force/endurance si tt hormonal ± métastases os",
+    "Cancer du côlon avec stomie : voir capacité du patient à gérer AP avant validation AP > marche",
+    "Lymphœdème : pas de CI AP mais discuter PEC médicale si symptômes ou augmentation nette ± vêtement compression",
+    "Mobilité articulaire réduite (chirurgie, RTE, corticoïdes) : intérêt exercices assouplissement"
+  ],
+
+  regles: [
+    "SI phase active de traitement avec effets secondaires fluctuants → ajuster durée/intensité fréquemment",
+    "SI fatigue >24–48h après séance → réduire charge suivante",
+    "SI douleur osseuse inhabituelle / vertiges / douleur thoracique / malaise → suspendre et réévaluer",
+    "SI bonne tolérance clinique → progression graduelle vers recommandations générales"
+  ],
+
+  crc: [
+    "L’activité physique adaptée fait partie des soins de support utiles",
+    "Même fatigué, bouger doucement est souvent préférable à l’inactivité complète si cela est possible",
+    "AP est le seul traitement validé pour lutter contre la fatigue",
+    "Adapter les séances selon l’état du jour et les traitements",
+    "Arrêtez et signalez tout symptôme inhabituel"
+  ],
+
+  crc_default: [
+    "L’activité physique adaptée fait partie des soins de support utiles",
+    "Même fatigué, bouger doucement est souvent préférable à l’inactivité complète si cela est possible",
+    "Adapter les séances selon l’état du jour et les traitements",
+    "Arrêtez et signalez tout symptôme inhabituel"
+  ]
+},
+
+pa_maintien: {
+  titre: "Personnes âgées – maintien des capacités",
+
+  contraintes: [
+    "Pas de CI spécifique",
+    "Vigilance selon risque de chute, fracture, blessures musculosquelettiques et cutanées",
+    "Vigilance selon médicaments (hypotension orthostatique, déshydratation, hypoglycémie…)"
+  ],
+
+  adaptations: [
+    "Éviter ambiance chaude, ↓ intensité sinon, hydratation régulière sans attendre la soif (↓ seuil soif, thermorégulation ± diurétiques)",
+    "Séances courtes au début (5 à 15 min) si fragilité",
+    "Chaussage adapté et environnement sécurisé",
+    "Favoriser activités plaisantes et sociales"
+  ],
+
+  situations: [
+    "Évaluation fonctionnelle rapide : test de lever de chaise x5 (<15 sec)",
+    "SI test chaise <15 sec → AP autonomie / ES",
+    "SI test >15 sec ou non réalisable → CMAP avec <a href='https://www.has-sante.fr/upload/docs/application/pdf/2024-04/synthese_aps_icope.pdf#page=3' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>SPPB</a>",
+    "SI SPPB 0–6 → MPR/kiné si risque de chute élevé, comorbidités sévères ou déclin sévère",
+    "SI SPPB 7–9 → APA / SI SPPB 10–12 → ES voire autonomie",
+    "Évaluer douleur MI, pieds/chaussage ± avis podologue",
+    "Analyser traitements : déshydratation, hypotension, hypoglycémie",
+    "Risque chute/fracture : idéalement intervention multifactorielle",
+    "Sujet fragile (FRAIL/FRIED) → vigilance nutrition protéino-énergétique",
+    "Troubles cognitifs majeurs : séances simples, répétitives, supervisées"
+  ],
+
+  regles: [
+    "SI malaise/chute/douleur ou signe inhabituel → réévaluer rapidement"
+  ],
+
+  crc: [
+    "Bouger reste utile à tout âge",
+    "Même commencer tard apporte des bénéfices",
+    "Prendre ses médicaments aux heures habituelles, même si séance d’activité physique",
+    "Prendre des chaussures adaptées à l’activité",
+    "Bien s’hydrater sans attendre la soif",
+    "Connaitre <a href='https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>les signes devant faire arrêter l’activité</a> et prévenir son médecin"
+  ],
+
+  crc_default: [
+    "Bouger reste utile à tout âge",
+    "Même commencer tard apporte des bénéfices",
+    "Prendre des chaussures adaptées à l’activité",
+    "Bien s’hydrater sans attendre la soif"
+  ]
+},
+
+pa_chute: {
+  titre: "Personnes âgées – risque de chute",
+
+  contraintes: [
+    "Pas de CI spécifique",
+    "Vigilance selon risque de chute et fracture, blessures musculosquelettiques et cutanées",
+    "Vigilance selon médicaments (hypotension orthostatique, déshydratation, hypoglycémie…)"
+  ],
+
+  adaptations: [
+    "Privilégier programme combiné : équilibre + renforcement MI + marche/endurance + coordination",
+    "Risque faible → autonomie / sport santé + éducation + rééval 12 mois",
+    "Risque intermédiaire → APA ± kiné + éducation + rééval 12 mois",
+    "Risque élevé → rééducation ± APA puis APA + rééval 30–90 j",
+    "Progressivité stricte",
+    "Intégrer exercices fonctionnels : demi-tour, obstacles, changement de cadence, relever du sol",
+    "Chaussage stable, éclairage suffisant, aides techniques adaptées",
+    "Programmes utiles : <a href='https://vivifrail.com/fr/accueil/' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>VIVIFRAIL</a>, PEM-ES, <a href='https://www.agevillage.com/media/library/documents/Otago-French-Booklet.pdf' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>OTAGO</a>"
+  ],
+
+  situations: [
+   "Repérage : 3 questions <button type='button' class='info-trigger info-hitbox' data-info='3Q : 1/Êtes-vous tombé au cours des 12 derniers mois ? 2/Vous sentez-vous instable en vous mettant debout ou en marchant ? 3/Avez-vous peur de tomber ?'><span class='info-icon'>i</span></button> + STEADI <button type='button' class='info-trigger info-hitbox' data-info='1/ Avez-vous besoin de vous appuyer sur les accoudoirs pour vous relever d’un fauteuil ? 2/ Difficultés à monter sur les trottoirs ? 3/ Besoin de se dépêcher pour aller aux toilettes ? 4/ Prenez-vous des médicaments hypnotiques ou antidépresseurs ? 5/ Êtes-vous triste ? 6/ Avez-vous des troubles de sensibilité au niveau des pieds ?'><span class='info-icon'>i</span></button>",
+    
+    "SI chute → rechercher gravité (grave si ≥ 1 : blessure avec avis médical, ≥2 chutes/an, station au sol >1 h, cause inexpliquée, fragilité <button type='button' class='info-trigger info-hitbox' data-info='FRIED ≥3/5 : perte de poids >4.5 kg ou 5%, fatigue, vitesse marche <0.8 m/s, baisse force (5 levers chaise >15 sec ou préhension <27 kg homme / <16 kg femme), baisse niveau activité physique'><span class='info-icon'>i</span></button>)",
+
+    "SI PAS de chute grave ET ≥1 réponse positive 3Q <button type='button' class='info-trigger info-hitbox' data-info='1/Êtes-vous tombé au cours des 12 derniers mois ? 2/Vous sentez-vous instable en vous mettant debout ou en marchant ? 3/Avez-vous peur de tomber ?'><span class='info-icon'>i</span></button> ou STEADI ≥1 <button type='button' class='info-trigger info-hitbox' data-info='1/Besoin accoudoirs pour se relever, 2/difficultés pour monter les trottoirs, 3/urgence pour aller aux toilettes, 4/hypnotiques/antidépresseurs, 5/sentiment de tristesse, 6/troubles sensitifs des pieds'><span class='info-icon'>i</span></button> : recherche troubles équilibre/marche par TUG <button type='button' class='info-trigger info-hitbox' data-info='Timed Up and Go pathologique si >15 sec'><span class='info-icon'>i</span></button> + vitesse marche <button type='button' class='info-trigger info-hitbox' data-info='Pathologique si <0.8 m/s = 4 m en + de 5 sec'><span class='info-icon'>i</span></button>",
+
+    "TUG et marche normaux = risque faible de chute",
+    "TUG et/ou marche anormal = risque intermédiaire de chute",
+
+    "Toujours : bilan somatique + ergonomie domicile + peur de tomber"
+  ],
+
+  regles: [
+    "SI malaise/chute/douleur ou signe inhabituel → réévaluer rapidement",
+    "SI absence progression → refaire bilan ± consultation chute/HDJ"
+  ],
+
+  crc: [
+    "Bouger reste un traitement clé contre le risque de chute",
+    "Importance de travailler l’équilibre et la force",
+    "La peur de tomber se traite aussi par l’entraînement progressif",
+    "Signalez toute chute récente à votre médecin",
+    "Sécurisez le domicile : éclairage, tapis, obstacles",
+    "Contrôler régulièrement sa vue avec son ophtalmologiste",
+    "Importance d’avoir une alimentation saine et équilibrée"
+  ],
+
+  crc_default: [
+    "Bouger reste un traitement clé contre le risque de chute",
+    "Importance de travailler l’équilibre et la force",
+    "Signalez toute chute récente à votre médecin",
+    "Sécurisez le domicile"
+  ]
+},
+
+grossesse: {
+  titre: "Grossesse",
+
+  contraintes: [
+    "Absolues : indices de RCIU <button type='button' class='info-trigger info-hitbox' data-info='Retard de croissance intra-utérin'><span class='info-icon'>i</span></button>, ATCD ≥2 accouchements prématurés, MAP <button type='button' class='info-trigger info-hitbox' data-info='Menace d’accouchement prématuré'><span class='info-icon'>i</span></button>, rupture prématurée des membranes, saignement vaginal inexpliqué, placenta prævia après 24 SA, béance du col/cerclage, grossesse multiple ≥ triplés, pré-éclampsie, épilepsie non contrôlée, autres pathologies aiguës ou chroniques graves (CV, pulm, hémoglobinopathies…)",
+
+    "Relatives : ATCD FC à répétition, HTA gestationnelle, grossesse gémellaire à partir 28 sem, Hb <9 ou anémie symptomatique, diabète mal équilibré (HbA1c >6.5%), malnutrition, troubles alimentation (anorexie, boulimie), obésité IMC >40, limitations orthopédiques (rachis, genou, hanches), maladies CV ou pulmonaires légères à modérées, HTA non contrôlée, maladie thyroïdienne non contrôlée, haut niveau de tabagisme, autres problèmes de santé importants (discussion pro santé / obstétricien)"
+  ],
+
+  adaptations: [
+    "Privilégier endurance + renforcement musculaire modérés + mobilité",
+    "Intégrer renforcement dos, hanches, membres inférieurs et plancher pelvien",
+    "Favoriser activités à faible impact : marche, vélo stationnaire, natation, aquagym",
+    "Hydratation régulière, vêtements amples adaptés, pauses fréquentes",
+    
+    "Prudence sports à impact <button type='button' class='info-trigger info-hitbox' data-info='Course à pied, trampoline, tennis, activités avec sauts'><span class='info-icon'>i</span></button>",
+
+    "Éviter sports à risque de chute <button type='button' class='info-trigger info-hitbox' data-info='Ski alpin, équitation...'><span class='info-icon'>i</span></button>, sports traumatiques <button type='button' class='info-trigger info-hitbox' data-info='Arts martiaux, sports collectifs'><span class='info-icon'>i</span></button> et plongée sous-marine",
+
+    "Éviter chaleur, humidité excessive, altitude >2500 m si non habituée",
+
+    "Éviter manœuvre de Valsalva (RM)",
+    "Éviter position allongée sur le dos après 24 SA",
+
+    "Informer sur signes d’arrêt : <a href='https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>signes classiques</a> + dyspnée inhabituelle, douleur/gonflement mollet, contractions régulières douloureuses, saignement, fuite de LA <button type='button' class='info-trigger info-hitbox' data-info='Liquide amniotique'><span class='info-icon'>i</span></button>"
+  ],
+
+  situations: [
+    "CI relative : voir AP avec discussion professionnel de santé et obstétricien",
+    "CI absolue : encourager AP d’intensité faible après accord obstétricien",
+    "Grossesse non compliquée : viser au moins 150 à 180 min/sem d’AP modérée répartie sur ≥3 jours",
+    "Femme auparavant inactive/surpoids/obésité : débuter progressivement (ex : 15 min x3/sem puis augmenter selon tolérance)",
+
+    "Sportive souhaitant poursuivre entraînement <button type='button' class='info-trigger info-hitbox' data-info='Pas de preuve que le sport soit délétère pendant la grossesse mais discussion médicale nécessaire pour adaptations éventuelles'><span class='info-icon'>i</span></button> : éviter musculation lourde et AP très intense <button type='button' class='info-trigger info-hitbox' data-info='FC <80-85% FCM = 85-90% VO2 max'><span class='info-icon'>i</span></button>"
+  ],
+
+  regles: [
+    "SI signes d’alerte <button type='button' class='info-trigger info-hitbox' data-info='Dyspnée inhabituelle, douleur/gonflement mollet, contractions douloureuses, saignement vaginal, fuite de liquide amniotique, malaise'><span class='info-icon'>i</span></button> → arrêter AP et avis médical rapide"
+  ],
+
+  crc: [
+    "Bouger pendant la grossesse est bon pour la femme enceinte et son enfant",
+    "Bien s’hydrater et porter des vêtements amples adaptés",
+    "Marche, natation, vélo stationnaire sont souvent de bons choix",
+    "Connaître les signes devant faire arrêter l’activité et consulter",
+    "Chaque mouvement compte, même en petites durées"
+  ],
+
+  crc_default: [
+    "Bouger pendant la grossesse est bon pour la femme enceinte et son enfant",
+    "Marche, natation, vélo stationnaire sont souvent de bons choix",
+    "Chaque mouvement compte, même en petites durées"
+  ]
+},  
+};
+
+    
 const DEBUG = false;
-const APP_VERSION = "v0.1.4";
+const APP_VERSION = "v0.1.5";
+function showInfo(text, el) {
+
+  const popup = document.getElementById("infoPopup");
+
+  if (!el.dataset.uid) {
+    el.dataset.uid = "info_" + Math.random().toString(36).slice(2,9);
+  }
+
+  const uid = el.dataset.uid;
+
+  // re-clic = fermer
+  if (
+    popup.style.display === "block" &&
+    popup.dataset.anchor === uid
+  ) {
+    closeInfoPopup();
+    return;
+  }
+
+popup.innerHTML = `
+  <div style="
+    position:absolute;
+    top:-8px;
+    left:18px;
+    width:14px;
+    height:14px;
+    background:#eff6ff;
+    border-left:1px solid rgba(148,163,184,0.25);
+    border-top:1px solid rgba(148,163,184,0.25);
+    transform:rotate(45deg);
+  "></div>
+
+  <div style="display:flex;justify-content:space-between;gap:8px;position:relative;z-index:2;">
+    <div style="flex:1;">${text}</div>
+
+    <button onclick="closeInfoPopup()"
+      style="
+        border:none;
+        background:none;
+        font-size:18px;
+        cursor:pointer;
+        color:#64748b;
+        padding:0;
+        line-height:1;
+      ">×</button>
+  </div>
+`;
+
+popup.style.display = "block";
+popup.dataset.anchor = uid;
+
+requestAnimationFrame(() => {
+  popup.style.opacity = "1";
+  popup.style.transform = "translateY(0) scale(1)";
+});
+
+  const rect = el.getBoundingClientRect();
+
+  let top = rect.bottom + 8;
+  let left = rect.left;
+
+  popup.style.top = top + "px";
+  popup.style.left = left + "px";
+
+  const p = popup.getBoundingClientRect();
+
+  if (p.right > window.innerWidth - 10) {
+    left = window.innerWidth - p.width - 10;
+  }
+
+  if (left < 10) left = 10;
+
+  popup.style.left = left + "px";
+}
+
+function closeInfoPopup() {
+  const popup = document.getElementById("infoPopup");
+  popup.style.display = "none";
+  popup.dataset.anchor = "";
+}
+
+document.addEventListener("pointerup", function(e) {
+
+  const popup = document.getElementById("infoPopup");
+  const modal = document.getElementById("infoModal");
+
+  const trigger = e.target.closest(".info-trigger");
+
+  // clic petit i pathologie
+  if (trigger) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const text = trigger.dataset.info || "";
+    showInfo(text, trigger);
+    return;
+  }
+
+  // clic dans popup court
+  if (popup && popup.contains(e.target)) return;
+
+  // clic dans modal
+  if (e.target.closest(".modal-content")) return;
+
+  // fermer popup court
+  closeInfoPopup();
+
+  // fermer modal si ouvert
+  if (modal && !modal.classList.contains("hidden")) {
+    closeInfoModal();
+  }
+
+});
     
 let isImporting = false;
 let clinicalModel = null;
@@ -1180,7 +2645,131 @@ if (window.matchMedia("(max-width: 768px)").matches) {
 }, 90);
   }
 }
-   
+function updatePathoRules() {
+
+  const container = document.getElementById("pathoRulesContainer");
+  if (!container) return;
+
+  const selectedPathos = document.querySelectorAll('.patho:checked');
+
+  // 🔒 sécurité
+  if (selectedPathos.length === 0) {
+    container.innerHTML = "Aucune pathologie sélectionnée.";
+    return;
+  }
+
+  let html = "";
+
+  selectedPathos.forEach(p => {
+
+    const data = PATHO_DATA[p.value];
+    if (!data) return;
+
+    html += `
+   <details style="margin-bottom:15px;border-left:4px solid #6366f1;background:#f8fafc;border-radius:8px;padding:10px;" open>
+
+<summary style="
+  cursor:pointer;
+  font-weight:700;
+  font-size:1.08em;
+  color:#312e81;
+  padding:4px 0;
+">
+  📌 ${data.titre}
+</summary>
+
+<div style="margin-top:10px;">
+
+        <strong>🔧 Adaptations de la prescription AP</strong><br>
+        ${data.adaptations.map(a => `• ${a}`).join("<br>")}<br><br>
+
+         <strong>🔎 Situations particulières</strong><br>
+        ${data.situations.map(s => `• ${s}`).join("<br>")}<br><br>
+
+ <strong>⚙️ Points de vigilance clinique</strong><br>
+${data.regles.map(r => `• ${r}`).join("<br>")}
+
+<br>
+<span style="display:block; margin-top:6px;">
+  🧾 Éléments intégrables au compte rendu
+</span>
+
+<div style="display:flex; gap:10px; align-items:center; margin:2px 0; font-size:0.9em; flex-wrap:wrap;">
+
+  <label style="margin:0;">
+    <input type="radio" name="crc_detail_${p.value}" value="simple">
+    Tous
+  </label>
+
+  <label style="margin:0;">
+    <input type="radio" name="crc_detail_${p.value}" value="detail" checked>
+    Certains
+  </label>
+
+  <label style="margin:0;">
+    <input type="radio" name="crc_detail_${p.value}" value="none">
+    Aucun
+  </label>
+
+</div>
+
+<div style="display:flex; gap:10px; align-items:center; margin:2px 0; font-size:0.9em;">
+
+  <label style="margin:0;">
+    <input type="radio" name="crc_mode_${p.value}" value="both" checked>
+    Intégrer à tous les CRC
+  </label>
+
+  <label style="margin:0;">
+    <input type="radio" name="crc_mode_${p.value}" value="patient">
+    À la version patient
+  </label>
+
+</div>
+
+<div id="crcContainer_${p.value}" class="crc-container">
+
+<div class="crc-simple">
+<em>Tous les éléments seront intégrés automatiquement.</em>
+</div>
+
+<div class="crc-detail" style="display:none;">
+${data.crc.map(c => `
+<label style="display:block; margin:1px 0; line-height:1.2;">
+<input type="checkbox" class="crc-item" value="${c}" style="vertical-align:middle;"
+${data.crc_default && data.crc_default.includes(c) ? "checked" : ""}>
+${c}
+</label>
+`).join("")}
+</div>
+
+</div>
+</details>
+    `;
+
+  });
+
+  container.innerHTML = html;
+
+container.innerHTML += `
+  <div style="
+    margin-top:20px;
+    padding-top:10px;
+    border-top:1px solid #e5e7eb;
+    text-align:center;
+    font-size:0.9em;
+  ">
+    <a href="https://www.has-sante.fr/jcms/c_2876862/fr/consultation-et-prescription-medicale-d-activite-physique-a-des-fins-de-sante"
+       target="_blank"
+       style="color:#2563eb;text-decoration:underline;">
+      Recommandations HAS – activité physique - toutes pathologies chroniques
+    </a>
+  </div>
+`;
+    
+initCRCModeToggle();
+}
+    
 function cleanMedicalText(text) {
 
   return text
@@ -1231,6 +2820,9 @@ function openInfoModal(title, content, link = null) {
   document.getElementById("infoModal").classList.remove("hidden");
 }
 
+function closeInfoModal() {
+  document.getElementById("infoModal").classList.add("hidden");
+}
 // =========================
 // FENÊTRES INFO CONTEXTUELLES
 // =========================
@@ -1296,6 +2888,84 @@ function closeInfoModal() {
   document.getElementById("infoModal").classList.add("hidden");
 }  
     
+function updatePathoHelp(){
+
+  const container = document.getElementById("pathoHelpContainer");
+  const crContainer = document.getElementById("pathoCRContainer");
+
+  if (!container || !crContainer) return;
+
+  const selected = document.querySelectorAll(".patho:checked");
+
+  if (selected.length === 0){
+    container.innerHTML = "";
+    crContainer.innerHTML = "";
+    return;
+  }
+
+  let html = "";
+
+ selected.forEach(el => {
+
+  const data = PATHO_DATA[el.value];
+  if (!data) return;
+
+  html += `
+<details style="margin-top:10px;border-left:4px solid #3b82f6;background:#eff6ff;border-radius:6px;padding:8px;" open>
+
+<summary style="
+  cursor:pointer;
+  font-weight:600;
+  font-size:1.05em;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  list-style:none;
+">
+
+  <span class="arrow" style="transition:transform 0.2s;">▶</span>
+
+  ${data.titre}
+
+</summary>
+
+
+<div style="margin-top:8px;">
+          
+⚠️ Contre-indications / Limitations<br>
+${data.contraintes.map((c, index) => 
+  index === 0 && c.includes("CI temporaire AP ≥ modérée si")
+    ? `${c}`
+    : `- ${c}`
+).join("<br>")}
+  </div>
+</details>
+  `;
+});
+    
+  container.innerHTML = html;
+
+crContainer.innerHTML = "";
+}
+
+function copySelectedCRC(){
+  const selected = document.querySelectorAll(".crc-item:checked");
+  let text = "";
+  selected.forEach(el => text += "- " + el.value + "\\n");
+  navigator.clipboard.writeText(text);
+}
+
+function copyAllCRC(){
+  const selectedPatho = document.querySelectorAll(".patho:checked");
+  let text = "";
+  selectedPatho.forEach(el => {
+    const data = PATHO_DATA[el.value];
+    if (!data) return;
+    data.crc.forEach(c => text += "- " + c + "\\n");
+  });
+  navigator.clipboard.writeText(text);
+}    
+    
 /* =====================================
 3. INITIALISATION UI ===================
 ===================================== */
@@ -1308,7 +2978,7 @@ initSymptomes();
 initBPCO();
 initHandicap();
 initActivitePhysique();
-
+initCRCModeToggle();
 
 toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup", "intensite_aerobie_block");
 toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
@@ -1320,8 +2990,111 @@ document.getElementById("sixmois-subgroup")?.classList.add("hidden");
 
 updateNiveauButtons("clinique");
     
+document.querySelectorAll(".patho").forEach(el => {
+  el.addEventListener("change", updatePathoHelp);
+});    
+}
+    
+function initCRCModeToggle(){
+
+  document.addEventListener("change", function(e){
+
+    // 🔹 1. Gestion affichage simple/détail
+    if (e.target.name && e.target.name.startsWith("crc_detail_")) {
+
+      const patho = e.target.name.replace("crc_detail_", "");
+      const container = document.getElementById(`crcContainer_${patho}`);
+      if (!container) return;
+
+      const simple = container.querySelector(".crc-simple");
+      const detail = container.querySelector(".crc-detail");
+
+      if (!simple || !detail) return;
+
+const modeBlock = container.previousElementSibling;
+
+if (e.target.value === "simple") {
+
+  if (modeBlock) modeBlock.style.display = "flex";
+
+  container.style.display = "block";
+  simple.style.display = "block";
+  detail.style.display = "none";
+
+} else if (e.target.value === "detail") {
+
+  if (modeBlock) modeBlock.style.display = "flex";
+
+  container.style.display = "block";
+  simple.style.display = "none";
+  detail.style.display = "block";
+
+} else if (e.target.value === "none") {
+
+  if (modeBlock) modeBlock.style.display = "none";
+
+  container.style.display = "none";
+}
+    }
+
+    // 🔹 2. 🔥 MAJ AUTOMATIQUE DU CRC
+    const isRelevantChange =
+      e.target.classList.contains("patho") ||
+      e.target.classList.contains("crc-item") ||
+      (e.target.name && e.target.name.startsWith("crc_detail_")) ||
+      (e.target.name && e.target.name.startsWith("crc_mode_"));
+
+    if (isRelevantChange) {
+
+      if (typeof renderActiveMode === "function") {
+        renderActiveMode();
+      }
+
+    }
+
+  });
+
+  // 🔹 INITIALISATION AU CHARGEMENT (CONSERVÉE)
+  document.querySelectorAll('[id^="crcContainer_"]').forEach(container => {
+
+    const patho = container.id.replace("crcContainer_", "");
+
+    const selected = document.querySelector(`input[name="crc_detail_${patho}"]:checked`)?.value;
+
+    const simple = container.querySelector(".crc-simple");
+    const detail = container.querySelector(".crc-detail");
+
+    if (!simple || !detail) return;
+
+const modeBlock = container.previousElementSibling;
+
+if (selected === "simple") {
+
+  if (modeBlock) modeBlock.style.display = "flex";
+
+  container.style.display = "block";
+  simple.style.display = "block";
+  detail.style.display = "none";
+
+} else if (selected === "detail") {
+
+  if (modeBlock) modeBlock.style.display = "flex";
+
+  container.style.display = "block";
+  simple.style.display = "none";
+  detail.style.display = "block";
+
+} else if (selected === "none") {
+
+  if (modeBlock) modeBlock.style.display = "none";
+
+  container.style.display = "none";
 }
 
+  });
+
+}
+    
 /* =====================================
 4. IMPORT / EXPORT / QR ===============
 ===================================== */
@@ -1337,9 +3110,17 @@ const closeQR = document.getElementById("closeQRScanner");
 
 if(scanBtn){
 
-  scanBtn.addEventListener("click", function(){
+ scanBtn.addEventListener("click", function(){
 
     qrContainer.style.display = "block";
+
+    // scroll automatique iPhone/Safari
+    setTimeout(() => {
+      qrContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }, 300);
 
     qrScanner = new Html5Qrcode("qr-reader");
 
@@ -1352,14 +3133,16 @@ qrScanner.start(
     if(qrAlreadyRead) return;
     qrAlreadyRead = true;
 
-    try{
-      importPatientJSON(decodedText);
+  try{
+  importPatientJSON(decodedText);
 
-      if(qrScanner){
-        qrScanner.stop().then(() => {
-          qrContainer.style.display = "none";
-        });
-      }
+  alert("Données patient importées.\n\nVérifiez et complétez les champs avant de générer le compte-rendu.");
+
+  if(qrScanner){
+    qrScanner.stop().then(() => {
+      qrContainer.style.display = "none";
+    });
+  }
 
       setTimeout(() => {
         qrAlreadyRead = false;
@@ -1880,7 +3663,36 @@ if (container) {
 /* =====================================
 6. GENERATION CRC / RENDU =============
 ===================================== */
-function handleGenerate(e) {
+function getSelectedCRC(){
+
+  const detailMode = document.querySelector('input[name="crc_detail"]:checked')?.value;
+
+  let values = [];
+
+  if (detailMode === "simple") {
+
+    // 🔹 on prend tous les éléments des pathologies cochées
+    const selectedPathos = document.querySelectorAll('.patho:checked');
+
+    selectedPathos.forEach(p => {
+      const data = PATHO_DATA[p.value];
+      if (data && data.crc) {
+        values = values.concat(data.crc);
+      }
+    });
+
+  } else {
+
+    document.querySelectorAll('.crc-item:checked').forEach(el => {
+      values.push(el.value);
+    });
+
+  }
+
+  return values;
+}
+    
+    function handleGenerate(e) {
 
   e.preventDefault();
   e.stopPropagation();
@@ -1894,18 +3706,115 @@ clinicalModel = buildClinicalModel();
 
     activeMode = "long";
 
-    document.getElementById("formatTabs").classList.remove("hidden");
-    document.getElementById("reportOutput").classList.remove("hidden");
-    document.getElementById("generateReport").classList.add("hidden");
+document.getElementById("formatTabs").classList.remove("hidden");
+document.getElementById("reportOutput").classList.remove("hidden");
+document.getElementById("generateReport").classList.add("hidden");
+const resetSection = document.getElementById("resetSection");
 
-    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-    document.querySelector('.tab-btn[data-mode="long"]').classList.add("active");
+if (resetSection) {
+    resetSection.classList.remove("hidden");
+    resetSection.style.display = "block";
+}
 
-    renderActiveMode();
+document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+document.querySelector('.tab-btn[data-mode="long"]').classList.add("active");
+
+   renderActiveMode({ scroll: true });
 
   }, 40);
 }
+    
+function buildCRCPathoBloc(mode = "long") {
 
+  const selectedPathos = Array.from(document.querySelectorAll(".patho:checked"));
+
+  let grouped = {};
+
+  selectedPathos.forEach(p => {
+
+    const container = document.getElementById(`crcContainer_${p.value}`);
+    if (!container) return;
+
+    const detailMode = document.querySelector(`input[name="crc_detail_${p.value}"]:checked`)?.value;
+
+    let items = [];
+
+    if (detailMode === "detail") {
+      items = Array.from(container.querySelectorAll(".crc-item:checked")).map(el => el.value);
+    } else {
+      items = PATHO_DATA[p.value]?.crc || [];
+    }
+
+    // 🔹 LABEL
+    const full = PATHO_DATA[p.value]?.titre || p.value;
+    const short = p.value.toUpperCase(); // HTA, DT2...
+
+    grouped[p.value] = {
+      items,
+      full,
+      short
+    };
+
+  });
+
+  const pathoKeys = Object.keys(grouped);
+  if (pathoKeys.length === 0) return "";
+
+  // 🔹 construire texte : groupé par pathologie
+  let parts = [];
+
+  pathoKeys.forEach(key => {
+
+    const { items, full, short } = grouped[key];
+    if (!items || items.length === 0) return;
+
+    const label = (mode === "long" || mode === "medical" || mode === "paragraph")
+      ? short
+      : full.toLowerCase();
+
+    parts.push(`${items.join(", ")} (${label})`);
+  });
+
+  const itemsText = parts.join(", ");
+
+  const nbPathos = pathoKeys.length;
+  const nbItems = parts.length;
+
+  const pathoTxt = nbPathos > 1 ? "ses pathologies" : "sa pathologie";
+  const verbe = nbItems > 1 ? "ont été abordées" : "a été abordée";
+
+  // 🎯 PATIENT
+  if (mode === "patient") {
+
+    const probleme = nbPathos > 1 ? "vos problèmes" : "votre problème";
+    const conseil = nbItems > 1 ? "voici quelques conseils de santé" : "voici un conseil de santé";
+
+    return `En lien avec ${probleme} de santé, ${conseil} : ${itemsText}.`;
+  }
+
+  // 🎯 COURRIER COMPLET
+  if (mode === "long") {
+
+    return `Les recommandations spécifiques en rapport avec ${pathoTxt} ${verbe} lors de la consultation : ${itemsText}.`;
+  }
+
+  // 🎯 PARAGRAPHE
+  if (mode === "paragraph") {
+
+    return `Les recommandations spécifiques suivantes en rapport avec ${pathoTxt} ${verbe} lors de la consultation : ${itemsText}.`;
+  }
+
+  // 🎯 DOSSIER MÉDICAL
+  if (mode === "medical") {
+
+    const verbeMed = nbPathos > 1 ? "abordées" : "abordée";
+
+    return `Recommandations spécifiques en lien avec ${pathoTxt} ${verbeMed} en consultation : ${itemsText}.`;
+  }
+
+  return "";
+}
+    
       function renderLongLetterV2(model) {
 
   const p = model.patient;
@@ -1935,7 +3844,8 @@ clinicalModel = buildClinicalModel();
   const motivationBloc = buildMotivation(model);
   const rcvBloc = buildRCV(model);
   const prescriptionBloc = buildPrescription(model);
- 
+const crcPathoBloc = buildCRCPathoBloc("long");
+          
   return `
 <p style="text-align:right;">Le ${today}</p>
 
@@ -1965,6 +3875,12 @@ Les objectifs de cette prescription d’activité physique sont : ${model.therap
 ${prescriptionBloc}
 </p>
 
+${crcPathoBloc ? `
+<p>
+${crcPathoBloc}
+</p>
+` : ""}
+
 <p>
 J’espère que cette consultation l’aidera à augmenter son niveau d’activité physique en toute sécurité et à en tirer des bénéfices perceptibles à court et moyen terme.
 Je me tiens à votre disposition pour toute précision complémentaire.
@@ -1983,7 +3899,8 @@ Je me tiens à votre disposition pour toute précision complémentaire.
   const motivationBloc = buildMotivation(model);
   const rcvBloc = buildRCV(model);
   const prescriptionBloc = buildPrescription(model);
-
+  const crcPathoBloc = buildCRCPathoBloc("paragraph");    
+                
   return `
 <p>
 ${titre} _____ a été ${participe} en consultation d’activité physique.
@@ -1992,6 +3909,8 @@ ${motivationBloc}
 ${rcvBloc}
 Les objectifs principaux sont : ${model.therapeutic_plan.objectif_principal || "à préciser"}.
 ${prescriptionBloc}
+
+${crcPathoBloc}
 </p>
 `;
 }
@@ -2001,7 +3920,8 @@ ${prescriptionBloc}
   const motivationBloc = buildMotivation(model);
   const rcvBloc = buildRCV(model);
   const prescriptionBloc = buildPrescription(model);
-
+  const crcPathoBloc = buildCRCPathoBloc("medical");
+                
   return `
 <p style="margin-bottom:28px;">
 <p><strong>Consultation d’activité physique – Synthèse</strong></p>
@@ -2023,6 +3943,12 @@ ${model.therapeutic_plan.objectif_principal || "À préciser."}</p>
 
 <p><strong>Prescription :</strong><br>
 ${prescriptionBloc}</p>
+
+${crcPathoBloc ? `
+<p><strong>Éléments spécifiques par pathologie :</strong><br>
+${crcPathoBloc}
+</p>
+` : ""}
 `;
 }
          function renderPatientVersion(model) {
@@ -2037,11 +3963,12 @@ ${prescriptionBloc}</p>
     .replace("Le risque cardiovasculaire global est évalué comme", "Votre risque cardiovasculaire est considéré comme")
     .replace(".", "");
 
-  const prescriptionBloc = buildPrescription(model)
-    .replace("Une activité physique d’endurance est recommandée", "Votre médecin vous a prescrit une ordonnance d’activité physique d’endurance")
-    .replace("Un travail de renforcement musculaire est conseillé", "Votre médecin vous a prescrit un travail de renforcement musculaire")
-    .replace("Un travail de souplesse et de mobilité est proposé", "Votre médecin vous a prescrit un travail de souplesse et de mobilité");
+const prescriptionBloc = buildPrescription({ ...model, context: "patient" })
+  .replace("Une activité physique d’endurance est recommandée", "Votre médecin vous a prescrit une ordonnance d’activité physique d’endurance")
+  .replace("Un travail de renforcement musculaire est conseillé", "Votre médecin vous a prescrit un travail de renforcement musculaire")
+  .replace("Un travail de souplesse et de mobilité est proposé", "Votre médecin vous a prescrit un travail de souplesse et de mobilité");
 
+const crcPathoBloc = buildCRCPathoBloc("patient");
   // 🔹 Message progressivité seulement si insuffisamment actif ou actif depuis moins de 6 mois
 const progressiviteMessage = (() => {
 
@@ -2087,6 +4014,13 @@ Lors de l’échange que vous avez eu avec votre médecin, l’objectif principa
 <p>
 ${prescriptionBloc}
 </p>
+
+${crcPathoBloc ? `
+<p>
+
+${crcPathoBloc}
+</p>
+` : ""}
 
 <p>
 Le plus important est de réussir à augmenter votre niveau d’activité physique, même si c’est très progressivement : chaque pas compte.
@@ -2164,10 +4098,62 @@ container.style.opacity = "1";
   container.classList.remove("fade-out");
   container.classList.add("fade-in");
                
-document.getElementById("formatTabs").scrollIntoView({
-  behavior: "auto",
-  block: "start"
-});
+function renderActiveMode(options = {}) {
+
+  const { scroll = false } = options;
+
+  if (!clinicalModel) return;
+
+  savedScrollPosition = window.scrollY;
+
+  const container = document.getElementById("outputContainer");
+
+  let html = "";
+
+  const pdfBtn = document.getElementById("downloadPdf");
+
+  switch (activeMode) {
+    case "long":
+      html = renderLongLetterV2(clinicalModel);
+      break;
+
+    case "paragraph":
+      html = renderParagraphVersion(clinicalModel);
+      break;
+
+    case "medical":
+      html = renderMedicalRecord(clinicalModel);
+      break;
+
+    case "patient":
+      html = renderPatientVersion(clinicalModel);
+      break;
+  }
+
+  container.classList.add("fade-out");
+
+  if (activeMode === "patient") {
+    pdfBtn.classList.remove("hidden");
+  } else {
+    pdfBtn.classList.add("hidden");
+  }
+
+  container.style.opacity = "0";
+  container.innerHTML = html;
+  container.style.opacity = "1";
+
+  container.classList.remove("fade-out");
+  container.classList.add("fade-in");
+
+  // 🔹 SCROLL UNIQUEMENT SI DEMANDÉ
+  if (scroll) {
+    document.getElementById("formatTabs").scrollIntoView({
+      behavior: "auto",
+      block: "start"
+    });
+  }
+
+}
 
 }   
 
@@ -3106,8 +5092,12 @@ function clearHighlight(el){
   if (!el) return;
   el.classList.remove("has-missing");
 }
-
+    
 function initHASListeners() {
+
+  document.querySelectorAll('.patho').forEach(cb => {
+    cb.addEventListener("change", updatePathoRules);
+  });
 
   document.querySelectorAll('input, textarea').forEach(el => {
     el.addEventListener("change", updateHAS);
@@ -3119,12 +5109,29 @@ function initHASListeners() {
   });
 
   const refreshBtn = document.getElementById("refreshHAS");
-
   if (refreshBtn) {
     refreshBtn.addEventListener("click", updateHAS);
   }
 
+  // 🔹 CRC : auto-refresh (UNE SEULE FOIS)
+  if (!window._crcListenerAdded) {
+    document.addEventListener("change", function(e){
+
+      if (
+        e.target.classList.contains("crc-item") ||
+        e.target.name === "crc_detail" ||
+        e.target.name === "crc_mode"
+      ) {
+        updateHAS();
+      }
+
+    });
+    window._crcListenerAdded = true;
+  }
+
+  updatePathoRules();
 }
+    
 function initActionButtons() {
 
 document.getElementById("confirmPrint")?.addEventListener("click", function() {
@@ -3515,7 +5522,8 @@ phrase += ".";
 }
             function buildPrescription(model) {
 
-  const pr = model.prescription;
+const isPatient = model.context === "patient";
+                const pr = model.prescription;
 
   let phrases = [];
 
@@ -3545,11 +5553,52 @@ phrase += ".";
 if (pr.fiches_promotion === "oui") {
   phrases.push("Des fiches de promotion d’activité physique ont été remises.");
 }
-  if (phrases.length === 0) {
-    return "Aucune prescription spécifique n’a été formalisée lors de cette consultation.";
-  }
+const crcElements = getSelectedCRC();
+const crcMode = document.querySelector('input[name="crc_mode"]:checked')?.value;
+const outputType = document.querySelector('input[name="output_type"]:checked')?.value || "medecin";                
+console.log("outputType =", outputType);
+                console.log("crcMode =", crcMode);
+                
+const selectedPathos = document.querySelectorAll('.patho:checked');
+let pathoNames = [];
 
-  return phrases.join(" ");
+selectedPathos.forEach(p => {
+  const data = PATHO_DATA[p.value];
+  if (data?.titre) pathoNames.push(data.titre);
+});
+
+if (crcElements.length > 0 && crcMode === "both" && pathoNames.length > 0) {
+
+  const pluriel = pathoNames.length > 1;
+
+ let intro = "";
+
+if (isPatient) {
+
+  intro = pluriel
+    ? `Des éléments importants liés à vos pathologies (${pathoNames.join(", ")}) ont été abordés`
+    : `Des éléments importants liés à votre pathologie (${pathoNames[0]}) ont été abordés`;
+
+} else {
+
+  intro = pluriel
+    ? `Les points spécifiques liés à ses pathologies (${pathoNames.join(", ")}) ont été abordés en consultation`
+    : `Les points spécifiques liés à sa pathologie (${pathoNames[0]}) ont été abordés en consultation`;
+
+}
+
+  const details = crcElements
+    .map(c => c.charAt(0).toLowerCase() + c.slice(1))
+    .join(", ");
+
+  phrases.push(`${intro} : ${details}.`);
+}
+                
+if (phrases.length === 0) {
+  return "Aucune prescription spécifique n’a été formalisée lors de cette consultation.";
+}
+
+return phrases.join(" ");
 }
   
  function copyPatientLink() {
@@ -3626,7 +5675,21 @@ document.addEventListener("click", () => {
             document.getElementById("confirmPrint")?.addEventListener("click", () => {
   console.log("CONFIRM CLICK");
 });
-            </script>
+      
+      document.addEventListener("toggle", function(e) {
+  if (e.target.tagName === "DETAILS") {
+
+    const arrow = e.target.querySelector(".arrow");
+
+    if (arrow) {
+      arrow.style.transform = e.target.open
+        ? "rotate(90deg)"
+        : "rotate(0deg)";
+    }
+  }
+});
+      
+                  </script>
     
     <div id="identityModal" class="modal hidden">
   <div class="modal-content">
@@ -3703,6 +5766,59 @@ document.addEventListener("click", () => {
 
   </div>
 </div>
-          
+<div id="infoPopup" style="
+  display:none;
+  position:fixed;
+  background:#eff6ff;
+  color:#1e3a8a;
+  padding:10px 12px;
+  border-radius:14px;
+  font-size:0.92em;
+  z-index:9999;
+  border:1px solid rgba(59,130,246,0.18);
+  box-shadow:0 18px 38px rgba(30,58,138,0.10), 0 4px 10px rgba(30,58,138,0.06);
+  width:max-content;
+  min-width:150px;
+  max-width:min(340px, calc(100vw - 24px));
+  max-height:60vh;
+  overflow-y:auto;
+  line-height:1.45;
+  opacity:0;
+  transform:translateY(-4px) scale(0.98);
+  transition:opacity .18s ease, transform .18s ease;
+">
+</div>
+ <div id="resetConfirmModal" class="modal hidden">
+  <div class="modal-content" style="max-width:400px; text-align:center;">
+
+    <h3>Nouvelle consultation</h3>
+
+    <p style="margin:15px 0;">
+      Voulez-vous démarrer une nouvelle consultation ?
+    </p>
+
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+
+      <button type="button" id="confirmResetBtn" class="btn">
+        Oui
+      </button>
+
+      <button type="button" id="cancelResetBtn" class="btn secondary-btn">
+        Annuler
+      </button>
+
+    </div>
+
+  </div>
+</div>    
+        
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/PAP-Plateforme-dev/sw.js');
+}
+</script>
+        
+<script src="reset.js"></script>
+        
 </body>
 </html>
