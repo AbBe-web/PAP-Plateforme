@@ -10,10 +10,11 @@
 <style>
   
 .page-container {
-  max-width: 800px;     /* largeur de référence */
-  margin: 0 auto;       /* centrage horizontal */
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
 }
-  
+
 @page {
   size: A4;
   margin: 20mm;
@@ -25,9 +26,9 @@
   }
 }
   
-  body {
+body {
   font-family: Arial, sans-serif;
-  margin: 30px;
+  margin: 0;
   color: #000;
   font-size: 14px;
 }
@@ -391,33 +392,29 @@ table th {
     margin-top: 16px;
   }
 
-#content {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-  
 </style>
 
 </head>
 
 <body>
   
-<div class="nav-back">
+<div class="page-container">
+
+  <div class="nav-back">
     <button onclick="goBack()">← Retour au questionnaire</button>
   </div>
-  
-<h1>Résumé de l'auto-évaluation "activité physique et sédentarité"</h1>
 
-<p id="questionnaire-type" class="small"></p>
+  <h1>Résumé de l'auto-évaluation "activité physique et sédentarité"</h1>
 
-<p class="small">
-À conserver ou à partager avec votre médecin pour en discuter.<br>
-Date : <span id="date"></span>
-</p>
-  
-<div class="page-container">
+  <p id="questionnaire-type" class="small"></p>
+
+  <p class="small">
+    À conserver ou à partager avec votre médecin pour en discuter.<br>
+    Date : <span id="date"></span>
+  </p>
+
   <div id="content"></div>
+
 </div>
   
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
@@ -427,11 +424,13 @@ Date : <span id="date"></span>
 function goBack() {
   window.location.href = "index.html";
 }
-
+  
 function safePrint() {
-  setTimeout(() => {
+  if (typeof window.print === "function") {
     window.print();
-  }, 500);
+  } else {
+    alert("L’impression n’est pas disponible sur ce navigateur.");
+  }
 }
   
 function getJSONFromURL(){
