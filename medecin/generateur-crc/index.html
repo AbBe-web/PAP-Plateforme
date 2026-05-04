@@ -522,7 +522,27 @@ label:has(input[type="radio"]) .info-icon{
     gap:18px;
   }
 }
-  
+
+/* 🔹 Radios sur une ligne (RCV + niveau visé) */
+.inline-radio-group {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+/* 🔹 Réduction taille bloc CI / L (haut) */
+#pathoHelpContainer details > div {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+#pathoHelpContainer summary {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
 </style>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -750,16 +770,23 @@ Importer fichier JSON
 
     <div id="grossesse_block" style="display:none; margin-left:15px;">
 
-      <label>
-        <input type="checkbox" name="grossesse_comorbidite">
-        Comorbidité associée
-      </label>
+     <label>
+  <input 
+    type="checkbox" 
+    id="grossesse_comorbidite_checkbox"
+    name="grossesse_comorbidite"
+  >
+  Comorbidité associée
+</label>
 
-      <label>
-        <input type="checkbox" name="grossesse_complication">
-        Complication obstétricale
-      </label>
-
+<label>
+  <input 
+    type="checkbox" 
+    id="grossesse_complication_checkbox"
+    name="grossesse_complication"
+  >
+  Complication obstétricale
+</label>
     </div>
 
   </div>
@@ -841,14 +868,14 @@ Importer fichier JSON
 </label>
 
     <label>
-  <input type="checkbox" id="_suivi_checkbox">
+  <input type="checkbox" id="cancer_suivi_checkbox">
   Suivi actuel pour un cancer
 </label>
     
   <!-- BPCO -->
   <label>
-    <input type="checkbox" id="bpco_checkbox">
-    Maladie respiratoire chronique
+<input type="checkbox" id="respiratoire_chronique_checkbox">
+Maladie respiratoire chronique
   </label>
 
   <div id="bpco_block" style="display:none; margin-left:15px;">
@@ -985,6 +1012,7 @@ Importer fichier JSON
 <div>
 <strong style="display:block; margin-bottom:6px;">Spécifiques</strong>
 <label><input type="checkbox" class="patho" value="grossesse"> Grossesse</label>
+<label><input type="checkbox" class="patho" value="post_partum"> Post-partum</label>
 </div>
 
 </div>
@@ -1005,8 +1033,7 @@ Importer fichier JSON
   </span>
 </h2>
 
-<div id="rcv-container"
-style="display:flex; align-items:center; gap:25px; flex-wrap:wrap; margin-bottom:10px;">
+<div id="rcv-container" class="inline-radio-group">
 
   <label>
     <input type="radio" name="rcv" value="faible"> Faible
@@ -1135,14 +1162,14 @@ Pas d’AP envisagée dans les 6 mois
 >
   i
 </span>
- </h3>                   
-                    <label><input type="radio" name="niveau_vise" value="faible"> Faible</label>
-                    <label><input type="radio" name="niveau_vise" value="modere"> Modéré</label>
-                    <label><input type="radio" name="niveau_vise" value="eleve"> Élevé</label>
-                </div>
-    
- </div>
-        
+</h3>                   
+<div id="niveau-vise-container" class="inline-radio-group">
+  <label><input type="radio" name="niveau_vise" value="faible"> Faible</label>
+  <label><input type="radio" name="niveau_vise" value="modere"> Modéré</label>
+  <label><input type="radio" name="niveau_vise" value="eleve"> Élevé</label>
+</div>
+ </div>     
+                
 <div class="form-group">
     <h2>5/ Évaluation motivationnelle (complément) :</h2>
         <div class="sub-group">
@@ -2490,12 +2517,52 @@ grossesse: {
     "Marche, natation, vélo stationnaire sont souvent de bons choix",
     "Chaque mouvement compte, même en petites durées"
   ]
-},  
+}, 
+
+post_partum: {
+  titre: "Post-partum",
+
+  contraintes: [
+    "Pas de CI spécifique hors complications obstétricales",
+    "Vigilance selon état périnéal, cicatrisation, fatigue"
+  ],
+
+  adaptations: [
+    "Rééducation périnéale systématique surtout avant reprise AP avec impact",
+    "Associer AP + apport calorique adapté pour perte et maintien pondéral",
+    "Allaitement : AP possible si apports énergétiques suffisants et brassière adaptée"
+  ],
+
+  situations: [
+    "Avant CS postnatale : AP légère à modérée (marche, escaliers, natation)",
+    "Après CS postnatale : prescription rééducation périnéale + conseils reprise AP ± sport",
+    "Reprise AP avec impact <button type='button' class='info-trigger info-hitbox' data-info='Course à pied, trampoline, activités avec sauts'><span class='info-icon'>i</span></button> si fonction périnéale normale (4–6 sem si RAS, 8–10 sem si césarienne/épisiotomie, parfois moins)",
+    "Femme sportive : reprise progressive endurance (privilégier faible impact initial), reprise renforcement progressive avec travail du plancher pelvien"
+  ],
+
+  regles: [
+    "SI symptômes périnéaux (fuites, pesanteur, douleur) → différer AP avec impact et réévaluer",
+    "SI bonne tolérance → progression graduelle"
+  ],
+
+  crc: [
+    "Bouger après l’accouchement aide à récupérer et réduit le risque de dépression",
+    "L’activité physique est compatible avec l’allaitement",
+    "Reprendre progressivement en fonction de son ressenti",
+    "Le travail du périnée est essentiel avant les activités à impact"
+  ],
+
+  crc_default: [
+    "Bouger après l’accouchement aide à récupérer",
+    "L’activité physique est compatible avec l’allaitement",
+    "Reprendre progressivement"
+  ]
+},
 };
 
     
 const DEBUG = false;
-const APP_VERSION = "v0.2";
+const APP_VERSION = "v0.2.1";
 function showInfo(text, el) {
 
   const popup = document.getElementById("infoPopup");
@@ -2680,19 +2747,19 @@ function updatePathoRules() {
 
 <div style="margin-top:10px;">
 
-        <strong>🔧 Adaptations de la prescription AP</strong><br>
-        ${data.adaptations.map(a => `• ${a}`).join("<br>")}<br><br>
-
          <strong>🔎 Situations particulières</strong><br>
-        ${data.situations.map(s => `• ${s}`).join("<br>")}<br><br>
+        ${data.situations?.map(s => `• ${s}`).join("<br>") || ""}<br><br>
+        
+        <strong>🔧 Adaptations prescription</strong><br>
+       ${data.adaptations?.map(a => `• ${a}`).join("<br>") || ""}<br><br>
 
- <strong>⚙️ Points de vigilance clinique</strong><br>
-${data.regles.map(r => `• ${r}`).join("<br>")}
+        <strong>⚙️ Points de vigilance</strong><br>
+${data.regles?.map(r => `• ${r}`).join("<br>") || ""}
 
 <br>
-<span style="display:block; margin-top:6px;">
-  🧾 Éléments intégrables au compte rendu
-</span>
+<strong style="display:block; margin-top:6px;">
+  🧾 Messages patient.e
+</strong>
 
 <div style="display:flex; gap:10px; align-items:center; margin:2px 0; font-size:0.9em; flex-wrap:wrap;">
 
@@ -2734,7 +2801,7 @@ ${data.regles.map(r => `• ${r}`).join("<br>")}
 </div>
 
 <div class="crc-detail" style="display:none;">
-${data.crc.map(c => `
+${(data.crc || []).map(c => `
 <label style="display:block; margin:1px 0; line-height:1.2;">
 <input type="checkbox" class="crc-item" value="${c}" style="vertical-align:middle;"
 ${data.crc_default && data.crc_default.includes(c) ? "checked" : ""}>
@@ -2975,7 +3042,9 @@ initIMC();
 initAge();
 initGrossesse();
 initSymptomes();
-initBPCO();
+function initBPCO() {
+  initRespiratoire();
+}
 initHandicap();
 initActivitePhysique();
 initCRCModeToggle();
@@ -3331,6 +3400,8 @@ alert("Données patient importées.\n\nVérifiez et complétez les champs avant 
 // 🔥 AUTO UPDATE HAS
 function updateHAS(){
 
+  console.trace("UPDATE HAS TRIGGERED");
+
   const ageInput = document.getElementById("age_input");
   const age = parseInt(ageInput?.value);
 
@@ -3401,9 +3472,24 @@ if (missingFields.length > 0) {
     
   const model = buildClinicalModel();
   const reco = runHAS(model);
-  displayHASRecommendations(reco);
+displayHASRecommendations(reco);
+
+}
+    
+// =====================================
+// 🔒 HELPERS EXTRACTION FIABLE
+// =====================================
+
+function isAnyChecked(name) {
+  return Array.from(document.querySelectorAll(`input[name="${name}"]`))
+    .some(el => el.checked);
 }
 
+function getPathoValues() {
+  return Array.from(document.querySelectorAll(".patho:checked"))
+    .map(el => el.value);
+}
+    
 function runHAS(model){
 
   const reco = {
@@ -3418,113 +3504,199 @@ function runHAS(model){
   const p = model.patient;
 
   // 🔹 Raccourcis
-const niveauVise = document.querySelector('input[name="niveau_vise"]:checked')?.value;
+  const niveauVise = document.querySelector('input[name="niveau_vise"]:checked')?.value;
   const niveauActuel = evalData.classification;
   const rcv = evalData.rcv;
 
   const age = parseInt(document.getElementById("age_input")?.value) || null;
-const imcText = document.getElementById("imc_result")?.innerText || "";
-const imcMatch = imcText.match(/IMC : ([0-9.]+)/);
-const imc = imcMatch ? parseFloat(imcMatch[1]) : null;
 
-  const handicap = document.getElementById("handicap_checkbox")?.checked;
-  const bpco = document.getElementById("bpco_checkbox")?.checked;
-  const bpcoSevere = document.getElementById("bpco_severe")?.checked;
+  const imcText = document.getElementById("imc_result")?.innerText || "";
+  const imcMatch = imcText.match(/IMC : ([0-9.]+)/);
+  const imc = imcMatch ? parseFloat(imcMatch[1]) : null;
 
-  const atcdCV = document.querySelector('input[name="atcd_cv"]')?.checked;
-  const atcdFamilial = document.querySelector('input[name="atcd_familial_cv"]')?.checked;
-  const cardiotox = document.querySelector('input[name="cardiotoxicite"]')?.checked;
-const cancer = document.getElementById("cancer_suivi_checkbox")?.checked;
-  const msk = document.querySelector('input[name="risque_msk"]')?.checked;
+  // =====================================
+  // 🔹 EXTRACTION FIABLE
+  // =====================================
+
+  const pathologies = getPathoValues();
+
+    // 🔹 GROSSESSE (HAS)
+
+const grossesse =
+  document.getElementById("grossesse_checkbox")?.checked ||
+  pathologies.includes("grossesse");
+
+const grossesseRisque =
+  document.getElementById("grossesse_comorbidite_checkbox")?.checked ||
+  document.getElementById("grossesse_complication_checkbox")?.checked;
+    
+  const handicap = document.getElementById("handicap_checkbox")?.checked || false;
+
+  const respiratoire =
+    document.getElementById("respiratoire_chronique_checkbox")?.checked ||
+    pathologies.includes("bpco") ||
+    pathologies.includes("asthme");
+
+  const bpcoSevere = document.getElementById("bpco_severe")?.checked || false;
+
+  const atcdCV = isAnyChecked("atcd_cv");
+  const atcdFamilial = isAnyChecked("atcd_familial_cv");
+  const cardiotox = isAnyChecked("cardiotoxicite");
+
+  const cancer =
+    document.getElementById("cancer_suivi_checkbox")?.checked ||
+    pathologies.includes("cancer");
+
+  const msk = document.getElementById("blessure_checkbox")?.checked || false;
 
   const bioOk = document.querySelector('input[name="bio_ok"]')?.checked;
   const efrOk = document.querySelector('input[name="efr_ok"]')?.checked;
   const testMarcheOk = document.querySelector('input[name="test_marche_ok"]')?.checked;
 
+ // =========================
+// 1️⃣ CMAP — VERSION HAS STRICTE
 // =========================
-// 1️⃣ CMAP — VERSION CLEAN SÉCURISÉE
+
+let finalCmap = "";
+
+// 🔴 VARIABLES MÉTIER MANQUANTES
+
+const contreIndications =
+  document.getElementById("contre_indications_checkbox")?.checked ||
+  document.getElementById("contre_indications_msk_checkbox")?.checked;
+
+const avisSpecialiseOk = document.querySelector('input[name="avis_specialise_ok"]')?.checked;
+
+// 🔹 MRC (HAS)
+const mrcConcernee =
+  respiratoire &&
+  (niveauVise === "modere" || niveauVise === "eleve");
+    
+// =========================
+// 🔥 1️⃣ PRIORITÉ ABSOLUE — GROSSESSE À RISQUE
 // =========================
 
-let cmapReco = [];
+if (grossesse && grossesseRisque) {
 
-// 🔹 RÈGLES PRIORITAIRES
+  finalCmap = "Une consultation médicale d’activité physique et une consultation obstétricale sont recommandées.";
 
-// Handicap
-if (handicap) {
-  cmapReco.push("prioritaire_handicap");
 }
 
-// Cancer
-if (cancer) {
-  cmapReco.push("preconisee");
+// =========================
+// 🔥 2️⃣ CONTRE-INDICATIONS
+// =========================
+
+else if (contreIndications) {
+
+  finalCmap = "Une prise en charge classique et/ou une consultation médicale d’activité physique sont recommandées.";
+
 }
 
-// Risque MSK
-if (msk) {
-  cmapReco.push("preconisee");
-}
+// =========================
+// 🔥 3️⃣ HANDICAP
+// =========================
 
-// 🔹 AP INTENSE — RÈGLE MAJEURE HAS
-if (
-  niveauVise === "eleve" &&
+else if (handicap) {
+
+  finalCmap = "Une consultation médicale d’activité physique est préconisée et un avis médical spécialisé et/ou médicotechnique peut se justifier.";
+
+  if (avisSpecialiseOk === false) {
+    finalCmap += " Le rythme de la consultation médicale d’activité physique et/ou des avis médicaux spécialisés et/ou médicotechniques est variable selon les personnes en situation de handicap. La consultation médicale d’activité physique est l’occasion de vérifier le bon suivi spécialisé du handicap et de la pathologie sous-jacente, au moins une fois par an.";
+  }
+
+}
+// =========================
+// 🔥 4️⃣ MRC (HAS)
+// =========================
+    
+// 🔥 4️⃣ MRC (HAS)
+else if (mrcConcernee) {
+
+  finalCmap = "Une consultation médicale d’activité physique est recommandée.";
+
+}
+// =========================
+// 🔥 4️⃣ PRÉCONISÉE
+// =========================
+
+else if (
+
+  cancer ||
+  msk ||
+
   (
-    rcv !== "faible" ||
-    cardiotox ||
-    (age && age >= 65)
+    niveauVise === "eleve" &&
+    (
+      rcv !== "faible" ||
+      cardiotox ||
+      (age && age >= 65)
+    )
   )
+
 ) {
-  cmapReco.push("preconisee");
+
+  finalCmap = "Une consultation médicale d’activité physique est préconisée.";
+
 }
 
-// 🔹 IMC ≥ 35 + AP intense
-if (niveauVise === "eleve" && imc >= 35) {
-  cmapReco.push("proposable");
+// =========================
+// 🔥 5️⃣ PROPOSABLE
+// =========================
+
+else if (
+
+  (niveauVise === "eleve" && imc >= 35) ||
+
+  (
+    niveauVise === "modere" &&
+    niveauActuel === "inactif" &&
+    (
+      rcv === "eleve_tres_eleve" ||
+      cardiotox ||
+      (age && age >= 70)
+    )
+  )
+
+) {
+
+  finalCmap = "Une consultation médicale d’activité physique peut être proposée.";
+
 }
 
-// 🔹 AP modérée + inactif + haut risque
+// =========================
+// 🔥 6️⃣ NON RECOMMANDÉE
+// =========================
+
+else {
+
+  finalCmap = "Une consultation médicale d’activité physique n’est pas recommandée.";
+
+}
+
+// =========================
+// 🔹 AJOUT NUANCE HAS
+// =========================
+const isRecommandee = finalCmap.startsWith("Une consultation médicale d’activité physique est recommandée");
+
 if (
+  isRecommandee &&
+  (cancer || respiratoire) &&
   niveauVise === "modere" &&
-  niveauActuel === "inactif" &&
-  (
-    rcv === "eleve_tres_eleve" ||
-    cardiotox ||
-    (age && age >= 70)
-  )
+  niveauActuel === "actif"
 ) {
-  cmapReco.push("proposable");
-}
 
-// 🔹 BPCO (info complémentaire, non prioritaire)
-if (bpco && (niveauVise === "modere" || niveauVise === "eleve")) {
-  cmapReco.push("pneumo");
+  finalCmap += " ⚠️ Remarque clinique (hors référentiel HAS) : chez une personne déjà active, avec une bonne tolérance et sans projet d’augmentation, sa nécessité peut être discutée ; elle reste à privilégier en cas d’augmentation prévue ou de doute clinique.";
+
 }
 
 // =========================
-// 🔥 PRIORISATION FINALE
+// 🔹 PUSH FINAL
 // =========================
 
-if (cmapReco.includes("prioritaire_handicap")) {
-
-  reco.cmap.push("Une consultation médicale d’activité physique est préconisée et un avis médical spécialisé et/ou médicotechnique peut se justifier.");
-
-} else if (cmapReco.includes("preconisee")) {
-
-  reco.cmap.push("Une consultation médicale d’activité physique est préconisée.");
-
-} else if (cmapReco.includes("proposable")) {
-
-  reco.cmap.push("Une consultation médicale d’activité physique peut être proposée.");
-
-} else {
-
-  // 🔐 CAS NON PRÉVU = NON RECOMMANDÉE (sécurité)
-  reco.cmap.push("Une consultation médicale d’activité physique n’est pas recommandée.");
-
-}
-
-  // =========================
+reco.cmap = [finalCmap];
+  // =====================================
   // 2️⃣ CARDIO
-  // =========================
+  // =====================================
 
   if (
     niveauVise === "eleve" &&
@@ -3536,9 +3708,9 @@ if (cmapReco.includes("prioritaire_handicap")) {
     reco.cardio.push("Un avis cardiologique spécialisé et/ou un ECG sont recommandés.");
   }
 
-  // =========================
+  // =====================================
   // 3️⃣ ÉPREUVE D’EFFORT
-  // =========================
+  // =====================================
 
   let effortReco = [];
 
@@ -3553,30 +3725,27 @@ if (cmapReco.includes("prioritaire_handicap")) {
   if (niveauVise === "modere" && rcv !== "faible") {
     effortReco.push("non_preconise");
   }
-if (niveauVise === "eleve") {
 
-  if (atcdFamilial) {
-    effortReco.push("indique");
-  } 
+  if (niveauVise === "eleve") {
 
-  else {
+    if (atcdFamilial) {
+      effortReco.push("indique");
+    } else {
 
-    if (niveauActuel === "inactif") {
-      if (rcv === "faible") effortReco.push("non_preconise");
-      if (rcv === "modere") effortReco.push("possible");
-      if (rcv === "eleve_tres_eleve") effortReco.push("recommande");
+      if (niveauActuel === "inactif") {
+        if (rcv === "faible") effortReco.push("non_preconise");
+        if (rcv === "modere") effortReco.push("possible");
+        if (rcv === "eleve_tres_eleve") effortReco.push("recommande");
+      }
+
+      if (niveauActuel === "actif") {
+        if (rcv === "faible") effortReco.push("non");
+        if (rcv === "modere") effortReco.push("non_preconise");
+        if (rcv === "eleve_tres_eleve") effortReco.push("recommande");
+      }
     }
-
-    if (niveauActuel === "actif") {
-      if (rcv === "faible") effortReco.push("non");
-      if (rcv === "modere") effortReco.push("non_preconise");
-      if (rcv === "eleve_tres_eleve") effortReco.push("recommande");
-    }
-
   }
-}
 
-  // 🔥 PRIORISATION
   if (effortReco.includes("recommande")) {
     reco.effort.push("Une épreuve d’effort est recommandée.");
   } else if (effortReco.includes("indique")) {
@@ -3589,25 +3758,39 @@ if (niveauVise === "eleve") {
     reco.effort.push("Une épreuve d’effort n’est pas préconisée.");
   }
 
-  // =========================
+  // =====================================
   // 4️⃣ BIO
-  // =========================
+  // =====================================
 
   if (!bioOk && niveauVise !== "faible") {
     reco.bio.push("Un bilan biologique (glycémie, bilan lipidique, créatininémie) peut se justifier.");
   }
+// =========================
+// 5️⃣ PNEUMO — LOGIQUE HAS PROPRE
+// =========================
 
-  // =========================
-  // 5️⃣ BPCO
-  // =========================
+// 🔹 Avis pneumo + EFR
+if (
+  respiratoire &&
+  !efrOk &&
+  niveauVise !== "faible"
+) {
+  reco.pneumo.push(
+    "Un avis pneumologique et refaire des EFR peut se justifier dans le cadre des bonnes pratiques car les dernières EFR ont été réalisées depuis plus d’un an."
+  );
+}
 
-  if (bpco && !efrOk && niveauVise !== "faible") {
-    reco.pneumo.push("Un avis pneumologique et un contrôle des EFR peuvent se justifier.");
-  }
-
-  if (bpco && bpcoSevere && !testMarcheOk && niveauVise !== "faible") {
-    reco.pneumo.push("Un test de marche avec SpO₂ peut être indiqué (stade sévère).");
-  }
+// 🔹 Test de marche (stade sévère)
+if (
+  respiratoire &&
+  bpcoSevere &&
+  !testMarcheOk &&
+  niveauVise !== "faible"
+) {
+  reco.pneumo.push(
+    "Un test de marche avec mesure continue de la saturation peut se justifier dans le cadre des bonnes pratiques car il s’agit d’un stade sévère."
+  );
+}
 
   return reco;
 }
@@ -3618,7 +3801,7 @@ function formatHASRecommendation(text) {
 
     .replace(/n’est pas recommandée/gi, "<strong>n’est pas recommandée</strong>")
     .replace(/n’est pas préconisée/gi, "<strong>n’est pas préconisée</strong>")
-    .replace(/est recommandée/gi, "<strong>est recommandée</strong>")
+    .replace(/(est|sont) recommandée?s?/gi, "<strong>$&</strong>")
     .replace(/est préconisée/gi, "<strong>est préconisée</strong>")
     .replace(/est indiquée/gi, "<strong>est indiquée</strong>")
     .replace(/peut être proposée/gi, "<strong>peut être proposée</strong>")
@@ -3639,11 +3822,11 @@ function displayHASRecommendations(reco){
 
   const all = [
     ...reco.cmap,
+    ...reco.pneumo,
     ...reco.cardio,
     ...reco.effort,
     ...reco.bio,
-    ...reco.pneumo
-  ];
+   ];
 
   if (all.length === 0) {
     html += "Aucune recommandation spécifique.<br>";
@@ -4783,26 +4966,43 @@ function initSymptomes() {
 
 }
 
-function initBPCO() {
+function initRespiratoire() {
 
-  const bpcoCheckbox = document.getElementById("bpco_checkbox");
+  const respiratoireCheckbox = document.getElementById("respiratoire_chronique_checkbox");
   const bpcoBlock = document.getElementById("bpco_block");
 
+  const efr = document.querySelector('input[name="efr_ok"]');
   const bpcoSevere = document.getElementById("bpco_severe");
-  const bpcoSevereBlock = document.getElementById("bpco_severe_block");
+  const severeBlock = document.getElementById("bpco_severe_block");
+  const testMarche = document.querySelector('input[name="test_marche_ok"]');
 
-  if (bpcoCheckbox) {
-    bpcoCheckbox.addEventListener("change", function(){
-      bpcoBlock.style.display = this.checked ? "block" : "none";
-    });
+  if (!respiratoireCheckbox || !bpcoBlock) return;
+
+  function updateDisplay() {
+
+    // 🔹 affichage bloc principal
+    bpcoBlock.style.display = respiratoireCheckbox.checked ? "block" : "none";
+
+    // 🔹 affichage bloc sévère
+    if (bpcoSevere && severeBlock) {
+      severeBlock.style.display = bpcoSevere.checked ? "block" : "none";
+    }
+
+    // 🔥 🔴 RESET SI MRC DECOCHEE
+    if (!respiratoireCheckbox.checked) {
+
+      if (efr) efr.checked = false;
+      if (bpcoSevere) bpcoSevere.checked = false;
+      if (testMarche) testMarche.checked = false;
+
+      if (severeBlock) severeBlock.style.display = "none";
+    }
   }
 
-  if (bpcoSevere) {
-    bpcoSevere.addEventListener("change", function(){
-      bpcoSevereBlock.style.display = this.checked ? "block" : "none";
-    });
-  }
+  respiratoireCheckbox.addEventListener("change", updateDisplay);
+  bpcoSevere?.addEventListener("change", updateDisplay);
 
+  updateDisplay();
 }
             
 function initHandicap() {
@@ -5196,27 +5396,185 @@ document.getElementById("confirmPrint")?.addEventListener("click", function() {
   }
 }
     
+// =====================================
+// 🔧 UTILITAIRE SYNCHRO UI
+// =====================================
+
+function setChecked(el, value) {
+  if (!el) return;
+  el.checked = value;
+  el.dispatchEvent(new Event("change"));
+}
+
+// =====================================
+// 🔄 SYNCHRONISATION UI PATHOLOGIES
+// =====================================
+
+// ⚠️ IMPORTANT :
+// Cette fonction garantit la cohérence entre les inputs UI (pathologies / situations spécifiques).
+// Le moteur HAS repose sur cette cohérence (pas de double état contradictoire).
+// Toute modification ici doit préserver :
+// - synchronisation bidirectionnelle (cancer, grossesse)
+// - synchronisation conditionnelle (respiratoire)
+// - absence d'état incohérent (ex : MRC cochée sans BPCO/asthme)
+// ⚠️ Ne pas modifier sans vérifier impact sur runHAS()
+
+function setupPathologySync() {
+
+  const cancerSuivi = document.getElementById("cancer_suivi_checkbox");
+  const respiratoire = document.getElementById("respiratoire_chronique_checkbox");
+
+  function getPatho(value) {
+    return document.querySelector(`.patho[value="${value}"]`);
+  }
+
+// 🔴 CANCER (bidirectionnel sécurisé + UI sync)
+
+const cancerPatho = getPatho("cancer");
+
+if (cancerSuivi && cancerPatho) {
+
+  cancerSuivi.addEventListener("change", () => {
+
+    if (cancerPatho.checked !== cancerSuivi.checked) {
+      setChecked(cancerPatho, cancerSuivi.checked);
+    }
+
+  });
+
+  cancerPatho.addEventListener("change", () => {
+
+    if (cancerSuivi.checked !== cancerPatho.checked) {
+      setChecked(cancerSuivi, cancerPatho.checked);
+    }
+
+  });
+
+}
+
+// 🔴 GROSSESSE (bidirectionnel + synchro UI)
+
+const grossessePatho = getPatho("grossesse");
+const grossesseSpecifique = document.getElementById("grossesse_checkbox");
+
+if (grossessePatho && grossesseSpecifique) {
+
+  grossessePatho.addEventListener("change", () => {
+
+    if (grossesseSpecifique.checked !== grossessePatho.checked) {
+      setChecked(grossesseSpecifique, grossessePatho.checked);
+    }
+
+  });
+
+  grossesseSpecifique.addEventListener("change", () => {
+
+    if (grossessePatho.checked !== grossesseSpecifique.checked) {
+      setChecked(grossessePatho, grossesseSpecifique.checked);
+    }
+
+  });
+
+}
+
+  // 🔵 RESPIRATOIRE (logique conditionnelle correcte)
+  const bpco = getPatho("bpco");
+  const asthme = getPatho("asthme");
+
+function updateRespiratoireFromPatho() {
+  if (!respiratoire) return;
+
+  if (bpco?.checked || asthme?.checked) {
+    respiratoire.checked = true;
+  } else {
+    respiratoire.checked = false;
+  }
+
+  // 🔥 AJOUT CRITIQUE
+  respiratoire.dispatchEvent(new Event("change"));
+}
+
+  bpco?.addEventListener("change", updateRespiratoireFromPatho);
+  asthme?.addEventListener("change", updateRespiratoireFromPatho);
+
+  // 🔄 synchronisation initiale
+  updateRespiratoireFromPatho();
+    
+// 🔵 SYNCHRO INVERSE : MRC → BPCO / ASTHME
+if (respiratoire) {
+  respiratoire.addEventListener("change", () => {
+
+    if (!respiratoire.checked) {
+      if (bpco) bpco.checked = false;
+      if (asthme) asthme.checked = false;
+    }
+
+  });
+}
+}
+
+// 🔥 INIT
 document.addEventListener("DOMContentLoaded", function () {
-  // Initialisation UI
+
+  // =====================================
+  // 1️⃣ UI DE BASE
+  // =====================================
   initUI();
 
-  // Initialisation UI  
-  initImportExport();
-  
-  // Import / export / QR  
-  initIOSWarning();
-  
-  // Listeners moteur HAS 
+  // =====================================
+  // 2️⃣ UI CONDITIONNELLE (CRITIQUE)
+  // =====================================
+  initHandicap();
+  initRespiratoire();
+
+  // =====================================
+  // 3️⃣ SYNCHRONISATION UI (APRÈS UI)
+  // =====================================
+  setupPathologySync();
+
+  // =====================================
+  // 4️⃣ MOTEUR / LOGIQUE
+  // =====================================
   initHASListeners();
-  
-  // Boutons / modales / impression 
+
+  // =====================================
+  // 5️⃣ AUTRES MODULES
+  // =====================================
+  initImportExport();
+  initIOSWarning();
   initActionButtons();
 
-    document.getElementById("appVersionLabel").textContent = APP_VERSION;
-    
+  // =====================================
+  // 6️⃣ META
+  // =====================================
+  document.getElementById("appVersionLabel").textContent = APP_VERSION;
+
 });
             
+// =========================
+// 🧪 TESTS RAPIDES (TEMPORAIRE)
+// =========================
 
+function testCMAP() {
+
+  const tests = [
+    {
+      name: "MRC actif modéré",
+      expected: "recommandée"
+    },
+    {
+      name: "AP faible",
+      expected: "n’est pas recommandée"
+    }
+  ];
+
+  console.log("=== TESTS CMAP ===");
+
+  tests.forEach(t => {
+    console.log(t.name + " → attendu:", t.expected);
+  });
+
+}
           
 const form = document.getElementById('consultationForm');
 if (form) {
