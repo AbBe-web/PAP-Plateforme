@@ -6,18 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- PWA -->
-    <link rel="manifest" href="/PAP-Plateforme/manifest.json">
+    <link rel="manifest" href="/PAP-Plateforme-dev/manifest.json">
 
     <!-- Favicons navigateur -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/PAP-Plateforme/assets/icons/favicon-32.png">
-    <link rel="icon" type="image/png" sizes=paty"16x16" href="/PAP-Plateforme/assets/icons/favicon-16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/PAP-Plateforme-dev/assets/icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes=paty"16x16" href="/PAP-Plateforme-dev/assets/icons/favicon-16.png">
 
     <!-- Android / PWA -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/PAP-Plateforme/assets/icons/icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/PAP-Plateforme/assets/icons/icon-512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/PAP-Plateforme-dev/assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/PAP-Plateforme-dev/assets/icons/icon-512.png">
 
     <!-- iPhone / iPad -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/PAP-Plateforme/assets/icons/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/PAP-Plateforme-dev/assets/icons/apple-touch-icon.png">
 
     <!-- Theme -->
     <meta name="theme-color" content="#2b7cff">
@@ -542,7 +542,11 @@ label:has(input[type="radio"]) .info-icon{
   font-size: 14.5px;
   font-weight: 600;
 }
-
+        
+.precaution-highlight-wrapper{
+  display:contents;
+}
+        
 </style>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -670,6 +674,20 @@ Vous pouvez importer les données issues du questionnaire d’auto-évaluation
 rempli par le patient afin de préremplir certains champs du formulaire.
 </p>
 
+<div style="margin-bottom:12px;">
+
+<button
+  type="button"
+  id="resetConsultationBtnTop"
+  class="btn secondary-btn"
+  style="width:100%;">
+
+  Nouvelle consultation
+
+</button>
+
+</div>
+    
 <button type="button" id="scanQRBtn" class="btn">
 Scanner QR patient
 </button>
@@ -760,6 +778,53 @@ Importer fichier JSON
     <strong>Situations spécifiques</strong>
   </div>
 
+  <div
+  id="precautionSearchBlock"
+  style="
+    margin:8px 0 14px 0;
+    padding:10px;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    background:#f8fafc;
+  "
+>
+
+  <div
+    style="
+      font-size:0.9rem;
+      font-weight:600;
+      margin-bottom:6px;
+      color:#1e3a8a;
+    "
+  >
+    🔎 Recherche rapide précautions AP
+  </div>
+
+  <input
+    type="text"
+    id="precautionSearchInput"
+    placeholder="Ex : escarre, drépanocytose, rétinopathie..."
+    autocomplete="off"
+    style="
+      width:100%;
+      padding:10px;
+      border:1px solid #cbd5e1;
+      border-radius:8px;
+      font-size:0.95rem;
+      box-sizing:border-box;
+    "
+  >
+
+  <div
+    id="precautionSearchResults"
+    style="
+      margin-top:10px;
+      display:none;
+    "
+  ></div>
+
+</div>
+    
   <!-- Grossesse (conditionnelle) -->
   <div id="grossesse_container" style="display:none; margin-bottom:10px;">
 
@@ -796,20 +861,27 @@ Importer fichier JSON
   <!-- ========================= -->
 
   <!-- Symptômes -->
-<label>
+<div
+  id="highlight_symptomes"
+  class="precaution-highlight-wrapper"
+>
+
+<label id="label_symptomes">
+
   <input type="checkbox" id="symptomes_checkbox">
 
   Symptômes de maladie CV, respiratoire, métabolique ou rénale décompensée
 
-<span
-  class="info-icon"
-  onclick="event.preventDefault(); event.stopPropagation(); showSymptomesInfo();"
->
-  i
-</span>
+  <span
+    class="info-icon"
+    onclick="event.preventDefault(); event.stopPropagation(); showSymptomesInfo();"
+  >
+    i
+  </span>
 
 </label>
 
+</div>
   <div id="symptomes_alert" style="
     display:none;
     margin-top:6px;
@@ -822,7 +894,13 @@ Importer fichier JSON
     ⚠️ Situation nécessitant une prise en charge médicale préalable.
   </div>
     
-<label>
+<div
+  id="highlight_ci_ap"
+  class="precaution-highlight-wrapper"
+>
+
+<label id="label_contre_indications">
+
   <input type="checkbox" id="contre_indications_checkbox">
 
   Contre-indications / limitations à l'activité physique
@@ -833,9 +911,18 @@ Importer fichier JSON
   >
     i
   </span>
+
 </label>
 
-<label>
+</div>
+
+<div
+  id="highlight_ci_msk"
+  class="precaution-highlight-wrapper"
+>
+
+<label id="label_contre_indications_msk">
+
   <input type="checkbox" id="contre_indications_msk_checkbox">
 
   Contre-indications et limitations musculosquelettiques et cutanées à l'activité physique
@@ -846,7 +933,10 @@ Importer fichier JSON
   >
     i
   </span>
+
 </label>
+
+</div>
     
   <!-- ATCD CV -->
 <label>
@@ -913,20 +1003,27 @@ Maladie respiratoire chronique
   </div>
 
   <!-- Risque MSK -->
- <label>
+<div
+  id="highlight_blessure"
+  class="precaution-highlight-wrapper"
+>
+
+<label id="label_blessure">
+
   <input type="checkbox" id="blessure_checkbox">
 
   Risque de blessure musculosquelettique ou cutanée
 
- <span
-  class="info-icon"
-  onclick="event.preventDefault(); event.stopPropagation(); showBlessureInfo();"
->
-  i
-</span>
+  <span
+    class="info-icon"
+    onclick="event.preventDefault(); event.stopPropagation(); showBlessureInfo();"
+  >
+    i
+  </span>
 
 </label>
 
+</div>
   <!-- Biologie -->
 <div style="margin:10px 0 6px 0; font-weight:600;">
   <strong>Biologie récente</strong>
@@ -1421,6 +1518,22 @@ Pas d’AP envisagée dans les 6 mois
   </button>
 
   </div>
+
+<div id="crcDirtyWarning" class="hidden">
+
+  <p>
+    ⚠️ Le compte-rendu n’est plus synchronisé avec les données actuelles.
+  </p>
+
+  <button
+    type="button"
+    id="refreshCRCBtn"
+    class="btn secondary"
+  >
+    Mettre à jour le CRC
+  </button>
+
+</div>
     
     <div id="reportOutput" class="hidden">
 
@@ -1458,7 +1571,11 @@ Pas d’AP envisagée dans les 6 mois
 /* =====================================
 1. VARIABLES GLOBALES ==================
 ===================================== */
-
+const consultationState = {
+  reportGenerated: false,
+  reportDirty: false
+};
+    
 const PATHO_DATA = {
 
 hta: {
@@ -2562,7 +2679,7 @@ post_partum: {
 
     
 const DEBUG = false;
-const APP_VERSION = "v0.2.1";
+const APP_VERSION = "v0.1.5";
 function showInfo(text, el) {
 
   const popup = document.getElementById("infoPopup");
@@ -2690,6 +2807,31 @@ let identityAction = null;
 let qrScanner = null;
 let qrAlreadyRead = false;    
 
+function handleFormModification() {
+
+  // Aucun CRC généré
+  if (!consultationState.reportGenerated) {
+    return;
+  }
+
+  // Déjà dirty
+  if (consultationState.reportDirty) {
+    return;
+  }
+
+  consultationState.reportDirty = true;
+    
+const warning = document.getElementById("crcDirtyWarning");
+
+if (warning) {
+  warning.classList.remove("hidden");
+}
+    
+    console.log("État après modification", JSON.stringify(consultationState));
+    
+  console.log("CRC désynchronisé : modification détectée");
+}
+    
 /* =====================================
 2.   ===== FONCTIONS UTILITAIRES =========
 ===================================== */
@@ -2887,6 +3029,406 @@ function openInfoModal(title, content, link = null) {
   document.getElementById("infoModal").classList.remove("hidden");
 }
 
+// =========================
+// RECHERCHE RAPIDE PRECAUTIONS AP
+// =========================
+const PRECAUTION_SEARCH_INDEX = [
+
+  {
+keywords: [
+  "drepanocytose",
+  "drépanocytose",
+  "drepa",
+  "drépa",
+  "hta pulmonaire",
+  "hypertension pulmonaire",
+  "htap",
+  "retinopathie",
+  "rétinopathie",
+  "laser",
+  "desaturation",
+  "désaturation",
+  "anemie",
+  "anémie",
+  "denutrition",
+  "dénutrition",
+  "fatigue extreme",
+  "fatigue extrême",
+  "myocardite",
+  "pericardite",
+  "péricardite",
+  "epanchement",
+  "épanchement",
+  "insuffisance cardiaque",
+  "stenose aortique",
+  "sténose aortique",
+  "dysautonomie"
+],
+
+    title:
+      "Contre-indications / limitations à l’activité physique",
+
+selector: "#highlight_ci_ap",
+
+    content:
+      "<strong>Contre-indications absolues à l’AP</strong><br>• Insuffisance cardiaque décompensée<br>• Troubles rythmiques ventriculaires complexes<br>• Hypertension artérielle sévère non contrôlée<br>• Hypertension artérielle pulmonaire (> 60 mmHg)<br>• Myocardite ou épanchement péricardique aigu<br>• Myocardiopathie obstructive sévère<br>• Rétrécissement aortique serré et/ou symptomatique<br><br><strong>Contre-indications absolues et temporaires AP ≥ Modérée</strong><br>• Toutes les pathologies aiguës<br>• Toutes pathologies chroniques décompensées / non stabilisées<br>• Dénutrition importante<br>• Fatigue extrême et/ou incapacité physique manifeste à l’AP<br>• Anémie marquée (Hb < 8 g/dL)<br><br><strong>Contre-indications relatives pour AP élevée</strong><br>• Insuffisance respiratoire chronique sous O2 de longue durée<br>• Patho. respiratoire chronique sévère (risque désat. à l’effort)<br>• Diabète avec rétinopathie sévère, traitement récent au laser chirurgical de l’œil ou dysautonomie sévère<br>• Porteurs de drépanocytose",
+
+    link:
+      "https://www.has-sante.fr/upload/docs/application/pdf/2018-10/guide_aps_vf.pdf#page=27"
+  },
+
+  {
+  keywords: [
+  "escarre",
+  "plaie",
+  "plaie chronique",
+  "mal perforant",
+  "ulcere",
+  "ulcère",
+  "arthrose",
+  "arthrite",
+  "cutanee",
+  "cutanée",
+  "frottement",
+  "amputation",
+  "orthese",
+  "orthèse",
+  "prothese",
+  "prothèse",
+  "stomie",
+  "fauteuil roulant"
+],
+    title:
+      "Contre-indications et limitations musculosquelettiques et cutanées à l’activité physique",
+
+ selector: "#highlight_ci_msk",
+
+    content:
+      "<strong>CI absolues et temporaires pour les AP pour la zone concernée</strong><br>• Pathologies traumatiques non consolidées<br>• Path ostéo-articulaires en poussée congestive (arthrose, arthrite)<br><br><strong>CI absolues / temporaires pour AP ≥ modérée pour la zone concernée</strong><br>• Diabète + mal perforant plantaire pour AP avec 2 MI (même si unilat)<br>• Escarre / plaie évolutive ou chronique selon gravité, localisation<br>• Risque contact, frottement physique ou liée à AP (piscine, sable, terre, etc)",
+
+    link:
+      "https://www.has-sante.fr/upload/docs/application/pdf/2018-10/guide_aps_vf.pdf#page=28"
+  },
+
+  {
+keywords: [
+  "douleur thoracique",
+  "angor",
+  "ischémie",
+  "ischemie",
+  "palpitations",
+  "tachycardie",
+  "arythmie",
+  "rythme irrégulier",
+  "rythme irregulier",
+  "syncope",
+  "syncopes",
+  "vertige",
+  "vertiges",
+  "dyspnee",
+  "dyspnée",
+  "essoufflement",
+  "orthopnee",
+  "orthopnée",
+  "oedeme",
+  "œdème",
+  "oedemes",
+  "œdèmes",
+  "claudication",
+  "fatigue inhabituelle"
+],
+
+    title:
+      "Symptômes évocateurs de pathologie décompensée",
+
+ selector: "#highlight_symptomes",
+
+    content:
+      "Principaux signes d’alerte HAS :<br><br>• Douleur thoracique / gêne évocatrice d’ischémie<br>• Essoufflement au repos ou pour effort faible<br>• Fatigue inhabituelle / dyspnée anormale<br>• Orthopnée<br>• Œdèmes des chevilles<br>• Vertiges / syncopes<br>• Palpitations / tachycardie / rythme irrégulier<br>• Claudication intermittente<br>• Bruits anormaux à l’auscultation antérieure",
+
+    link:
+      "https://www.has-sante.fr/upload/docs/application/pdf/2018-10/guide_aps_vf.pdf#page=19"
+  }
+
+ ,
+
+{
+  keywords: [
+    "scoliose",
+    "osteoporose",
+    "ostéoporose",
+    "fragilite",
+    "fragilité",
+    "chute",
+    "chutes",
+    "neuropathie",
+    "lesion medullaire",
+    "lésion médullaire",
+    "equilibre",
+    "équilibre",
+    "psychotrope",
+    "psychotropes",
+    "amputation",
+    "troubles neuro-orthopediques",
+    "troubles neuro-orthopédiques",
+    "stomie",
+    "prothese",
+    "prothèse",
+    "orthese",
+    "orthèse",
+    "fauteuil roulant",
+    "canne"
+  ],
+
+  title:
+    "Situations à risque de blessure musculosquelettique ou cutanée",
+
+  selector: "#highlight_blessure",
+
+  content:
+    "• Pathologie osseuse ou articulaire, malformation (agénésie, scoliose…)<br>• Ostéopathie fragilisante et/ou avec antécédents de chutes<br>• Antécédents de blessures graves liées à l’activité physique<br>• Personnes âgées fragiles ou à risque de chute<br>• Neuropathie des membres inférieurs avec risque de plaie cutanée (diabète…)<br>• Certaines personnes en situation de handicap :<br>&nbsp;&nbsp;&nbsp;&nbsp;○ Physique<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▪ Amputation, troubles neuro-orthopédiques<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▪ Atteinte musculaire d’origine neurologique, dégénérative ou traumatique<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▪ Lésion médullaire<br>&nbsp;&nbsp;&nbsp;&nbsp;○ Sensoriel, visuel, auditif ou troubles de l’équilibre avec risque accru de chute<br>&nbsp;&nbsp;&nbsp;&nbsp;○ Troubles psychiques / cognitifs / psychotiques / de l’humeur avec comportements à risque ou psychotropes<br>• Personnes avec dispositif médical / aide technique : fauteuil roulant, canne, prothèse, orthèse, stomie…",
+
+  link:
+    "https://www.has-sante.fr/upload/docs/application/pdf/2018-10/guide_aps_vf.pdf#page=23"
+}   
+];
+
+function normalizePrecautionSearch(text) {
+
+  return String(text || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
+}
+function temporaryHighlight(selector) {
+
+  const wrapper = document.querySelector(selector);
+
+  if (!wrapper) {
+    return;
+  }
+
+  const target =
+    wrapper.querySelector("label");
+
+  if (!target) {
+    return;
+  }
+
+  target.dataset.precautionHighlight = "true";
+
+  target.style.transition =
+    "background-color 0.2s ease, box-shadow 0.2s ease";
+
+  target.style.backgroundColor = "#fff7ed";
+  target.style.boxShadow = "0 0 0 2px #f59e0b";
+  target.style.borderRadius = "6px";
+  target.style.padding = "2px 6px";
+
+}
+function clearAllPrecautionHighlights() {
+
+  document
+    .querySelectorAll('[data-precaution-highlight="true"]')
+    .forEach(el => {
+
+      el.style.backgroundColor = "";
+      el.style.boxShadow = "";
+      el.style.borderRadius = "";
+      el.style.padding = "";
+
+      delete el.dataset.precautionHighlight;
+
+    });
+
+}
+
+function scrollModalToSearchTerm(searchTerm) {
+
+  const modalBody =
+    document.getElementById("infoModalBody");
+
+  if (!modalBody) {
+    return;
+  }
+
+  const normalizedSearch =
+    normalizePrecautionSearch(searchTerm);
+
+  if (!normalizedSearch || normalizedSearch.length < 3) {
+    return;
+  }
+
+  const text =
+    normalizePrecautionSearch(
+      modalBody.innerText || ""
+    );
+
+  const index =
+    text.indexOf(normalizedSearch);
+
+  if (index < 0) {
+    return;
+  }
+
+  const ratio =
+    index / text.length;
+
+  const maxScroll =
+    modalBody.scrollHeight -
+    modalBody.clientHeight;
+
+  modalBody.scrollTo({
+    top: maxScroll * ratio,
+    behavior: "smooth"
+  });
+
+}
+    
+function initPrecautionSearch() {
+
+  const input =
+    document.getElementById("precautionSearchInput");
+
+  const results =
+    document.getElementById("precautionSearchResults");
+
+  if (!input || !results) {
+    return;
+  }
+
+  input.addEventListener("input", function(){
+
+    const rawValue = input.value || "";
+
+    const value =
+      normalizePrecautionSearch(rawValue);
+
+    results.innerHTML = "";
+    clearAllPrecautionHighlights();
+      
+   if (value.length < 3) {
+
+      results.style.display = "none";
+
+      clearAllPrecautionHighlights();
+
+      return;
+
+    }
+
+    const matches = [];
+
+    PRECAUTION_SEARCH_INDEX.forEach(item => {
+
+      const found = item.keywords.some(keyword => {
+
+        return normalizePrecautionSearch(keyword)
+          .includes(value);
+
+      });
+
+      if (found) {
+        matches.push(item);
+      }
+
+    });
+
+    if (matches.length === 0) {
+
+      results.style.display = "block";
+
+      results.innerHTML = `
+        <div style="
+          font-size:0.9rem;
+          color:#64748b;
+          padding:4px 2px;
+        ">
+          Aucun résultat trouvé.
+        </div>
+      `;
+
+      return;
+
+    }
+
+    const limitedMatches = matches.slice(0, 3);
+
+    limitedMatches.forEach(item => {
+
+      const row = document.createElement("div");
+
+      row.style.marginBottom = "8px";
+
+      row.innerHTML = `
+        <button
+          type="button"
+          style="
+            width:100%;
+            text-align:left;
+            padding:10px;
+            border:1px solid #dbeafe;
+            background:#eff6ff;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:0.92rem;
+            color:#1e3a8a;
+          "
+        >
+          🛈 ${item.title}
+        </button>
+      `;
+
+      const btn = row.querySelector("button");
+
+     btn.addEventListener("click", function(){
+
+     openInfoModal(
+  item.title,
+  item.content,
+  item.link
+);
+
+setTimeout(() => {
+
+  scrollModalToSearchTerm(input.value);
+
+}, 150);
+         
+if (item.selector) {
+
+  setTimeout(() => {
+
+    temporaryHighlight(item.selector);
+
+  }, 150);
+
+}
+
+      });
+
+if (item.selector) {
+  temporaryHighlight(item.selector);
+}
+
+results.appendChild(row);
+
+    });
+
+    results.style.display = "block";
+
+  });
+
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+
+  initPrecautionSearch();
+
+});
+    
 function closeInfoModal() {
   document.getElementById("infoModal").classList.add("hidden");
 }
@@ -3032,6 +3574,9 @@ function copyAllCRC(){
   });
   navigator.clipboard.writeText(text);
 }    
+
+document.addEventListener("input", handleFormModification);
+document.addEventListener("change", handleFormModification);
     
 /* =====================================
 3. INITIALISATION UI ===================
@@ -3880,13 +4425,26 @@ function getSelectedCRC(){
   e.preventDefault();
   e.stopPropagation();
 
+console.log("HANDLE GENERATE EXECUTÉ");
+        
     if (document.activeElement) {
     document.activeElement.blur();
   }
 
   requestAnimationFrame(() => {
 clinicalModel = buildClinicalModel();
+      
+consultationState.reportGenerated = true;
+consultationState.reportDirty = false;
 
+const warning = document.getElementById("crcDirtyWarning");
+
+if (warning) {
+  warning.classList.add("hidden");
+}
+      
+console.log("CRC généré", JSON.stringify(consultationState));
+      
     activeMode = "long";
 
 document.getElementById("formatTabs").classList.remove("hidden");
@@ -4025,8 +4583,9 @@ function buildCRCPathoBloc(mode = "long") {
 
   const evaluationBloc = buildEvaluationAP(model);
   const motivationBloc = buildMotivation(model);
-  const rcvBloc = buildRCV(model);
-  const prescriptionBloc = buildPrescription(model);
+const rcvBloc = buildRCV(model);
+const decisionBloc = buildDecisionBloc(model);
+const prescriptionBloc = buildPrescription(model);
 const crcPathoBloc = buildCRCPathoBloc("long");
           
   return `
@@ -4049,6 +4608,12 @@ ${motivationBloc}
 <p>
 ${rcvBloc}
 </p>
+
+${decisionBloc ? `
+<p>
+${decisionBloc}
+</p>
+` : ""}
 
 <p>
 Les objectifs de cette prescription d’activité physique sont : ${model.therapeutic_plan.objectif_principal || "à préciser"}.
@@ -4080,8 +4645,9 @@ Je me tiens à votre disposition pour toute précision complémentaire.
                 
   const evaluationBloc = buildEvaluationAP(model);
   const motivationBloc = buildMotivation(model);
-  const rcvBloc = buildRCV(model);
-  const prescriptionBloc = buildPrescription(model);
+const rcvBloc = buildRCV(model);
+const decisionBloc = buildDecisionBloc(model);
+const prescriptionBloc = buildPrescription(model);
   const crcPathoBloc = buildCRCPathoBloc("paragraph");    
                 
   return `
@@ -4090,7 +4656,10 @@ ${titre} _____ a été ${participe} en consultation d’activité physique.
 ${evaluationBloc}
 ${motivationBloc}
 ${rcvBloc}
-Les objectifs principaux sont : ${model.therapeutic_plan.objectif_principal || "à préciser"}.
+
+${decisionBloc}
+
+Les objectifs principaux sont :
 ${prescriptionBloc}
 
 ${crcPathoBloc}
@@ -4104,6 +4673,7 @@ ${crcPathoBloc}
   const rcvBloc = buildRCV(model);
   const prescriptionBloc = buildPrescription(model);
   const crcPathoBloc = buildCRCPathoBloc("medical");
+  const decisionBloc = buildDecisionBloc(model);
                 
   return `
 <p style="margin-bottom:28px;">
@@ -4120,6 +4690,12 @@ ${motivationBloc}</p>
 
 <p><strong>Risque cardiovasculaire global :</strong><br>
 ${rcvBloc.replace("Le risque cardiovasculaire global est évalué comme ", "").replace(".", "")}</p>
+
+${decisionBloc ? `
+<p><strong>Décisions complémentaires :</strong><br>
+${decisionBloc}
+</p>
+` : ""}
 
 <p><strong>Objectifs :</strong><br>
 ${model.therapeutic_plan.objectif_principal || "À préciser."}</p>
@@ -4146,6 +4722,12 @@ ${crcPathoBloc}
     .replace("Le risque cardiovasculaire global est évalué comme", "Votre risque cardiovasculaire est considéré comme")
     .replace(".", "");
 
+const decisionBloc = buildDecisionBloc(model)
+  .replace("est préconisée", "vous est recommandée")
+  .replace("sont préconisées", "vous sont recommandées")
+  .replace("peut être proposée", "peut vous être proposée")
+  .replace("peuvent être proposées", "peuvent vous être proposées");
+             
 const prescriptionBloc = buildPrescription({ ...model, context: "patient" })
   .replace("Une activité physique d’endurance est recommandée", "Votre médecin vous a prescrit une ordonnance d’activité physique d’endurance")
   .replace("Un travail de renforcement musculaire est conseillé", "Votre médecin vous a prescrit un travail de renforcement musculaire")
@@ -4188,6 +4770,12 @@ ${motivationBloc}
 <p>
 ${rcvBloc}.
 </p>
+
+${decisionBloc ? `
+<p>
+${decisionBloc}
+</p>
+` : ""}
 
 <p>
 Lors de l’échange que vous avez eu avec votre médecin, l’objectif principal retenu en termes d’activité physique est :
@@ -4530,13 +5118,198 @@ function resetFormulaireComplet() {
     .forEach(el => el.style.display = "none");
 
 }
-            
+const resetConsultationBtnTop =
+  document.getElementById("resetConsultationBtnTop");
+
+if (resetConsultationBtnTop) {
+
+  resetConsultationBtnTop.addEventListener("click", function(){
+
+    const confirmationReset = confirm(
+      "Effacer toutes les données de la consultation en cours ?"
+    );
+
+    if (!confirmationReset) {
+      return;
+    }
+
+    resetFormulaireComplet();
+
+    // 🔹 reset blocs commentaires patient
+    const importanceBlock =
+      document.getElementById("importance_patient_block");
+
+    const confianceBlock =
+      document.getElementById("confiance_patient_block");
+
+    if (importanceBlock) {
+      importanceBlock.style.display = "none";
+    }
+
+    if (confianceBlock) {
+      confianceBlock.style.display = "none";
+    }
+
+    // 🔹 reset analyse HAS
+    const hasContent =
+      document.getElementById("hasContent");
+
+    if (hasContent) {
+
+      hasContent.innerHTML =
+        "Remplissez les informations pour afficher les recommandations.";
+
+    }
+
+    // 🔹 retour haut formulaire
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  });
+
+}
+function resetBlocAutoEvaluationPatient() {
+
+  // =========================
+  // QUESTIONNAIRE
+  // =========================
+
+  document
+    .querySelectorAll('input[name="questionnaire"]')
+    .forEach(el => {
+      el.checked = false;
+    });
+
+  // =========================
+  // NIVEAU ACTIVITE
+  // =========================
+
+  document
+    .querySelectorAll('input[name="niveau_actuel"]')
+    .forEach(el => {
+      el.checked = false;
+    });
+
+  // =========================
+  // MOTIVATION
+  // =========================
+
+  document
+    .querySelectorAll('input[name="actif_depuis"]')
+    .forEach(el => {
+      el.checked = false;
+    });
+
+  document
+    .querySelectorAll('input[name="ap_envisagee"]')
+    .forEach(el => {
+      el.checked = false;
+    });
+
+  document
+    .querySelectorAll('input[name="ap_6_mois"]')
+    .forEach(el => {
+      el.checked = false;
+    });
+
+  // =========================
+  // PAS / SEDENTARITE
+  // =========================
+
+  const pasInput =
+    document.querySelector('input[name="nombre_pas"]');
+
+  if (pasInput) {
+    pasInput.value = "";
+  }
+
+  document
+    .querySelectorAll('input[name="sedentaire"]')
+    .forEach(el => {
+      el.checked = false;
+    });
+
+  const heuresInput =
+    document.querySelector('input[name="heures_assises"]');
+
+  if (heuresInput) {
+    heuresInput.value = "";
+  }
+
+  // =========================
+  // EVA IMPORTANCE
+  // =========================
+
+  const importanceInput =
+    document.querySelector('input[name="importance_ap"]');
+
+  if (importanceInput) {
+    importanceInput.value = "";
+  }
+
+  const importanceBlock =
+    document.getElementById("importance_patient_block");
+
+  const importanceField =
+    document.getElementById("importance_patient_comment");
+
+  if (importanceField) {
+    importanceField.value = "";
+  }
+
+  if (importanceBlock) {
+    importanceBlock.style.display = "none";
+  }
+
+  // =========================
+  // EVA CONFIANCE
+  // =========================
+
+  const confianceInput =
+    document.querySelector('input[name="confiance_ap"]');
+
+  if (confianceInput) {
+    confianceInput.value = "";
+  }
+
+  const confianceBlock =
+    document.getElementById("confiance_patient_block");
+
+  const confianceField =
+    document.getElementById("confiance_patient_comment");
+
+  if (confianceField) {
+    confianceField.value = "";
+  }
+
+  if (confianceBlock) {
+    confianceBlock.style.display = "none";
+  }
+
+  // =========================
+  // RESET UI MOTIVATION
+  // =========================
+
+  document
+    .querySelectorAll(
+      '#actif-subgroup, #inactif-subgroup, #sixmois-subgroup'
+    )
+    .forEach(el => {
+
+      el.classList.add("hidden");
+      el.style.display = "none";
+
+    });
+
+}    
 function importPatientJSON(jsonText) {
 console.count("IMPORT JSON EXECUTE");
   isImporting = true;
 
   // 🔥 AJOUT CRITIQUE
-  resetFormulaireComplet();
+resetBlocAutoEvaluationPatient();
 
   console.log("IMPORT JSON APPELE");
       console.log("IMPORT JSON APPELE");
@@ -5251,11 +6024,16 @@ function buildClinicalModel() {
   fiches_promotion: document.querySelector('input[name="fiches_promotion"]:checked')?.value || null
 },
 
-    decision: {
-      specialite: "aucune", // on structurera l’interface ensuite
-      autre_specialite: null,
-      epreuve_effort: document.querySelector('input[name="epreuve_effort"]:checked')?.value || null
-    }
+decision: {
+  specialite: "aucune", // on structurera l’interface ensuite
+  autre_specialite: null,
+
+  consultation_ap:
+    document.querySelector('input[name="consultation_ap"]:checked')?.value || null,
+
+  epreuve_effort:
+    document.querySelector('input[name="epreuve_effort"]:checked')?.value || null
+}
 
   };
 }
@@ -5375,6 +6153,19 @@ document.getElementById("confirmPrint")?.addEventListener("click", function() {
     generateBtn.addEventListener("click", handleGenerate);
   }
 
+const refreshBtn = document.getElementById('refreshCRCBtn');
+
+if (refreshBtn) {
+
+  refreshBtn.addEventListener("click", function(e){
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    handleGenerate(e);
+  });
+}    
+    
   const printBtn = document.getElementById('printReport');
 
   if (printBtn) {
@@ -5878,39 +6669,169 @@ phrase += ".";
   }
 
 }
-            function buildPrescription(model) {
+           
+function buildDecisionBloc(model) {
+
+  let elementsPreconises = [];
+  let elementsPossibles = [];
+
+  // Consultation AP
+  if (model.decision.consultation_ap === "oui") {
+    elementsPreconises.push(
+      "une consultation médicale d’activité physique"
+    );
+  }
+
+  if (model.decision.consultation_ap === "peut_etre") {
+    elementsPossibles.push(
+      "une consultation médicale d’activité physique"
+    );
+  }
+
+  // Épreuve d’effort
+  if (model.decision.epreuve_effort === "oui") {
+    elementsPreconises.push(
+      "une épreuve d’effort"
+    );
+  }
+
+  if (model.decision.epreuve_effort === "peut_etre") {
+    elementsPossibles.push(
+      "une épreuve d’effort"
+    );
+  }
+
+  function buildFrenchList(arr) {
+
+    if (arr.length === 1) {
+      return arr[0];
+    }
+
+    if (arr.length === 2) {
+      return arr.join(" et ");
+    }
+
+    return (
+      arr.slice(0, -1).join(", ")
+      + " et "
+      + arr[arr.length - 1]
+    );
+  }
+
+  let phrases = [];
+
+  // Préconisées
+  if (elementsPreconises.length > 0) {
+
+    let liste = buildFrenchList(elementsPreconises);
+
+    liste = liste.charAt(0).toUpperCase() + liste.slice(1);
+
+    phrases.push(
+      elementsPreconises.length > 1
+        ? `${liste} sont préconisées.`
+        : `${liste} est préconisée.`
+    );
+  }
+
+  // Possibles
+  if (elementsPossibles.length > 0) {
+
+    let liste = buildFrenchList(elementsPossibles);
+
+    liste = liste.charAt(0).toUpperCase() + liste.slice(1);
+
+    phrases.push(
+      elementsPossibles.length > 1
+        ? `${liste} peuvent être proposées.`
+        : `${liste} peut être proposée.`
+    );
+  }
+
+  return phrases.join(" ");
+}    
+    
+    function buildPrescription(model) {
 
 const isPatient = model.context === "patient";
                 const pr = model.prescription;
 
   let phrases = [];
+  let documentsRemis = [];
 
+  // --- Ordonnance aérobie ---
   if (pr.aerobie.frequence) {
-    let phrase = `Une activité physique d’endurance est recommandée à raison de ${pr.aerobie.frequence} fois par semaine`;
+
+    let details = [];
 
     if (pr.aerobie.intensite === "moderee") {
-      phrase += ", d’intensité modérée";
+      details.push("d’intensité modérée");
     }
 
     if (pr.aerobie.intensite === "elevee") {
-      phrase += ", d’intensité élevée";
+      details.push("d’intensité élevée");
     }
 
-    phrase += ".";
-    phrases.push(phrase);
+    details.push(`${pr.aerobie.frequence} fois par semaine`);
+
+    documentsRemis.push(
+      `d'activité aérobie (${details.join(", ")})`
+    );
   }
 
+  // --- Renforcement ---
   if (pr.renforcement.frequence) {
-    phrases.push(`Un travail de renforcement musculaire est conseillé ${pr.renforcement.frequence} fois par semaine.`);
+
+    documentsRemis.push(
+      `de renforcement musculaire (${pr.renforcement.frequence} fois par semaine)`
+    );
   }
 
+  // --- Souplesse / mobilité ---
   if (pr.souplesse.frequence) {
-    phrases.push(`Un travail de souplesse et de mobilité est proposé ${pr.souplesse.frequence} fois par semaine.`);
+
+    documentsRemis.push(
+      `de travail de souplesse et mobilité (${pr.souplesse.frequence} fois par semaine)`
+    );
   }
-                
-if (pr.fiches_promotion === "oui") {
-  phrases.push("Des fiches de promotion d’activité physique ont été remises.");
-}
+
+  // --- Fiches promotion ---
+  if (pr.fiches_promotion === "oui") {
+
+    documentsRemis.push(
+      "des fiches de promotion d’activité physique"
+    );
+  }
+
+  // --- Construction phrase finale ---
+  if (documentsRemis.length > 0) {
+
+    let liste = "";
+
+    if (documentsRemis.length === 1) {
+
+      liste = documentsRemis[0];
+
+    } else if (documentsRemis.length === 2) {
+
+      liste = documentsRemis.join(" et ");
+
+    } else {
+
+      liste =
+        documentsRemis.slice(0, -1).join(", ")
+        + " et "
+        + documentsRemis[documentsRemis.length - 1];
+    }
+
+    const pluriel = documentsRemis.length > 1;
+
+    phrases.push(
+      pluriel
+        ? `Des ordonnances ${liste} lui ont été remises.`
+        : `Une ordonnance ${liste} lui a été remise.`
+    );
+  }
 const crcElements = getSelectedCRC();
 const crcMode = document.querySelector('input[name="crc_mode"]:checked')?.value;
 const outputType = document.querySelector('input[name="output_type"]:checked')?.value || "medecin";                
