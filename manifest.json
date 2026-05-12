@@ -1,4 +1,5 @@
 {
+  "id": "pap-prod",
   "name": "PAP Consultation",
   "short_name": "PAP Pro",
   "start_url": "/PAP-Plateforme/medecin/generateur-crc/index.html",
