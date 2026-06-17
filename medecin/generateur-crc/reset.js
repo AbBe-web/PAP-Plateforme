@@ -75,7 +75,6 @@ document.addEventListener("DOMContentLoaded", function () {
         // 6. Masquer blocs dynamiques
         const dynamicBlocks = [
             "symptomes_alert",
-            "renforcement_musculaire_subgroup",
             "qrScannerContainer",
             "reportOutput",
             "formatTabs",
@@ -162,7 +161,74 @@ document.addEventListener("DOMContentLoaded", function () {
             behavior: "smooth"
         });
 
-        console.log("Nouvelle consultation prête");
-    }
+       if (typeof consultationState !== "undefined") {
+
+  consultationState.reportGenerated = false;
+  consultationState.reportDirty = false;
+
+  console.log(
+    "RESET CONSULTATION STATE",
+    consultationState
+  );
+
+}
+
+const crcWarning =
+  document.getElementById("crcDirtyWarning");
+
+if (crcWarning) {
+  crcWarning.classList.add("hidden");
+} 
+
+toggleSubgroup(
+  "ordonnance_aerobie",
+  "ordonnance_aerobie_subgroup",
+  "intensite_aerobie_block"
+);
+
+toggleSubgroup(
+  "renforcement_musculaire",
+  "renforcement_musculaire_subgroup"
+);
+
+toggleSubgroup(
+  "souplesse_mobilite",
+  "souplesse_mobilite_subgroup"
+);
+
+updatePathoHelp();
+updatePathoRules();
+
+// 13. Resynchronisation UI body-map locomotrice
+// Important : reset.js décoche bien les checkboxes,
+// mais la silhouette doit être réalignée visuellement.
+if (typeof updateBodyMapFromCheckboxes === "function") {
+    updateBodyMapFromCheckboxes();
+}
+
+if (typeof updateAPALimitationsCompactText === "function") {
+    updateAPALimitationsCompactText();
+}
+
+const selectedZones =
+    document.getElementById("bodyMapSelectedZones");
+
+if (selectedZones) {
+    selectedZones.textContent = "Aucune";
+}
+
+if (typeof closeAPALimitationsPanelAfterReset === "function") {
+    closeAPALimitationsPanelAfterReset();
+}
+
+if (typeof updateMedicationApaPanel === "function") {
+    updateMedicationApaPanel();
+}
+
+if (typeof updateMedicationOtherField === "function") {
+    updateMedicationOtherField();
+}
+
+}
 
 });
