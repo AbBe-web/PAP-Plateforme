@@ -6,18 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- PWA -->
-    <link rel="manifest" href="/PAP-Plateforme-dev/manifest.json">
+<script>
+const BASE_PATH =
+  location.hostname === '127.0.0.1' ||
+  location.hostname === 'localhost'
+    ? ''
+    : '/PAP-Plateforme';
+
+const manifestLink = document.createElement('link');
+manifestLink.rel = 'manifest';
+manifestLink.href =
+  BASE_PATH === ''
+    ? '/manifest.json'
+    : '/PAP-Plateforme/manifest.json';
+document.head.appendChild(manifestLink);
+</script>
 
     <!-- Favicons navigateur -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/PAP-Plateforme/assets/icons/favicon-32.png">
-    <link rel="icon" type="image/png" sizes=paty"16x16" href="/PAP-Plateforme/assets/icons/favicon-16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../assets/icons/favicon-16.png">
 
     <!-- Android / PWA -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/PAP-Plateforme/assets/icons/icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/PAP-Plateforme/assets/icons/icon-512.png">
+   <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../../assets/icons/icon-512.png">
 
     <!-- iPhone / iPad -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/PAP-Plateforme/assets/icons/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../assets/icons/icon-192.png">
 
     <!-- Theme -->
     <meta name="theme-color" content="#2b7cff">
@@ -585,17 +599,16 @@ ouvrez cette page dans <strong>Safari</strong> puis cliquez sur
 
 </div>
     
-    <h2 style="margin-top:20px;">Préparer la consultation</h2>
+<h2 style="margin-top:40px; margin-bottom:14px; font-size:1.6rem; font-weight:700;">👤 Avant la consultation</h2>
 
 <details class="patient-tool">
 
-  <summary>📄 Accès questionnaire patient (pré-consultation)</summary>
+<summary style="font-weight:600;">📄 Questionnaire patient</summary>
 
   <div class="patient-tool-content">
 
     <p>
-      Questionnaire d’auto-évaluation à proposer au patient avant la consultation
-      (papier ou QR code).
+      Questionnaire d’auto-évaluation à proposer au patient avant la consultation.
     </p>
 
     <div class="patient-tool-actions">
@@ -619,59 +632,26 @@ ouvrez cette page dans <strong>Safari</strong> puis cliquez sur
         >
       </a>
     </div>
-<div style="text-align:right; margin-top:10px;">
-  <button type="button" class="btn secondary" onclick="closeDetails(this)">
-    Fermer
-  </button>
-</div>
-  </div>
 
-</details>
-
-<details class="patient-tool">
-
-  <summary>📘 Guide pratique PAP (médecin)</summary>
-
-  <div class="patient-tool-content">
-
-    <p>
-      Guide d’aide à la prescription d’activité physique (version PC). Un mode d'emploi est accessible à la dernière page du guide.
-    </p>
-
-    <div class="patient-tool-actions">
-
-      <a href="https://zgqwa4.short.gy/guide-pap-pc" target="_blank" class="btn">
-        📘 Ouvrir le guide
-      </a>
-
-      <button type="button" onclick="copyGuideLink()" class="btn secondary">
-        🔗 Copier le lien
+    <div style="text-align:right; margin-top:10px;">
+      <button type="button" class="btn secondary" onclick="closeDetails(this)">
+        Fermer
       </button>
-
     </div>
 
-    <div class="patient-qr">
-      <a href="https://zgqwa4.short.gy/guide-pap-pc" target="_blank">
-        <img
-          src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https://zgqwa4.short.gy/guide-pap-pc"
-          alt="QR code guide PAP"
-          loading="lazy"
-        >
-      </a>
-    </div>
-   <div style="text-align:right; margin-top:10px;">
-  <button type="button" class="btn secondary" onclick="closeDetails(this)">
-    Fermer
-  </button>
-</div>
   </div>
 
 </details>
-    <h1>Générateur de compte-rendu – Consultation d’activité physique</h1>
+
+<h2 style="margin-top:40px; margin-bottom:14px; font-size:1.6rem; font-weight:700;">🩺 Consultation médicale</h2>
+
+<h3 style="margin-top:10px; font-size:1.15rem; font-weight:600; color:#444;">
+  Générateur de compte-rendu – Consultation d’activité physique
+</h3>
 
 <p>
-Vous pouvez importer les données issues du questionnaire d’auto-évaluation
-rempli par le patient afin de préremplir certains champs du formulaire.
+Vous pouvez importer les données issues du questionnaire patient
+afin de préremplir certains champs du formulaire.
 </p>
 
 <div style="margin-bottom:12px;">
@@ -687,16 +667,17 @@ rempli par le patient afin de préremplir certains champs du formulaire.
 </button>
 
 </div>
-    
+
 <button type="button" id="scanQRBtn" class="btn">
 Scanner QR patient
 </button>
 
 <button type="button" id="importJSONBtn" class="btn">
-Importer fichier JSON
+Importer données patient
 </button>
 
 <input type="file" id="importJSONFile" accept=".json" style="display:none;">
+
 <div id="qrScannerContainer" style="display:none;margin-top:15px;">
 
   <div style="text-align:center; margin-bottom:10px;">
@@ -708,12 +689,87 @@ Importer fichier JSON
   <div id="qr-reader" style="width:300px; margin:auto;"></div>
 
 </div>
-    
-<p>Veuillez ensuite vérifier et compléter les informations avant de générer le compte-rendu.</p>
+
+<p>
+Veuillez vérifier et compléter les informations avant de générer le compte-rendu.
+</p>
+
+<h2 style="margin-top:28px; font-size:1.2rem; font-weight:600; color:#555;">
+  Aide
+</h2>
+
+<details class="patient-tool">
+
+  <summary>📘 Première utilisation</summary>
+
+  <div class="patient-tool-content">
+
+    <p>
+      Présentation rapide du fonctionnement de PAP :
+      import patient, consultation, génération du compte-rendu et confidentialité.
+    </p>
+
+    <div class="patient-tool-actions">
+
+      <a href="premiere-utilisation.html" class="btn">
+        📘 Ouvrir
+      </a>
+
+    </div>
+
+    <div style="text-align:right; margin-top:10px;">
+      <button type="button" class="btn secondary" onclick="closeDetails(this)">
+        Fermer
+      </button>
+    </div>
+
+  </div>
+
+</details>
+
+<details class="patient-tool">
+
+  <summary>📄 Guide clinique A4 (PDF)</summary>
+
+  <div class="patient-tool-content">
+
+    <p>
+      Synthèse clinique imprimable recto/verso :
+      rappels HAS, repères d’évaluation, indications,
+      contre-indications et aide à la prescription d’activité physique.
+    </p>
+
+    <div class="patient-tool-actions">
+
+      <a href="https://zgqwa4.short.gy/guide-pap-pc"
+         target="_blank"
+         class="btn">
+
+        📄 Ouvrir le guide PDF
+
+      </a>
+
+    </div>
+
+    <div style="text-align:right; margin-top:10px;">
+
+      <button type="button"
+              class="btn secondary"
+              onclick="closeDetails(this)">
+
+        Fermer
+
+      </button>
+
+    </div>
+
+  </div>
+
+</details>
 
 <form id="consultationForm">
-    
-                  <div class="form-group">
+
+<div class="form-group">
 
 <h2>1/ Données générales</h2>
 
@@ -1112,13 +1168,60 @@ Maladie respiratoire chronique
 <label><input type="checkbox" class="patho" value="post_partum"> Post-partum</label>
 </div>
 
-</div>
+
 
 </div>
 
 <div id="pathoHelpContainer" style="margin-top:10px;"></div>
 <div id="pathoCRContainer" style="margin-top:10px;"></div>
-        
+
+<div style="margin-top:16px;">
+
+<strong style="display:block; margin-bottom:6px;">
+Autres antécédents
+</strong>
+
+<label>
+  <input type="checkbox" id="autres_atcd_checkbox">
+  Ajouter
+</label>
+
+<div
+  id="autres_atcd_block"
+  style="display:none; margin-top:8px;"
+>
+
+<textarea
+  id="autresAtcd"
+  rows="3"
+  style="width:100%; resize:vertical;"
+  placeholder="Ex :
+Allergie pénicilline (œdème de Quincke)
+Ictus amnésique 2018s">
+</textarea>
+
+</div>
+
+</div>
+
+<div style="margin:10px 0 6px 0; font-weight:600;">
+  <strong>Traitement actuel</strong>
+</div>
+
+<p style="margin-bottom:10px; color:#555;">
+Copier/coller possible depuis ordonnance ou logiciel métier.
+</p>
+
+<textarea
+  id="traitementsActuels"
+  rows="6"
+  style="width:100%; resize:vertical;"
+  placeholder="Ex :
+Metformine 850 mg x2/j
+Bisoprolol 2,5 mg/j
+Apixaban 5 mg x2/j">
+</textarea>
+
 <h2>
   3/ Évaluation du RCV (tableau 3) :
 
@@ -1389,48 +1492,507 @@ Pas d’AP envisagée dans les 6 mois
 
 </div>
     
-    <h2>8/ Les objectifs principaux en termes d’activité physique sont :</h2>
-    <textarea name="objectifs_ap"></textarea>
+<div class="form-group">
+
+<h2>8/ Objectifs thérapeutiques</h2>
+
+<div class="sub-group objectifs-group">
+
+<h3 style="color:#0056b3;">🏥 Santé</h3>
+
+<label><input type="checkbox" name="objectif_ap" value="augmenter_ap">
+Augmenter le niveau global d'activité physique</label>
+
+<label><input type="checkbox" name="objectif_ap" value="reduire_sedentarite">
+Réduire la sédentarité</label>
+
+<label><input type="checkbox" name="objectif_ap" value="controle_maladie">
+Améliorer le contrôle d'une maladie chronique</label>
+
+<h3 style="color:#0056b3;">💪 Condition physique</h3>
+
+<label><input type="checkbox" name="objectif_ap" value="condition_physique">
+Améliorer la condition physique</label>
+
+<label><input type="checkbox" name="objectif_ap" value="capacites_cardio">
+Améliorer les capacités cardiorespiratoires</label>
+
+<label><input type="checkbox" name="objectif_ap" value="force">
+Renforcer la force musculaire</label>
+
+<label><input type="checkbox" name="objectif_ap" value="equilibre">
+Améliorer l’équilibre / prévenir les chutes</label>
+
+<h3 style="color:#0056b3;">🚶 Fonction</h3>
+
+<label><input type="checkbox" name="objectif_ap" value="autonomie">
+Préserver ou restaurer l’autonomie</label>
+
+<label><input type="checkbox" name="objectif_ap" value="limitation">
+Réduire une limitation fonctionnelle</label>
+
+<h3 style="color:#0056b3;">😊 Qualité de vie</h3>
+
+<label><input type="checkbox" name="objectif_ap" value="qualite_vie">
+Améliorer la qualité de vie</label>
+
+<label><input type="checkbox" name="objectif_ap" value="bien_etre">
+Améliorer le bien-être psychologique</label>
+
+<label>
+<input type="checkbox" id="objectif_autre_checkbox">
+Autre
+</label>
+
+<input
+type="text"
+id="objectif_autre"
+style="display:none;"
+placeholder="Préciser..."
+>
+
 </div>
 
-        
+<label style="display:block;margin-top:6px;">
+Commentaires complémentaires (facultatif) :
+</label>
+
+<textarea
+  name="objectifs_ap"
+  style="width:95%;"
+></textarea>
+
+</div>
+
 <div class="form-group">
-<h2>9/ Je lui ai remis :</h2>
+
+<h2>9/ Précautions / limitations</h2>
+
+<div class="sub-group">
+
+<div class="apa-limitations-compact" id="apaLimitationsCompact">
+  <div>
+    <strong>Limitations / adaptations APA :</strong>
+    <span id="apaLimitationsCompactText">Aucune sélectionnée</span>
+  </div>
+
+  <button type="button" id="toggleApaLimitationsPanel">
+    Configurer
+  </button>
+</div>
+
+<div id="apaLimitationsPanel" class="apa-limitations-panel" hidden>
+
+<h3 style="color:#0056b3;">
+🛡️ Précautions générales
+</h3>
+
+<label><input type="checkbox" name="precaution_ap" value="cardio">
+Cardio-vasculaires</label>
+
+<label><input type="checkbox" name="precaution_ap" value="respiratoire">
+Respiratoires</label>
+
+<label><input type="checkbox" name="precaution_ap" value="metabolique">
+Métaboliques</label>
+
+<label><input type="checkbox" name="precaution_ap" value="neurologique">
+Neurologiques</label>
+
+<label><input type="checkbox" name="precaution_ap" value="psychique">
+Psychiques / cognitives</label>
+
+<label><input type="checkbox" name="precaution_ap" value="chute">
+Risque de chute</label>
+
+<label><input
+type="checkbox"
+name="precaution_ap"
+value="aucune"
+id="precaution_aucune"
+>
+Aucune</label>
+
+<h3 style="color:#0056b3;">🚶 Limitations locomotrices</h3>
+
+<div class="body-map-wrapper">
+
+  <div class="body-map-panel">
+    <div class="body-map-title">Vue de face</div>
+
+    <div class="body-map-figure body-map-front">
+
+      <div class="body-silhouette front-silhouette"></div>
+
+      <button type="button" class="body-dot shoulder-left" data-target="epaule_d" aria-label="Épaule droite"></button>
+      <button type="button" class="body-dot shoulder-right" data-target="epaule_g" aria-label="Épaule gauche"></button>
+
+      <button type="button" class="body-dot elbow-left" data-target="coude_d" aria-label="Coude droit"></button>
+      <button type="button" class="body-dot elbow-right" data-target="coude_g" aria-label="Coude gauche"></button>
+
+      <button type="button" class="body-dot wrist-left" data-target="poignet_d" aria-label="Main-poignet droit"></button>
+      <button type="button" class="body-dot wrist-right" data-target="poignet_g" aria-label="Main-poignet gauche"></button>
+
+      <button type="button" class="body-dot pelvis-front" data-target="bassin" aria-label="Bassin"></button>
+
+      <button type="button" class="body-dot hip-left" data-target="hanche_d" aria-label="Hanche droite"></button>
+      <button type="button" class="body-dot hip-right" data-target="hanche_g" aria-label="Hanche gauche"></button>
+
+      <button type="button" class="body-dot knee-left" data-target="genou_d" aria-label="Genou droit"></button>
+      <button type="button" class="body-dot knee-right" data-target="genou_g" aria-label="Genou gauche"></button>
+
+      <button type="button" class="body-dot ankle-left" data-target="cheville_d" aria-label="Cheville droite"></button>
+      <button type="button" class="body-dot ankle-right" data-target="cheville_g" aria-label="Cheville gauche"></button>
+
+      <button type="button" class="body-dot foot-left" data-target="pied_d" aria-label="Pied droit"></button>
+      <button type="button" class="body-dot foot-right" data-target="pied_g" aria-label="Pied gauche"></button>
+
+
+    </div>
+  </div>
+
+  <div class="body-map-panel">
+    <div class="body-map-title">Vue de dos</div>
+
+    <div class="body-map-figure body-map-back">
+
+      <div class="body-silhouette back-silhouette"></div>
+
+      <button type="button" class="body-dot spine-cervical" data-target="cervical" aria-label="Cervical"></button>
+      <button type="button" class="body-dot spine-dorsal" data-target="dorsal" aria-label="Dorsal"></button>
+      <button type="button" class="body-dot spine-lumbar" data-target="lombaire" aria-label="Lombaire"></button>
+     
+    </div>
+  </div>
+
+</div>
+
+<div class="body-map-selection">
+  <strong>Zones sélectionnées :</strong>
+  <span id="bodyMapSelectedZones">Aucune</span>
+</div>
+
+<details class="body-map-fallback">
+  <summary>
+    Voir / modifier la liste détaillée des limitations locomotrices
+  </summary>
+
+  <div class="body-map-fallback-content">
+
+<label><input type="checkbox" name="limitation_ap" value="cervical">
+Cervical</label>
+
+<label><input type="checkbox" name="limitation_ap" value="dorsal">
+Dorsal</label>
+
+<label><input type="checkbox" name="limitation_ap" value="lombaire">
+Lombaire</label>
+
+<label><input type="checkbox" name="limitation_ap" value="epaule_d">
+Épaule droite</label>
+
+<label><input type="checkbox" name="limitation_ap" value="epaule_g">
+Épaule gauche</label>
+
+<label><input type="checkbox" name="limitation_ap" value="coude_d">
+Coude droit</label>
+
+<label><input type="checkbox" name="limitation_ap" value="coude_g">
+Coude gauche</label>
+
+<label><input type="checkbox" name="limitation_ap" value="poignet_d">
+Main-poignet droit</label>
+
+<label><input type="checkbox" name="limitation_ap" value="poignet_g">
+Main-poignet gauche</label>
+
+<label><input type="checkbox" name="limitation_ap" value="bassin">
+Bassin</label>
+
+<label><input type="checkbox" name="limitation_ap" value="hanche_d">
+Hanche droite</label>
+
+<label><input type="checkbox" name="limitation_ap" value="hanche_g">
+Hanche gauche</label>
+
+<label><input type="checkbox" name="limitation_ap" value="genou_d">
+Genou droit</label>
+
+<label><input type="checkbox" name="limitation_ap" value="genou_g">
+Genou gauche</label>
+
+<label><input type="checkbox" name="limitation_ap" value="cheville_d">
+Cheville droite</label>
+
+<label><input type="checkbox" name="limitation_ap" value="cheville_g">
+Cheville gauche</label>
+
+<label><input type="checkbox" name="limitation_ap" value="pied_d">
+Pied droit</label>
+
+<label><input type="checkbox" name="limitation_ap" value="pied_g">
+Pied gauche</label>
+
+<label>
+<input type="checkbox" id="limitation_autre_checkbox">
+Autre
+</label>
+
+<input
+type="text"
+id="limitation_autre"
+style="display:none;"
+placeholder="Préciser..."
+>
+
+  </div>
+</details>
+
+<div class="form-group">
+  <label for="apa_exercise_adaptations">
+    <strong>Consignes / adaptations spécifiques des exercices :</strong>
+  </label>
+
+  <textarea
+    id="apa_exercise_adaptations"
+    rows="3"
+    placeholder="Ex. éviter les impacts, adapter les amplitudes, privilégier vélo / marche / renforcement assis, progression selon douleur et fatigue..."
+    style="
+      width:100%;
+      margin-top:8px;
+      padding:10px;
+      border:1px solid #d9d9d9;
+      border-radius:8px;
+      font-family:inherit;
+      font-size:14px;
+      line-height:1.5;
+      resize:vertical;
+    "
+  ></textarea>
+</div>
+</div>
+
+</div>
+
+<div class="form-group">
+<h2>10/ Prescription</h2>
+
+<div style="margin-bottom:18px;">
+
+  <label>
+    Durée prévisionnelle de prescription :
+  </label>
+
+  <input
+    type="text"
+    name="duree_prescription"
+    placeholder="Ex : 3 mois"
+    style="width:140px; font-size:inherit; margin-left:8px;"
+  />
+
+<div
+  id="medicationApaBlock"
+  class="hidden"
+  style="
+    margin:14px 0 18px 0;
+    padding:12px;
+    border:1px solid #fde68a;
+    border-left:4px solid #f59e0b;
+    border-radius:10px;
+    background:#fffbeb;
+    font-size:0.92rem;
+    line-height:1.45;
+  "
+>
+
+  <strong>
+    💊 Classes médicamenteuses pouvant interférer avec l’activité physique
+  </strong>
+
+<div
+  id="medicationApaTreatmentDetails"
+  style="
+    margin-top:8px;
+    padding:6px 8px;
+    border-radius:8px;
+    background:#ffffff;
+    border:1px solid #fef3c7;
+    font-size:0.86rem;
+    line-height:1.35;
+  "
+>
+  <strong>Traitements rappelés :</strong>
+  <span
+    id="medicationApaTreatmentMemo"
+    style="
+      color:#374151;
+      overflow-wrap:anywhere;
+    "
+  ></span>
+</div>
+
+  <div style="margin-top:12px;">
+    <strong>
+      Classes à confirmer par le médecin
+    </strong>
+
+    <div
+      id="medicationApaClassContent"
+      style="margin-top:8px;"
+    ></div>
+  </div>
+
+  <label
+    style="
+      display:block;
+      margin-top:10px;
+      padding:8px;
+      border-radius:8px;
+      background:#ffffff;
+      border:1px solid #fef3c7;
+    "
+  >
+    <input
+      type="checkbox"
+      id="medication_vigilance_autre"
+      name="medication_vigilance_class"
+      value="autre"
+    >
+    Autre classe pertinente non listée
+  </label>
+
+  <input
+    type="text"
+    id="medication_vigilance_autre_text"
+    class="hidden"
+    placeholder="Préciser la classe ou le point de vigilance..."
+    style="
+      width:100%;
+      margin-top:6px;
+      padding:8px;
+      border:1px solid #d1d5db;
+      border-radius:8px;
+      font-size:0.9rem;
+      box-sizing:border-box;
+    "
+  >
+
+  <div
+    style="
+      margin-top:10px;
+      color:#92400e;
+      font-size:0.85rem;
+    "
+  >
+    Mémo indicatif : les classes affichées automatiquement sont seulement probables et doivent être vérifiées.
+  </div>
+
+</div>
+
+<div
+  style="
+    margin-top:12px;
+    margin-bottom:12px;
+    font-weight:700;
+    font-size:1rem;
+    color:#1f2937;
+  "
+>
+Prescription d’activité physique
+</div>
 
 <!-- ================= AEROBIE ================= -->
 <div class="sub-group">
+
   <h3>Une ordonnance d’AP aérobie :</h3>
 
-  <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+  <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
 
-   <label class="inline-option" style="display:flex; align-items:center; gap:6px;">
-  <input type="radio" name="ordonnance_aerobie" id="ordonnance_aerobie" value="oui">
-  Oui
-</label>
+    <label class="inline-option" style="display:flex; align-items:center; gap:6px;">
+   <input type="radio" name="mode_aerobie" value="fitt">
+    FITT
+    </label>
 
-<label class="inline-option" style="display:flex; align-items:center; gap:6px;">
-  <input type="radio" name="ordonnance_aerobie" value="non">
-  Non
-</label>
+    <label class="inline-option" style="display:flex; align-items:center; gap:6px;">
+    <input type="radio" name="mode_aerobie" value="pas">
+    Pas/jour
+    </label>
 
-    <div id="ordonnance_aerobie_subgroup" style="display:none; align-items:center; gap:8px;">
-      <input type="number" name="fois_aerobie" min="0" max="9"
+    <div id="ordonnance_aerobie_subgroup"
+         style="display:none; align-items:center; gap:10px; flex-wrap:wrap;">
+
+      <input type="number"
+             name="fois_aerobie"
+             min="0"
+             max="9"
              style="width:55px; font-size:inherit;">
-      <span style="font-size:inherit;">fois par semaine</span>
+
+      <span style="font-size:inherit;">
+        fois/semaine
+      </span>
+
+      <input type="text"
+             name="type_aerobie"
+             placeholder="marche rapide, vélo..."
+             style="width:180px; font-size:inherit;">
+
+      <input type="number"
+             name="duree_aerobie"
+             min="0"
+             max="300"
+             style="width:65px; font-size:inherit;">
+
+      <span style="font-size:inherit;">
+        min/séance
+      </span>
+
     </div>
 
   </div>
 
-  <div id="intensite_aerobie_block" style="display:none; margin-top:8px;">
+  <div id="intensite_aerobie_block"
+       style="display:none; margin-top:8px;">
+
     <label class="inline-option">
       <input type="radio" name="intensite_aerobie" value="moderee">
       Intensité modérée
     </label>
+
     <label class="inline-option">
       <input type="radio" name="intensite_aerobie" value="elevee">
       Intensité élevée
     </label>
+
   </div>
+<div id="aerobie_pas_subgroup"
+     style="display:none; margin-top:8px;">
+
+  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+
+    <input type="number"
+           name="objectif_pas"
+           min="0"
+           max="50000"
+           step="100"
+           style="width:100px; font-size:inherit;">
+
+    <span>
+      pas/jour
+    </span>
+
+  </div>
+
+  <div style="margin-top:8px;">
+
+    <textarea
+      name="consignes_pas"
+      placeholder="Ex : augmentation progressive de 500 pas/semaine si tolérance satisfaisante."
+      style="width:100%; min-height:60px;">
+    </textarea>
+
+  </div>
+
+</div>
 </div>
 
 <!-- ================= RENFORCEMENT ================= -->
@@ -1446,13 +2008,35 @@ Pas d’AP envisagée dans les 6 mois
   <input type="radio" name="renforcement_musculaire" value="non">
   Non
 </label>
+<div id="renforcement_musculaire_subgroup"
+     style="display:none; align-items:center; gap:10px; flex-wrap:wrap;">
 
-    <div id="renforcement_musculaire_subgroup"
-         style="display:none; align-items:center; gap:8px;">
-      <input type="number" name="fois_renforcement" min="0" max="9"
-             style="width:55px; font-size:inherit;">
-      <span style="font-size:inherit;">fois par semaine</span>
-    </div>
+  <input type="number"
+         name="fois_renforcement"
+         min="0"
+         max="9"
+         style="width:55px; font-size:inherit;">
+     
+  <span style="font-size:inherit;">
+    fois/semaine
+  </span>
+
+  <input type="text"
+         name="type_renforcement"
+         placeholder="circuit training..."
+         style="width:180px; font-size:inherit;">
+
+         <input type="number"
+       name="duree_renforcement"
+       min="0"
+       max="300"
+       style="width:65px; font-size:inherit;">
+
+<span style="font-size:inherit;">
+  min/séance
+</span>
+
+</div>
   </div>
 </div>
 
@@ -1471,17 +2055,439 @@ Pas d’AP envisagée dans les 6 mois
 </label>
 
     <div id="souplesse_mobilite_subgroup"
-         style="display:none; align-items:center; gap:8px;">
-      <input type="number" name="fois_souplesse" min="0" max="9"
+     style="display:none; align-items:center; gap:10px; flex-wrap:wrap;">
+
+  <input type="number"
+         name="fois_souplesse"
+         min="0"
+         max="9"
+         style="width:55px; font-size:inherit;">
+
+  <span style="font-size:inherit;">
+    fois/semaine
+  </span>
+
+  <input type="text"
+         name="type_souplesse"
+         placeholder="yoga, étirements..."
+         style="width:180px; font-size:inherit;">
+
+ <input type="number"
+       name="duree_souplesse"
+       min="0"
+       max="300"
+       style="width:65px; font-size:inherit;">
+
+<span style="font-size:inherit;">
+  min/séance
+</span>
+
+</div>
+  </div>
+</div>
+
+<!-- ================= EQUILIBRE ================= -->
+<div class="sub-group">
+  <h3>Travail de l'équilibre :</h3>
+
+  <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+    <label class="inline-option" style="display:flex; align-items:center; gap:6px;">
+      <input type="radio" name="equilibre" id="equilibre" value="oui">
+      Oui
+    </label>
+
+    <label class="inline-option" style="display:flex; align-items:center; gap:6px;">
+      <input type="radio" name="equilibre" value="non">
+      Non
+    </label>
+
+    <div id="equilibre_subgroup"
+         style="display:none; align-items:center; gap:10px; flex-wrap:wrap;">
+
+      <input type="number"
+             name="fois_equilibre"
+             min="0"
+             max="9"
              style="width:55px; font-size:inherit;">
-      <span style="font-size:inherit;">fois par semaine</span>
+
+      <span style="font-size:inherit;">
+        fois/semaine
+      </span>
+
+      <input type="text"
+             name="type_equilibre"
+             placeholder="tai-chi, exercices d'équilibre..."
+             style="width:180px; font-size:inherit;">
+
+      <input type="number"
+             name="duree_equilibre"
+             min="0"
+             max="300"
+             style="width:65px; font-size:inherit;">
+
+      <span style="font-size:inherit;">
+        min/séance
+      </span>
+
     </div>
   </div>
 </div>
 
-<!-- ================= FICHES ================= -->
+</div>
+
+<!-- ================= ORIENTATION ========= -->
+<div
+  style="
+    margin-top:18px;
+    margin-bottom:12px;
+    padding-top:10px;
+    border-top:1px solid #e5e7eb;
+    font-weight:700;
+    font-size:1rem;
+    color:#1f2937;
+  "
+>
+Orientation / encadrement
+</div>
+
 <div class="sub-group">
-  <h3 class="black-text">Des fiches de promotion d'activité physique :</h3>
+
+<div
+  style="
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:8px;
+  "
+>
+
+<input
+  type="checkbox"
+  id="orientation_ap_toggle"
+>
+
+<span
+  style="
+    font-weight:700;
+    font-size:1rem;
+    color:#1f2937;
+  "
+>
+Orientation AP spécifique (optionnel)
+</span>
+
+</div>
+
+<div
+  id="orientation_ap_subgroup"
+  style="display:none; margin-top:12px;"
+>
+
+<p style="margin-bottom:12px;">
+Le patient nécessite-t-il un encadrement spécifique
+pour pratiquer l’activité physique en sécurité ?
+</p>
+
+
+<div
+  id="orientation_help_block"
+  style="
+    margin-bottom:14px;
+    padding:10px;
+    background:#f8fafc;
+    border-left:4px solid #cbd5e1;
+    border-radius:6px;
+    font-size:0.9rem;
+  "
+>
+
+<strong>Repères identifiés :</strong>
+
+<div
+  id="orientation_help_content"
+  style="margin-top:6px;"
+>
+Aucun repère identifié.
+</div>
+
+</div>
+
+<h3
+  style="
+    color:#1f2937;
+    margin-bottom:10px;
+    font-size:0.98rem;
+    font-weight:700;
+  "
+>
+🧭 Orientations possibles
+</h3>
+
+<!-- NIVEAU 1 -->
+<div
+  style="
+    display:flex;
+   align-items:center;
+    flex-wrap:wrap;
+    gap:18px;
+    margin-bottom:6px;
+    line-height:1.2;
+  "
+>
+
+<span
+  style="
+    font-weight:600;
+    color:#374151;
+  "
+>
+Niv 1 :
+</span>
+
+<label
+  style="
+    display:flex;
+align-items:center;
+    gap:4px;
+    line-height:1.2;
+  "
+>
+<input
+  type="checkbox"
+  name="orientation_ap"
+  value="kine"
+>
+Kinésithérapeute
+</label>
+
+<label
+  style="
+    display:flex;
+align-items:center;
+    gap:4px;
+    line-height:1.2;
+  "
+>
+<input
+  type="checkbox"
+  name="orientation_ap"
+  value="ergo"
+>
+Ergothérapeute
+</label>
+
+<label
+  style="
+    display:flex;
+align-items:center;
+    gap:4px;
+    line-height:1.2;
+  "
+>
+<input
+  type="checkbox"
+  name="orientation_ap"
+  value="psychomot"
+>
+Psychomotricien
+</label>
+
+</div>
+
+<!-- NIVEAUX 2 / 3 / 4 -->
+<div
+  style="
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:26px;
+    margin-bottom:10px;
+    line-height:1.2;
+  "
+>
+
+<div style="display:flex; align-items:center; gap:8px;">
+
+<span
+  style="
+    font-weight:600;
+    color:#374151;
+  "
+>
+Niv 2 :
+</span>
+
+<label
+  style="
+    display:flex;
+align-items:center;
+    gap:4px;
+    line-height:1.2;
+  "
+>
+<input
+  type="checkbox"
+  name="orientation_ap"
+  value="apa"
+>
+Enseignant APA
+</label>
+
+</div>
+
+<div style="display:flex; align-items:center; gap:8px;">
+
+<span
+  style="
+    font-weight:600;
+    color:#374151;
+  "
+>
+Niv 3 :
+</span>
+
+<label
+  style="
+    display:flex;
+align-items:center;
+    gap:4px;
+    line-height:1.2;
+  "
+>
+<input
+  type="checkbox"
+  name="orientation_ap"
+  value="educateur"
+>
+Éducateur sportif
+</label>
+
+</div>
+
+<div style="display:flex; align-items:center; gap:8px;">
+
+<span
+  style="
+    font-weight:600;
+    color:#374151;
+  "
+>
+Niv 4 :
+</span>
+
+<label
+  style="
+    display:flex;
+    align-items:center;
+    gap:4px;
+    line-height:1.2;
+  "
+>
+<input
+  type="checkbox"
+  name="orientation_ap"
+  value="autonome"
+>
+En autonomie
+</label>
+
+</div>
+
+</div>
+
+<div
+  id="consentement_partage_block"
+  style="
+    display:none;
+    margin-top:12px;
+    padding-top:10px;
+    border-top:1px solid #e5e7eb;
+  "
+>
+
+<label
+  style="
+    display:flex;
+align-items:center;
+    gap:8px;
+    line-height:1.35;
+  "
+>
+
+<input
+  type="checkbox"
+  id="consentement_partage_apa"
+>
+
+<span>
+Patient informé du partage des informations
+nécessaires avec le professionnel encadrant
+et accord oral recueilli.
+</span>
+
+</label>
+
+</div>
+
+<div
+  id="bilan_condition_block"
+  style="
+    display:none;
+    margin-top:10px;
+  "
+>
+
+<label
+  style="
+    display:flex;
+    align-items:center;
+    gap:8px;
+    line-height:1.35;
+  "
+>
+
+<input
+  type="checkbox"
+  id="bilan_condition_apa"
+>
+
+<span>
+Bilan de condition et de capacités physiques souhaité.
+</span>
+
+</label>
+
+</div>
+
+<label style="display:block;margin-top:12px;">
+Commentaire complémentaire pour le professionnel encadrant — APA, kinésithérapeute, éducateur sportif... :
+</label>
+
+<textarea
+  name="orientation_commentaire"
+  style="width:95%;"
+  placeholder="Ex. points de vigilance, adaptations souhaitées, éléments utiles pour l’encadrement de la pratique..."
+></textarea>
+
+</div>
+
+</div>
+</div>
+
+<!-- ================= FICHES ================= -->
+<div
+  style="
+    margin-top:18px;
+    margin-bottom:12px;
+    padding-top:10px;
+    border-top:1px solid #e5e7eb;
+    font-weight:700;
+    font-size:1rem;
+    color:#1f2937;
+  "
+>
+Ressources / fiches AP
+</div>
 
   <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
 
@@ -1530,7 +2536,7 @@ Pas d’AP envisagée dans les 6 mois
     id="refreshCRCBtn"
     class="btn secondary"
   >
-    Mettre à jour le CRC
+    Mettre à jour le CRC et l'ordonnance
   </button>
 
 </div>
@@ -1540,22 +2546,128 @@ Pas d’AP envisagée dans les 6 mois
   <!-- Contenu rendu -->
   <div id="outputContainer"></div>
 
+  <!-- Sortie dédiée Ctrl+P navigateur -->
+  <div id="browserPrintOutput" aria-hidden="true"></div>
+
+  <div id="finalTextContainer"
+     style="display:none; margin-top:20px;">
+
+  <h3>
+    Texte final modifiable avant copier
+  </h3>
+
+  <textarea
+    id="finalTextOutput"
+    style="
+      width:100%;
+      min-height:260px;
+      padding:12px;
+      font-family:inherit;
+      font-size:14px;
+      line-height:1.5;
+      resize:vertical;
+      border:1px solid #d9d9d9;
+      border-radius:8px;
+    "
+  ></textarea>
+
+</div>
+
 <!-- Onglets de format -->
 <div id="formatTabs" class="format-tabs hidden">
 <button type="button" class="tab-btn active" data-mode="long">Courrier complet</button>
 <button type="button" class="tab-btn" data-mode="paragraph">Paragraphe</button>
 <button type="button" class="tab-btn" data-mode="medical">Dossier médical</button>
 <button type="button" class="tab-btn" data-mode="patient">Version patient</button>
+<button type="button" class="tab-btn" data-mode="ordonnance">Ordonnance AP simple</button>
+<button type="button" class="tab-btn" data-mode="apa">Certificat de NCI / Ordonnance APA</button>
 </div>
+ 
+
+<details id="physicianIdentityBlock" class="document-settings">
+ <summary class="physician-summary">
+  ⚙️ Coordonnées médecin
+</summary>
+
+  <p class="helper-text">
+    Ces informations sont stockées uniquement sur cet appareil et peuvent être réinitialisées.
+  </p>
+
+  <div class="physician-grid">
+
+  <input
+  type="text"
+  id="physician_lastName"
+  placeholder="Nom"
+>
+
+<input
+  type="text"
+  id="physician_firstName"
+  placeholder="Prénom"
+>
+
+    <input
+      type="text"
+      id="physician_speciality"
+      placeholder="Spécialité"
+    >
+
+    <input
+      type="text"
+      id="physician_rpps"
+      placeholder="RPPS"
+    >
+
+    <input
+      type="text"
+      id="physician_phone"
+      placeholder="Téléphone"
+    >
+
+    <input
+      type="email"
+      id="physician_email"
+      placeholder="Email"
+    >
+
+    <textarea
+      id="physician_address"
+      placeholder="Adresse"
+    ></textarea>
+
+  </div>
+
+  <div class="physician-actions">
+    <button
+      type="button"
+      id="savePhysicianIdentityBtn"
+      class="btn secondary-btn"
+    >
+      Enregistrer les coordonnées
+    </button>
+
+    <button
+      type="button"
+      id="resetPhysicianIdentityBtn"
+      class="btn secondary-btn"
+    >
+      Réinitialiser
+    </button>
+  </div>
+</details>
 
   <!-- Actions -->
   <div id="reportActions">
     <button type="button" id="printReport" class="btn">Imprimer</button>
 <button type="button" id="copyReport" class="btn">Copier</button>
+<button type="button" id="editReport" class="btn">
+  Modifier
+</button>
 <button type="button" id="downloadPdf" class="btn hidden">Télécharger PDF</button>
   </div>
-        
-<div id="resetSection" class="hidden" style="margin-top:12px; text-align:center;">
+ 
+  <div id="resetSection" class="hidden" style="margin-top:12px; text-align:center;">
 <button 
   type="button" 
   id="resetConsultationBtn" 
@@ -1566,6 +2678,16 @@ Pas d’AP envisagée dans les 6 mois
 </div>
 </div>
 
+<script src="../../core/prescriptionModel.js"></script>
+<script src="../../core/prescriptionUtils.js"></script>
+<script src="../../core/prescriptionSync.js"></script>
+<script src="../../core/prescriptionRenderer.js"></script>
+
+<script src="../../core/clinical-context/context-schema.js"></script>
+<script src="../../core/clinical-context/resource-registry.js"></script>
+<script src="../../core/clinical-context/medication-vigilance-registry.js"></script>
+<script src="../../core/clinical-context/computeClinicalContext.js"></script>
+
 <script>
     
 /* =====================================
@@ -1575,7 +2697,31 @@ const consultationState = {
   reportGenerated: false,
   reportDirty: false
 };
-    
+
+let renderedOutput = {
+  html: "",
+  text: "",
+  edited: false
+};
+
+let isEditingOutput = false;
+
+let prescriptionModel = createPrescriptionModel();
+
+prescriptionModel.activites.push({
+  categorie: "endurance",
+
+  type: "Marche rapide",
+
+  duree: {
+    valeur: 20
+  },
+
+  frequence: {
+    valeur: 4
+  }
+});
+
 const PATHO_DATA = {
 
 hta: {
@@ -1648,20 +2794,19 @@ coronaropathie: {
   ],
 
   crc: [
-    "Prise des traitements aux heures habituelles même en cas de séance d’AP",
-    "Respect important des règles habituelles de précaution (échauffement et retour au calme progressif, connaitre les 10 règles du club des cardiologues du sport)",
-    "Arrêtez l’effort si douleur thoracique, malaise ou essoufflement inhabituel",
-    "Eviter de faire des exercices de renforcement musculaires intenses bouche fermée",
-    "Bougez régulièrement chaque semaine plutôt qu’efforts intenses occasionnels",
-    "Nécessité d’un avis cardiologique si activité physique intense et/ou sportive voire en compétition souhaitée"
-  ],
+  "prise des traitements aux heures habituelles même en cas de séance d’AP",
+  "connaître et respecter les 10 règles d’or, dont l’importance d’un échauffement et d’un retour au calme progressif",
+  "arrêter l’effort si douleur thoracique, malaise ou essoufflement inhabituel",
+  "éviter les exercices de renforcement musculaire intenses en bloquant la respiration",
+  "bouger régulièrement chaque semaine plutôt qu’efforts intenses occasionnels",
+  "avis cardiologique nécessaire si activité physique intense, sportive ou en compétition souhaitée"
+],
 
-  crc_default: [
-    "Prise des traitements aux heures habituelles même en cas de séance d’AP",
-    "Respect important des règles habituelles de précaution (échauffement et retour au calme progressif, connaitre les 10 règles du club des cardiologues du sport)",
-    "Arrêtez l’effort si douleur thoracique, malaise ou essoufflement inhabituel"
-  ]
-},
+crc_default: [
+  "connaître et respecter les 10 règles d’or, dont l’importance d’un échauffement et d’un retour au calme progressif",
+  "arrêter l’effort si douleur thoracique, malaise ou essoufflement inhabituel",
+  "bouger régulièrement chaque semaine plutôt qu’efforts intenses occasionnels"
+]},
     
 aomi: {
   titre: "AOMI / Artériopathie oblitérante des membres inférieurs",
@@ -1696,22 +2841,21 @@ aomi: {
     "SI antiagrégant → ALORS prévenir du risque d’hématome en cas de choc"
   ],
 
-  crc: [
-    "L’activité physique régulière aide à reculer le seuil d’apparition de la douleur à la marche",
-    "Marcher jusqu’à une douleur supportable n’obligeant pas à s’arrêter puis récupérer avant de repartir",
-    "Importance de la marche régulière même fractionnée",
-    "Respecter l’échauffement et le retour au calme en fin d’activité",
-    "Porter de bonnes chaussures et surveiller ses pieds",
-    "Chaque période assise prolongée mérite d’être interrompue"
-  ],
+ crc: [
+  "l’activité physique régulière aide à reculer le seuil d’apparition de la douleur à la marche",
+  "marcher jusqu’à une douleur supportable n’obligeant pas à s’arrêter, puis récupérer avant de repartir",
+  "privilégier une marche régulière, même fractionnée",
+  "respecter l’échauffement et le retour au calme en fin d’activité",
+  "porter de bonnes chaussures et surveiller ses pieds",
+  "interrompre les périodes assises prolongées par quelques minutes de mouvement"
+],
 
-  crc_default: [
-    "La marche régulière est importante",
-    "Marcher jusqu’à une douleur supportable puis récupérer avant de repartir",
-    "Respecter échauffement et retour au calme",
-    "Porter de bonnes chaussures et surveiller ses pieds",
-    "Bouger régulièrement aide à améliorer la marche"
-  ]
+crc_default: [
+  "l’activité physique régulière aide à reculer le seuil d’apparition de la douleur à la marche",
+  "marcher jusqu’à une douleur supportable n’obligeant pas à s’arrêter, puis récupérer avant de repartir",
+  "privilégier une marche régulière, même fractionnée",
+  "porter de bonnes chaussures et surveiller ses pieds"
+]
 },
 
 dt1: {
@@ -1757,7 +2901,7 @@ dt1: {
   crc: [
     "Importance de surveiller sa glycémie avant, pendant et après l’effort",
     "Gardez toujours une source de sucre rapide avec soi",
-    "Chaque activité nouvelle peut nécessiter d’adapter différemment la glycémie",
+   "Chaque activité nouvelle peut nécessiter d’adapter les apports glucidiques ou l’insuline",
     "Après une grosse séance, surveillez la glycémie également le soir et la nuit",
     "Bon chaussage et contrôle quotidien des pieds recommandés",
     "Bouger régulièrement apporte plus de bénéfices que rester inactif"
@@ -1768,7 +2912,6 @@ dt1: {
     "Gardez toujours une source de sucre rapide avec soi",
     "Après une grosse séance, surveillez la glycémie également le soir et la nuit",
     "Bon chaussage et contrôle quotidien des pieds recommandés",
-    "Bouger régulièrement apporte plus de bénéfices que rester inactif"
   ]
 },
 
@@ -1811,11 +2954,12 @@ dt1: {
     "progressivité recommandée en début de programme"
   ],
 
-  crc_default: [
-    "surveillance glycémique recommandée",
-    "vigilance pour les pieds (chaussage adapté, surveillance)",
-    "adapter les apports alimentaires à l’activité"
-  ]
+crc_default: [
+  "surveillance glycémique recommandée",
+  "vigilance pour les pieds (chaussage adapté, surveillance)",
+  "adapter les apports alimentaires à l’activité",
+  "progressivité recommandée en début de programme"
+]
 },
 
 obesite: {
@@ -1848,10 +2992,10 @@ obesite: {
   ],
 
   crc: [
-    "privilégier les activités en décharge (aquatiques) ou à faible impact (marche nordique, vélo ± électrique)",
+    "privilégier les activités à faible impact ou en décharge (aquatiques, vélo, marche nordique)",
     "être progressif dans la durée et l’intensité",
     "chaque pas en plus est bénéfique",
-    "le renforcement musculaire est important pour prévenir la perte musculaire",
+    "le renforcement musculaire aide à préserver la masse musculaire",
     "les effets positifs de l’activité physique existent même en l’absence de diminution du poids"
   ],
 
@@ -1877,7 +3021,7 @@ icc: {
     "Prescription AP après idéalement séjour en réadaptation cardiaque et avis cardiologique",
     "Intensité AP à adapter au seuil d’apparition ischémie/angor/arythmie (ETT, avis cardiologique)",
     "Intensité modérée (≈ Borg 3–5) avec progressivité",
-    "Respect des recommandations habituelles (pollution, règles du club des cardiologues du sport)",
+   "respecter les règles habituelles de précaution, notamment selon la météo et la pollution (10 règles d'or)",
     "Adapter/éviter AP si altitude > 2500 m, dans eau < 25°"
   ],
 
@@ -1895,15 +3039,16 @@ icc: {
 
   crc: [
     "Respect particulièrement important des règles de précaution (selon pollution et conditions météo, 10 règles du club des cardiologues du sport)",
-    "Connaitre le seuil d’intensité de l’activité physique à respecter",
-    "savoir surveiller sa tolérance à l’effort (essoufflement, fatigue)"
+    "respecter une intensité d’effort adaptée et progressive",
+    "surveiller sa tolérance à l’effort (essoufflement, fatigue inhabituelle)",
+    "interrompre l’activité physique en cas de malaise, douleur thoracique ou essoufflement inhabituel"
   ],
 
   crc_default: [
-    "Respect particulièrement important des règles de précaution (selon pollution et conditions météo, 10 règles du club des cardiologues du sport)",
-    "Connaitre le seuil d’intensité de l’activité physique à respecter",
-    "savoir surveiller sa tolérance à l’effort (essoufflement, fatigue)"
-  ]
+  "respecter les règles habituelles de précaution, notamment selon la météo et la pollution",
+  "respecter une intensité d’effort adaptée et progressive",
+  "surveiller sa tolérance à l’effort (essoufflement, fatigue inhabituelle)"
+]
 },
 
 bpco: {
@@ -1942,14 +3087,14 @@ bpco: {
 
   crc: [
     "être actif régulièrement même à faible intensité",
-    "adapter l’effort en fonction de l’essoufflement",
-    "fractionner les activités si nécessaire",
+    "adapter l’intensité de l’effort selon l’essoufflement",
+    "fractionner l’activité physique si nécessaire",
     "éviter de rester trop longtemps inactif"
   ],
 
   crc_default: [
     "être actif régulièrement même à faible intensité",
-    "adapter l’effort en fonction de l’essoufflement",
+    "adapter l’intensité de l’effort selon l’essoufflement",
     "éviter de rester trop longtemps inactif"
   ]
 },
@@ -1994,7 +3139,7 @@ asthme: {
     "L’activité physique régulière aide souvent à mieux contrôler l’asthme",
    "Adaptez vos sorties à la météo, la pollution, les pollens (pas d’AP intense si pic de pollution, <a href='https://www.atmo-france.org/indiceatmo' target='_blank' rel='noopener noreferrer'>indice ATMO</a>)",
     "Commencer progressivement et bien s’échauffer avant l’effort",
-    "Faire sa sortie d’AP avec son inhalateur et savoir quoi faire en cas de crise",
+    "Avoir son inhalateur avec soi et savoir quoi faire en cas de crise",
     "Refaire le point avec mon médecin en cas de gêne respiratoire inhabituelle à l’effort"
   ],
 
@@ -2002,7 +3147,7 @@ asthme: {
     "L’activité physique régulière aide souvent à mieux contrôler l’asthme",
    "Adaptez vos sorties à la météo, la pollution, les pollens (pas d’AP intense si pic de pollution, <a href='https://www.atmo-france.org/indiceatmo' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>indice&nbsp;ATMO</a>)",
       "Commencer progressivement et bien s’échauffer avant l’effort",
-    "Faire sa sortie d’AP avec son inhalateur et savoir quoi faire en cas de crise"
+    "Avoir son inhalateur avec soi et savoir quoi faire en cas de crise"
   ]
 },
     
@@ -2040,14 +3185,14 @@ asthme: {
   crc: [
     "privilégier la marche régulière",
     "être progressif dans la durée et l’intensité",
-    "ajouter de l’activité physique dans la vie quotidienne",
+    "profiter des activités de la vie quotidienne pour bouger davantage",
     "ne pas se décourager malgré une progression lente"
   ],
 
   crc_default: [
     "privilégier la marche régulière",
     "être progressif dans la durée et l’intensité",
-    "ajouter de l’activité physique dans la vie quotidienne",
+    "profiter des activités de la vie quotidienne pour bouger davantage",
     "ne pas se décourager malgré une progression lente"
   ]
 },
@@ -2095,7 +3240,7 @@ parkinson: {
     "Choisir les moments où l’on est le plus mobile pour pratiquer son activité physique",
     "Même de courtes séances sont utiles",
     "Marchez avec musique rythmée ou repères au sol si cela aide",
-    "Importance de travailler aussi l’équilibre et la force"
+  "Travailler aussi l’équilibre et le renforcement musculaire"
   ],
 
   crc_default: [
@@ -2137,7 +3282,7 @@ sep: {
 
   crc: [
     "Bouger régulièrement améliore fatigue, mobilité, équilibre et qualité de vie",
-    "L’activité physique ne déclenche pas les poussées, même si une aggravation transitoire des symptômes est possible",
+   "L’activité physique ne déclenche pas les poussées, même si certains symptômes peuvent augmenter transitoirement pendant l’effort",
     "Privilégiez un environnement frais"
   ],
 
@@ -2180,8 +3325,8 @@ arthrose: {
 
   crc: [
     "L’exercice est un traitement de 1ère intention à tous les stades : il n’use pas l’articulation",
-    "Associer exercices ciblés (RM/mobilité) + exercices généraux",
-    "Reconnaître une poussée congestive et adapter l’AP",
+    "Associer exercices ciblés (renforcement, mobilité) et activité physique générale",
+    "Reconnaître une poussée congestive pour adapter temporairement l’activité physique",
     "Différencier douleur articulaire et courbatures après effort inhabituel",
     "Si douleur durable après séance → diminuer intensité",
     "Chaussage adapté si atteinte MI",
@@ -2190,7 +3335,7 @@ arthrose: {
 
   crc_default: [
     "L’exercice est un traitement de 1ère intention : il n’use pas l’articulation",
-    "Reconnaître une poussée congestive",
+    "Reconnaître une poussée congestive pour adapter temporairement l’activité physique",
     "Contrôle du poids utile pour les articulations des MI"
   ]
 },
@@ -2226,7 +3371,7 @@ lombalgie: {
 
   crc: [
     "rester actif malgré la douleur (activité physique = traitement)",
-    "être progressif dans les exercices",
+    "être progressif dans la reprise des exercices",
     "choisir des exercices n’aggravant pas les symptômes",
     "éviter le repos prolongé (repos = néfaste)",
     "l’efficacité du traitement se mesure par la douleur ET par le niveau d’activité physique et les activités quotidiennes"
@@ -2275,7 +3420,7 @@ pr: {
 
   crc: [
     "Bouger régulièrement est un traitement utile de la polyarthrite sans l’aggraver si elle est adaptée",
-    "Commencer doucement puis progressez progressivement",
+    "Commencer doucement puis continuer progressivement",
     "Savoir sauter/adapter une séance si majoration des douleurs articulaires ou poussée",
     "Porter le matériel conseillé par son médecin (semelles, orthèse)",
     "Le renforcement musculaire protège les articulations",
@@ -2284,7 +3429,7 @@ pr: {
 
   crc_default: [
     "Bouger régulièrement est un traitement utile de la polyarthrite sans l’aggraver si elle est adaptée",
-    "Commencez doucement puis progressez progressivement",
+    "Commencez doucement puis continuer progressivement",
    "Savoir sauter/adapter une séance si majoration des douleurs articulaires",
     "Le renforcement musculaire protège les articulations"
   ]
@@ -2406,8 +3551,8 @@ schizophrenie: {
 
   crc: [
     "Bouger régulièrement aide le moral, le sommeil et la santé physique",
-    "Bouger peut aider à réduire fatigue et stress avec le temps",
-    "L’activité physique peut réduire anxiété et dépression parfois associées à la schizophrénie",
+    "Bouger régulièrement peut aider à réduire fatigue et stress",
+    "L’activité physique peut améliorer anxiété et humeur",
   ],
 
   crc_default: [
@@ -2462,7 +3607,7 @@ cancer: {
   crc: [
     "L’activité physique adaptée fait partie des soins de support utiles",
     "Même fatigué, bouger doucement est souvent préférable à l’inactivité complète si cela est possible",
-    "AP est le seul traitement validé pour lutter contre la fatigue",
+    "L’activité physique aide à lutter contre la fatigue liée au cancer",
     "Adapter les séances selon l’état du jour et les traitements",
     "Arrêtez et signalez tout symptôme inhabituel"
   ],
@@ -2514,7 +3659,7 @@ pa_maintien: {
     "Prendre ses médicaments aux heures habituelles, même si séance d’activité physique",
     "Prendre des chaussures adaptées à l’activité",
     "Bien s’hydrater sans attendre la soif",
-    "Connaitre <a href='https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>les signes devant faire arrêter l’activité</a> et prévenir son médecin"
+    "Connaitre <a href='https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf' target='_blank' rel='noopener noreferrer' style='display:inline;color:inherit;text-decoration:underline;'>les signes devant faire interrompre l’activité physique</a> et prévenir son médecin"
   ],
 
   crc_default: [
@@ -2569,8 +3714,8 @@ pa_chute: {
     "La peur de tomber se traite aussi par l’entraînement progressif",
     "Signalez toute chute récente à votre médecin",
     "Sécurisez le domicile : éclairage, tapis, obstacles",
-    "Contrôler régulièrement sa vue avec son ophtalmologiste",
-    "Importance d’avoir une alimentation saine et équilibrée"
+    "Contrôler régulièrement sa vue",
+    "Une alimentation adaptée aide aussi à préserver la force musculaire"
   ],
 
   crc_default: [
@@ -2625,7 +3770,7 @@ grossesse: {
     "Bouger pendant la grossesse est bon pour la femme enceinte et son enfant",
     "Bien s’hydrater et porter des vêtements amples adaptés",
     "Marche, natation, vélo stationnaire sont souvent de bons choix",
-    "Connaître les signes devant faire arrêter l’activité et consulter",
+    "Connaître les signes devant faire interrompre l’activité physique et consulter",
     "Chaque mouvement compte, même en petites durées"
   ],
 
@@ -2670,9 +3815,9 @@ post_partum: {
   ],
 
   crc_default: [
-    "Bouger après l’accouchement aide à récupérer",
+    "Bouger après l’accouchement aide à récupérer et réduit le risque de dépression",
     "L’activité physique est compatible avec l’allaitement",
-    "Reprendre progressivement"
+    "Reprendre progressivement selon son ressenti"
   ]
 },
 };
@@ -2680,6 +3825,120 @@ post_partum: {
     
 const DEBUG = false;
 const APP_VERSION = "v0.2.2";
+
+const DEFAULT_PHYSICIAN_IDENTITY = {
+  lastName: "",
+  firstName: "",
+  speciality: "",
+  rpps: "",
+  address: "",
+  phone: "",
+  email: ""
+};
+
+function getPhysicianIdentity() {
+
+  try {
+    const saved =
+      localStorage.getItem("pap_physician_identity");
+
+    if (!saved) {
+      return structuredClone(DEFAULT_PHYSICIAN_IDENTITY);
+    }
+
+    return {
+      ...structuredClone(DEFAULT_PHYSICIAN_IDENTITY),
+      ...JSON.parse(saved)
+    };
+
+  } catch (error) {
+    return structuredClone(DEFAULT_PHYSICIAN_IDENTITY);
+  }
+}
+
+function savePhysicianIdentity(identity) {
+
+  localStorage.setItem(
+    "pap_physician_identity",
+    JSON.stringify(identity)
+  );
+}
+
+function renderPhysicianSignature(
+  align = "left"
+) {
+
+  const identity =
+    getPhysicianIdentity();
+
+const fullName =
+  [
+    "Dr",
+    identity.firstName,
+    identity.lastName
+  ]
+      .filter(Boolean)
+      .join(" ");
+
+  const lines = [
+    fullName,
+    identity.speciality,
+    identity.rpps ? `RPPS : ${identity.rpps}` : "",
+    identity.address,
+    identity.phone ? `Tél. : ${identity.phone}` : "",
+    identity.email
+  ].filter(Boolean);
+
+  if (!lines.length) {
+    return "";
+  }
+
+return `
+<div
+  style="
+    margin-top:24px;
+    display:flex;
+    const justifyContent =
+  align === "left"
+    ? "flex-start"
+    : align === "center"
+      ? "center"
+      : "flex-end";
+  "
+>
+  <div
+    style="
+      text-align:left;
+      line-height:1.6;
+      min-width:260px;
+    "
+  >
+    ${lines.join("<br>")}
+  </div>
+</div>
+`;
+}
+
+function capitalizeFirstLetter(text) {
+
+  if (!text) {
+    return "";
+  }
+
+  const clean =
+    text.trim();
+
+  return clean.charAt(0).toUpperCase()
+    + clean.slice(1);
+}
+
+function resetPhysicianIdentity() {
+
+  localStorage.removeItem(
+    "pap_physician_identity"
+  );
+}
+
 function showInfo(text, el) {
 
   const popup = document.getElementById("infoPopup");
@@ -2795,6 +4054,8 @@ document.addEventListener("pointerup", function(e) {
 });
     
 let isImporting = false;
+let isProgrammaticUpdate = false;
+
 let clinicalModel = null;
 let activeMode = "long";
 
@@ -2827,9 +4088,6 @@ if (warning) {
   warning.classList.remove("hidden");
 }
     
-    console.log("État après modification", JSON.stringify(consultationState));
-    
-  console.log("CRC désynchronisé : modification détectée");
 }
     
 /* =====================================
@@ -2854,6 +4112,394 @@ if (window.matchMedia("(max-width: 768px)").matches) {
 }, 90);
   }
 }
+
+function getConfirmedMedicationClassIds() {
+
+  return Array.from(
+    document.querySelectorAll(
+      ".medication-vigilance-class-checkbox:checked"
+    )
+  ).map(input => input.value);
+}
+
+function getMedicationShortMessage(item) {
+
+  const messages = {
+    "insuline":
+      "hypoglycémie / collation / autosurveillance",
+
+    "sulfamides-glinides":
+      "hypoglycémie / collation / autosurveillance",
+
+    "bradycardisants":
+      "FC moins fiable → Borg / ressenti d’effort",
+
+    "antihypertenseurs-vasodilatateurs":
+      "hypotension / vertiges / chaleur",
+
+    "diuretiques":
+      "hydratation / chaleur / hypotension",
+
+    "anticoagulants-antiagregants":
+      "chutes / chocs / traumatismes",
+
+    "psychotropes-sedatifs":
+      "somnolence / hypotension / chute",
+
+    "antalgiques-palier2-gabapentinoides":
+      "somnolence / vertiges / équilibre",
+
+    "statines":
+      "myalgies ou faiblesse musculaire inhabituelles",
+
+    "corticotherapie-generale":
+      "fragilité tendineuse / musculaire / osseuse"
+  };
+
+  return messages[item.id] || item.message || "";
+}
+
+function renderMedicationClassRow(
+  item,
+  options = {}
+) {
+
+  const checked =
+    options.checked
+      ? "checked"
+      : "";
+
+  const probable =
+    options.probable === true;
+
+  const confirmedOnly =
+    options.confirmedOnly === true;
+
+  const badge = probable
+    ? "probable"
+    : confirmedOnly
+      ? "confirmé"
+      : "manuel";
+
+  const badgeColor = probable
+    ? "#92400e"
+    : confirmedOnly
+      ? "#166534"
+      : "#64748b";
+
+  const background = probable
+    ? "#fff7ed"
+    : checked
+      ? "#f0fdf4"
+      : "#ffffff";
+
+  const border = probable
+    ? "#f59e0b"
+    : checked
+      ? "#86efac"
+      : "#e5e7eb";
+
+  return `
+<label
+  style="
+    display:inline-flex !important;
+    align-items:center;
+    gap:6px;
+    max-width:100%;
+    box-sizing:border-box;
+    margin:4px 6px 4px 0;
+    padding:6px 8px;
+    border-radius:8px;
+    background:${background};
+    border:1px solid ${border};
+    line-height:1.25;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    font-size:0.84rem;
+  "
+>
+  <input
+    type="checkbox"
+    class="medication-vigilance-class-checkbox"
+    name="medication_vigilance_class"
+    value="${item.id}"
+    ${checked}
+    style="
+      margin:0;
+      flex-shrink:0;
+    "
+  >
+
+  <span
+    style="
+      min-width:0;
+      overflow-wrap:anywhere;
+    "
+  >
+    <strong>${item.label}</strong>
+    <span
+      style="
+        margin-left:4px;
+        color:${badgeColor};
+        font-size:0.74rem;
+        font-weight:700;
+      "
+    >
+      ${badge}
+    </span>
+  </span>
+</label>
+`;
+}
+
+function updateMedicationApaPanel() {
+
+  const treatmentInput =
+    document.getElementById("traitementsActuels");
+
+  const block =
+    document.getElementById("medicationApaBlock");
+
+  const memo =
+    document.getElementById("medicationApaTreatmentMemo");
+
+  const content =
+    document.getElementById("medicationApaClassContent");
+
+  if (!treatmentInput || !block || !memo || !content) {
+    return;
+  }
+
+  const rawText =
+    treatmentInput.value || "";
+
+  const selectedBeforeUpdate =
+    getConfirmedMedicationClassIds();
+
+  const registry =
+    Array.isArray(window.MEDICATION_VIGILANCE_REGISTRY)
+      ? window.MEDICATION_VIGILANCE_REGISTRY
+      : [];
+
+  const detected =
+    rawText.trim() &&
+    typeof computeMedicationVigilanceFromText === "function"
+      ? computeMedicationVigilanceFromText(rawText)
+      : [];
+
+  const detectedIds =
+    detected.map(item => item.id);
+
+ if (rawText.trim()) {
+
+  memo.textContent =
+    rawText
+      .split("\n")
+      .map(line => line.trim())
+      .filter(Boolean)
+      .join(", ");
+
+} else {
+
+  memo.textContent =
+    "aucun traitement renseigné.";
+}
+
+  if (!registry.length) {
+
+    content.innerHTML = `
+      <div style="color:#64748b;">
+        Registre de classes médicamenteuses non disponible.
+      </div>
+    `;
+
+    block.classList.remove("hidden");
+    return;
+  }
+
+  const mainItems =
+    registry.filter(item =>
+      detectedIds.includes(item.id) ||
+      selectedBeforeUpdate.includes(item.id)
+    );
+
+  const mainIds =
+    mainItems.map(item => item.id);
+
+  const otherItems =
+    registry.filter(item =>
+      !mainIds.includes(item.id)
+    );
+
+  let html = "";
+
+  if (mainItems.length > 0) {
+
+    html += `
+<div
+  style="
+    margin-bottom:10px;
+    font-weight:600;
+  "
+>
+Classes probables / confirmées :
+</div>
+`;
+
+    html += mainItems
+      .map(item =>
+        renderMedicationClassRow(
+          item,
+          {
+            checked:
+              selectedBeforeUpdate.includes(item.id),
+
+            probable:
+              detectedIds.includes(item.id),
+
+            confirmedOnly:
+              !detectedIds.includes(item.id) &&
+              selectedBeforeUpdate.includes(item.id)
+          }
+        )
+      )
+      .join("");
+
+  } else {
+
+    html += `
+<div
+  style="
+    margin-bottom:10px;
+    color:#64748b;
+    font-size:0.88rem;
+  "
+>
+  Aucune classe médicamenteuse repérée automatiquement.
+  Le médecin peut cocher manuellement une classe pertinente ci-dessous.
+</div>
+`;
+  }
+
+  html += `
+<details
+  style="
+    margin-top:10px;
+    padding:8px;
+    border-radius:8px;
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+  "
+>
+  <summary
+    style="
+      cursor:pointer;
+      font-weight:600;
+      color:#1f2937;
+    "
+  >
+    Afficher / cocher les autres classes médicamenteuses
+  </summary>
+
+  <div style="margin-top:8px;">
+    ${
+      otherItems.length
+        ? otherItems
+            .map(item =>
+              renderMedicationClassRow(
+                item,
+                {
+                  checked:
+                    selectedBeforeUpdate.includes(item.id),
+
+                  probable: false,
+                  confirmedOnly: false
+                }
+              )
+            )
+            .join("")
+        : `
+          <div style="color:#64748b;">
+            Toutes les classes listées sont déjà affichées ci-dessus.
+          </div>
+        `
+    }
+  </div>
+</details>
+`;
+
+  content.innerHTML = html;
+
+  block.classList.remove("hidden");
+
+  updateMedicationOtherField();
+}
+
+function updateMedicationOtherField() {
+
+  const otherCheckbox =
+    document.getElementById("medication_vigilance_autre");
+
+  const otherText =
+    document.getElementById("medication_vigilance_autre_text");
+
+  if (!otherCheckbox || !otherText) {
+    return;
+  }
+
+  if (otherCheckbox.checked) {
+    otherText.classList.remove("hidden");
+  } else {
+    otherText.classList.add("hidden");
+    otherText.value = "";
+  }
+}
+
+function initMedicationApaPanel() {
+
+  const treatmentInput =
+    document.getElementById("traitementsActuels");
+
+  if (!treatmentInput) {
+    return;
+  }
+
+  if (window._medicationApaPanelInitialized) {
+    updateMedicationApaPanel();
+    return;
+  }
+
+  window._medicationApaPanelInitialized = true;
+
+  treatmentInput.addEventListener(
+    "input",
+    updateMedicationApaPanel
+  );
+
+  treatmentInput.addEventListener(
+    "change",
+    updateMedicationApaPanel
+  );
+
+  document.addEventListener("change", function(e) {
+
+    if (
+      e.target.classList.contains(
+        "medication-vigilance-class-checkbox"
+      )
+    ) {
+      updateMedicationApaPanel();
+    }
+
+    if (e.target.id === "medication_vigilance_autre") {
+      updateMedicationOtherField();
+    }
+
+  });
+
+  updateMedicationApaPanel();
+}
+
 function updatePathoRules() {
 
   const container = document.getElementById("pathoRulesContainer");
@@ -3575,12 +5221,94 @@ function copyAllCRC(){
   navigator.clipboard.writeText(text);
 }    
 
-document.addEventListener("input", handleFormModification);
-document.addEventListener("change", handleFormModification);
+const consultationForm =
+  document.getElementById("consultationForm");
+
+if (consultationForm) {
+
+ consultationForm.addEventListener("input", function(e){
+
+
+  if (e.target.id === "finalTextOutput") {
+    return;
+  }
+
+  if (
+    e.target.type !== "textarea" &&
+    e.target.type !== "text" &&
+    e.target.type !== "number"
+  ) {
+    return;
+  }
+
+  handleFormModification();
+
+});
+
+consultationForm.addEventListener("change", function(e){
+
+    if (e.target.id === "finalTextOutput") {
+      return;
+    }
+
+    handleFormModification();
+    updateOrientationHelp();
+  });
+
+}
     
 /* =====================================
 3. INITIALISATION UI ===================
 ===================================== */
+function hasClinicalCueForOrientationAP() {
+
+  const hasGeneralPrecaution =
+    Array.from(
+      document.querySelectorAll('input[name="precaution_ap"]:checked')
+    ).some(input => input.value !== "aucune");
+
+  const hasLocomotorLimitation =
+    Array.from(
+      document.querySelectorAll('input[name="limitation_ap"]:checked')
+    ).length > 0;
+
+  const hasOtherLocomotorLimitation =
+    document.getElementById("limitation_autre_checkbox")?.checked || false;
+
+  return (
+    hasGeneralPrecaution ||
+    hasLocomotorLimitation ||
+    hasOtherLocomotorLimitation
+  );
+}
+
+
+function openOrientationAPIfClinicalCue() {
+
+  if (!hasClinicalCueForOrientationAP()) return;
+
+  const orientationToggle =
+    document.getElementById("orientation_ap_toggle");
+
+  const orientationSubgroup =
+    document.getElementById("orientation_ap_subgroup");
+
+  if (!orientationToggle || !orientationSubgroup) return;
+
+  if (!orientationToggle.checked) {
+
+    orientationToggle.checked = true;
+
+    orientationToggle.dispatchEvent(
+      new Event("change", { bubbles: true })
+    );
+
+    return;
+  }
+
+  orientationSubgroup.style.display = "block";
+}
+
 function initUI() {
 
 initIMC();
@@ -3593,11 +5321,123 @@ function initBPCO() {
 initHandicap();
 initActivitePhysique();
 initCRCModeToggle();
+initMedicationApaPanel();
 
-toggleSubgroup("ordonnance_aerobie", "ordonnance_aerobie_subgroup", "intensite_aerobie_block");
+initAerobieMode();
+initObjectifAutre();
+initPrecautionsAucune();
+updateOrientationHelp();
+
 toggleSubgroup("renforcement_musculaire", "renforcement_musculaire_subgroup");
 toggleSubgroup("souplesse_mobilite", "souplesse_mobilite_subgroup");
-    
+toggleSubgroup("equilibre", "equilibre_subgroup");
+
+
+const orientationToggle =
+  document.getElementById("orientation_ap_toggle");
+
+const orientationSubgroup =
+  document.getElementById("orientation_ap_subgroup");
+
+if (orientationToggle && orientationSubgroup) {
+
+  orientationSubgroup.style.display =
+  orientationToggle.checked
+    ? "block"
+    : "none";
+
+  orientationToggle.addEventListener("change", function() {
+
+    orientationSubgroup.style.display =
+      orientationToggle.checked
+        ? "block"
+        : "none";
+
+  });
+
+}
+
+document
+  .querySelectorAll('input[name="precaution_ap"]')
+  .forEach(input => {
+
+    input.addEventListener("change", function() {
+
+      openOrientationAPIfClinicalCue();
+
+      updateAPALimitationsCompactText();
+
+    });
+
+  });
+
+document
+  .querySelectorAll(
+    'input[name="orientation_ap"]'
+  )
+  .forEach(el => {
+
+    el.addEventListener(
+      "change",
+      function() {
+
+        const checked =
+          Array.from(
+            document.querySelectorAll(
+              'input[name="orientation_ap"]:checked'
+            )
+          ).map(el => el.value);
+
+        const consentementBlock =
+          document.getElementById(
+            "consentement_partage_block"
+          );
+
+        const bilanBlock =
+          document.getElementById(
+            "bilan_condition_block"
+          );
+
+        const afficher =
+          checked.some(o =>
+            [
+              "apa",
+              "educateur",
+              "kine",
+              "ergo",
+              "psychomot"
+            ].includes(o)
+          );
+
+        if (consentementBlock) {
+
+          consentementBlock.style.display =
+            afficher
+              ? "block"
+              : "none";
+        }
+
+        const afficherBilan =
+  checked.some(o =>
+    [
+      "apa",
+      "kine"
+    ].includes(o)
+  );
+
+if (bilanBlock) {
+
+  bilanBlock.style.display =
+    afficherBilan
+      ? "block"
+      : "none";
+}
+
+      }
+    );
+
+  });
+
 document.getElementById("actif-subgroup")?.classList.add("hidden");
 document.getElementById("inactif-subgroup")?.classList.add("hidden");
 document.getElementById("sixmois-subgroup")?.classList.add("hidden");
@@ -3609,54 +5449,98 @@ document.querySelectorAll(".patho").forEach(el => {
 });    
 }
     
-function initCRCModeToggle(){
+function syncCRCModeDisplay() {
 
-  document.addEventListener("change", function(e){
+  document
+    .querySelectorAll('[id^="crcContainer_"]')
+    .forEach(container => {
 
-    // 🔹 1. Gestion affichage simple/détail
-    if (e.target.name && e.target.name.startsWith("crc_detail_")) {
+      const patho =
+        container.id.replace(
+          "crcContainer_",
+          ""
+        );
 
-      const patho = e.target.name.replace("crc_detail_", "");
-      const container = document.getElementById(`crcContainer_${patho}`);
-      if (!container) return;
+      const selected =
+        document.querySelector(
+          `input[name="crc_detail_${patho}"]:checked`
+        )?.value || "detail";
 
-      const simple = container.querySelector(".crc-simple");
-      const detail = container.querySelector(".crc-detail");
+      const simple =
+        container.querySelector(".crc-simple");
 
-      if (!simple || !detail) return;
+      const detail =
+        container.querySelector(".crc-detail");
 
-const modeBlock = container.previousElementSibling;
+      if (!simple || !detail) {
+        return;
+      }
 
-if (e.target.value === "simple") {
+      const modeBlock =
+        container.previousElementSibling;
 
-  if (modeBlock) modeBlock.style.display = "flex";
+      if (selected === "simple") {
 
-  container.style.display = "block";
-  simple.style.display = "block";
-  detail.style.display = "none";
+        if (modeBlock) {
+          modeBlock.style.display = "flex";
+        }
 
-} else if (e.target.value === "detail") {
+        container.style.display = "block";
+        simple.style.display = "block";
+        detail.style.display = "none";
 
-  if (modeBlock) modeBlock.style.display = "flex";
+      } else if (selected === "detail") {
 
-  container.style.display = "block";
-  simple.style.display = "none";
-  detail.style.display = "block";
+        if (modeBlock) {
+          modeBlock.style.display = "flex";
+        }
 
-} else if (e.target.value === "none") {
+        container.style.display = "block";
+        simple.style.display = "none";
+        detail.style.display = "block";
 
-  if (modeBlock) modeBlock.style.display = "none";
+      } else if (selected === "none") {
 
-  container.style.display = "none";
+        if (modeBlock) {
+          modeBlock.style.display = "none";
+        }
+
+        container.style.display = "none";
+      }
+
+    });
 }
+
+function initCRCModeToggle() {
+
+  // Synchronisation visuelle à chaque reconstruction du bloc pathologies
+  syncCRCModeDisplay();
+
+  // Listener global attaché une seule fois
+  if (window._crcModeToggleInitialized) {
+    return;
+  }
+
+  window._crcModeToggleInitialized = true;
+
+  document.addEventListener("change", function(e) {
+
+    const isDetailModeChange =
+      e.target.name &&
+      e.target.name.startsWith("crc_detail_");
+
+    if (isDetailModeChange) {
+      syncCRCModeDisplay();
     }
 
-    // 🔹 2. 🔥 MAJ AUTOMATIQUE DU CRC
     const isRelevantChange =
       e.target.classList.contains("patho") ||
       e.target.classList.contains("crc-item") ||
-      (e.target.name && e.target.name.startsWith("crc_detail_")) ||
-      (e.target.name && e.target.name.startsWith("crc_mode_"));
+      isDetailModeChange ||
+      (
+        e.target.name &&
+        e.target.name.startsWith("crc_mode_")
+      );
 
     if (isRelevantChange) {
 
@@ -3665,45 +5549,6 @@ if (e.target.value === "simple") {
       }
 
     }
-
-  });
-
-  // 🔹 INITIALISATION AU CHARGEMENT (CONSERVÉE)
-  document.querySelectorAll('[id^="crcContainer_"]').forEach(container => {
-
-    const patho = container.id.replace("crcContainer_", "");
-
-    const selected = document.querySelector(`input[name="crc_detail_${patho}"]:checked`)?.value;
-
-    const simple = container.querySelector(".crc-simple");
-    const detail = container.querySelector(".crc-detail");
-
-    if (!simple || !detail) return;
-
-const modeBlock = container.previousElementSibling;
-
-if (selected === "simple") {
-
-  if (modeBlock) modeBlock.style.display = "flex";
-
-  container.style.display = "block";
-  simple.style.display = "block";
-  detail.style.display = "none";
-
-} else if (selected === "detail") {
-
-  if (modeBlock) modeBlock.style.display = "flex";
-
-  container.style.display = "block";
-  simple.style.display = "none";
-  detail.style.display = "block";
-
-} else if (selected === "none") {
-
-  if (modeBlock) modeBlock.style.display = "none";
-
-  container.style.display = "none";
-}
 
   });
 
@@ -3763,7 +5608,6 @@ qrScanner.start(
       }, 1500);
 
     } catch(e){
-      console.warn("QR invalide");
       setTimeout(() => {
         qrAlreadyRead = false;
       }, 1000);
@@ -3771,14 +5615,11 @@ qrScanner.start(
 
   },
 
-  function(error){
-    // ⚠️ obligatoire pour éviter bug syntaxique + compat iOS
-    console.warn("Scan error", error);
-  }
+function() {}
 
 )
 .then(() => {
-  console.log("Scanner QR démarré");
+
 })
 .catch(err => {
   console.error("Erreur caméra :", err);
@@ -3945,8 +5786,6 @@ alert("Données patient importées.\n\nVérifiez et complétez les champs avant 
 // 🔥 AUTO UPDATE HAS
 function updateHAS(){
 
-  console.trace("UPDATE HAS TRIGGERED");
-
   const ageInput = document.getElementById("age_input");
   const age = parseInt(ageInput?.value);
 
@@ -4034,7 +5873,20 @@ function getPathoValues() {
   return Array.from(document.querySelectorAll(".patho:checked"))
     .map(el => el.value);
 }
-    
+  
+function updateOrientationHelp() {
+
+  const helpContent =
+    document.getElementById(
+      "orientation_help_content"
+    );
+
+  if (!helpContent) return;
+
+  helpContent.innerHTML =
+    "Aucun point particulier identifié.";
+}
+
 function runHAS(model){
 
   const reco = {
@@ -4420,20 +6272,33 @@ function getSelectedCRC(){
   return values;
 }
     
-    function handleGenerate(e) {
+    function handleGenerate(e, options = {}) {
 
   e.preventDefault();
   e.stopPropagation();
 
-console.log("HANDLE GENERATE EXECUTÉ");
-        
+  const modeBeforeGenerate =
+    activeMode || "long";
+
+  const targetMode =
+    options.preserveMode
+      ? modeBeforeGenerate
+      : "long";
+
+     
     if (document.activeElement) {
     document.activeElement.blur();
   }
 
   requestAnimationFrame(() => {
+
 clinicalModel = buildClinicalModel();
-      
+
+const clinicalContext =
+  computeClinicalContext(
+    clinicalModel
+  );
+
 consultationState.reportGenerated = true;
 consultationState.reportDirty = false;
 
@@ -4442,10 +6307,8 @@ const warning = document.getElementById("crcDirtyWarning");
 if (warning) {
   warning.classList.add("hidden");
 }
-      
-console.log("CRC généré", JSON.stringify(consultationState));
-      
-    activeMode = "long";
+       
+activeMode = targetMode;
 
 document.getElementById("formatTabs").classList.remove("hidden");
 document.getElementById("reportOutput").classList.remove("hidden");
@@ -4457,15 +6320,332 @@ if (resetSection) {
     resetSection.style.display = "block";
 }
 
-document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-document.querySelector('.tab-btn[data-mode="long"]').classList.add("active");
+document
+  .querySelectorAll(".tab-btn")
+  .forEach(b => b.classList.remove("active"));
 
-   renderActiveMode({ scroll: true });
+const targetTab =
+  document.querySelector(`.tab-btn[data-mode="${targetMode}"]`);
+
+if (targetTab) {
+  targetTab.classList.add("active");
+}
+
+   renderActiveMode({
+  clinicalModel,
+  clinicalContext,
+  scroll: true
+});
 
   }, 40);
 }
-    
-function buildCRCPathoBloc(mode = "long") {
+
+function formatFrenchList(items = []) {
+
+  const cleaned = items
+    .map(i => i?.trim())
+    .filter(Boolean);
+
+  if (cleaned.length === 0) {
+    return "";
+  }
+
+  if (cleaned.length === 1) {
+    return cleaned[0];
+  }
+
+  if (cleaned.length === 2) {
+    return `${cleaned[0]} et ${cleaned[1]}`;
+  }
+
+  return (
+    cleaned.slice(0, -1).join(", ") +
+    " et " +
+    cleaned[cleaned.length - 1]
+  );
+}
+
+function buildAntecedentsBloc() {
+
+  // 🔹 pathologies cochées
+  const selectedPathos = Array.from(
+    document.querySelectorAll(".patho:checked")
+  );
+
+ const EXCLUDED_ANTECEDENTS = [
+  "pa_maintien",
+  "pa_chute",
+  "grossesse",
+  "post_partum",
+  "obesite"
+];
+
+const pathoLabels = selectedPathos
+
+  // exclusion éléments non-ATCD
+  .filter(p =>
+    !EXCLUDED_ANTECEDENTS.includes(p.value)
+  )
+
+  .map(p => {
+
+    let label = PATHO_DATA[p.value]?.titre;
+
+    if (!label) return null;
+
+    // 🔹 cancer : nettoyage texte CRC
+    if (p.value === "cancer") {
+      label = "cancer";
+    }
+
+    return label.charAt(0).toLowerCase() + label.slice(1);
+
+  })
+
+  .filter(Boolean);
+ 
+  // 🔹 ATCD libres
+  const rawAutres =
+    document.getElementById("autresAtcd")?.value || "";
+
+  const autres = rawAutres
+  .split("\n")
+
+  .map(line => line.trim())
+
+  // retire lignes vides
+  .filter(line => line.length > 0)
+
+  // retire virgules terminales
+  .map(line => line.replace(/,+$/, "").trim())
+
+  // minuscule première lettre
+  .map(line =>
+    line.charAt(0).toLowerCase() + line.slice(1)
+  );
+
+  // 🔹 IMC → surpoids / obésité
+
+  const taille =
+    parseFloat(
+      document.getElementById("taille_input")?.value
+    );
+
+  const poids =
+    parseFloat(
+      document.getElementById("poids_input")?.value
+    );
+
+  if (taille && poids) {
+
+    const imc =
+      poids / ((taille / 100) ** 2);
+
+    if (imc >= 40) {
+
+      pathoLabels.push(
+        "obésité morbide (classe III)"
+      );
+
+    } else if (imc >= 35) {
+
+      pathoLabels.push(
+        "obésité sévère (classe II)"
+      );
+
+    } else if (imc >= 30) {
+
+      pathoLabels.push(
+        "obésité modérée (classe I)"
+      );
+
+    } else if (imc >= 25) {
+
+      pathoLabels.push("surpoids");
+
+    }
+
+  }
+
+  // 🔹 fusion
+  const antecedents = [
+    ...pathoLabels,
+    ...autres
+  ];
+
+  if (antecedents.length === 0) {
+    return "";
+  }
+
+  const antecedentsText =
+    formatFrenchList(antecedents);
+
+  const label =
+    antecedents.length > 1
+      ? "Comme antécédents, on note :"
+      : "Comme antécédent, on note :";
+
+  return `${label} ${antecedentsText}.`;
+}
+
+function cleanTraitementsText(raw) {
+
+  if (!raw) {
+    return "";
+  }
+
+return raw
+  .split("\n")
+
+  // trim lignes
+  .map(line => line.trim())
+
+  // retire lignes vides
+  .filter(line => line.length > 0)
+
+  // retire tirets début ligne
+  .map(line => line.replace(/^-\s*/, ""))
+
+  // retire mentions administratives simples
+    // retire mentions administratives simples
+  .map(line =>
+    line
+
+      // dates type "Le 01/09/2025"
+      .replace(/\bLe\s+\d{1,2}\/\d{1,2}\/\d{2,4}\b/gi, "")
+
+      // TRAITEMENT POUR X JOURS/MOIS
+      .replace(/traitement\s+pour\s+\d+\s*(jours?|mois?)\s*:?/gi, "")
+
+      // renouvellement
+      .replace(/renouvelable\s+QSP\s+\d+\s*mois?/gi, "")
+
+      // QSP
+      .replace(/QSP\s+\d+\s*mois?/gi, "")
+
+      // ; inutiles
+      .replace(/;/g, ",")
+
+      // espaces multiples
+      .replace(/\s+/g, " ")
+
+      // virgules multiples
+      .replace(/,+/g, ",")
+
+      // virgule début
+      .replace(/^,\s*/, "")
+      
+      // minuscule après virgule
+      .replace(/,\s+([A-ZÉÈÀ])/g, (match, p1) =>
+        ", " + p1.toLowerCase()
+      )
+      .trim()
+  )
+
+  // retire lignes devenues vides
+  .filter(line => line.length > 0)
+
+  // fusion finale
+  .join(", ")
+
+  // espaces multiples
+  .replace(/\s+/g, " ")
+
+  .trim();
+
+}
+
+function buildTraitementsBloc() {
+
+const rawTraitements =
+  document.getElementById("traitementsActuels")?.value;
+
+const traitements =
+  cleanTraitementsText(rawTraitements);
+  if (!traitements) {
+    return "";
+  }
+
+return `Le traitement actuel comprend : ${traitements}.`;
+}
+
+function buildCRCResourcesSentence(
+  hasResources,
+  resourcesText
+) {
+
+  if (!hasResources || !resourcesText) {
+    return "";
+  }
+
+  return ` Une fiche patient associée peut être remise : ${resourcesText}.`;
+}
+
+function buildContextRecommendationsBloc(
+  clinicalContext
+) {
+
+  if (!clinicalContext) {
+    return "";
+  }
+
+  const patientMessages =
+    clinicalContext?.patientMessages || [];
+
+  if (!patientMessages.length) {
+    return "";
+  }
+
+  const messages =
+    patientMessages
+      .map(item => {
+
+        const label =
+          item.sourceLabel
+            ? ` (${item.sourceLabel})`
+            : "";
+
+        return item.message.replace(
+          /\.$/,
+          `${label}.`
+        );
+      })
+      .filter((message, index, array) =>
+        array.indexOf(message) === index
+      );
+
+  if (!messages.length) {
+    return "";
+  }
+
+  const formattedMessages =
+    messages.map(message => {
+
+      const clean =
+        message.replace(/\.$/, "");
+
+      return clean.charAt(0).toLowerCase()
+        + clean.slice(1);
+    });
+
+  const sentence =
+    formattedMessages.length === 1
+      ? formattedMessages[0]
+      : formattedMessages.slice(0, -1).join(", ")
+        + " et "
+        + formattedMessages.at(-1);
+
+  return `
+<p>
+Conseil(s) transmis au patient : ${sentence}.
+</p>
+`;
+}
+
+function buildCRCPathoBloc(
+  mode = "long",
+  clinicalContext = null
+) {
 
   const selectedPathos = Array.from(document.querySelectorAll(".patho:checked"));
 
@@ -4501,6 +6681,43 @@ function buildCRCPathoBloc(mode = "long") {
   const pathoKeys = Object.keys(grouped);
   if (pathoKeys.length === 0) return "";
 
+  const crcResources =
+  clinicalContext
+    ? getContextResourcesByOutput(
+        clinicalContext,
+        "crc"
+      )
+    : [];
+
+    const hasCRCResources =
+  crcResources.length > 0;
+
+  function renderCRCResources(
+  resources
+) {
+
+  if (!resources || resources.length === 0) {
+    return "";
+  }
+
+  return resources
+.map(resource => {
+
+  const label =
+    resource.sourceLabel
+      ? ` (${resource.sourceLabel})`
+      : "";
+
+  return `${resource.label || resource.id}${label}`;
+})
+    .join(", ");
+}
+
+const crcResourcesText =
+  renderCRCResources(
+    crcResources
+  );
+
   // 🔹 construire texte : groupé par pathologie
   let parts = [];
 
@@ -4509,20 +6726,39 @@ function buildCRCPathoBloc(mode = "long") {
     const { items, full, short } = grouped[key];
     if (!items || items.length === 0) return;
 
+    let filteredItems =
+  [...items];
+
+if (filteredItems.length === 0) return;
+
     const label = (mode === "long" || mode === "medical" || mode === "paragraph")
       ? short
       : full.toLowerCase();
 
-    parts.push(`${items.join(", ")} (${label})`);
+parts.push(
+  `${filteredItems
+    .map(item =>
+      item.charAt(0).toLowerCase()
+      + item.slice(1)
+    )
+    .join(", ")} (${label})`
+);
   });
 
-  const itemsText = parts.join(", ");
+  const uniqueParts =
+  [...new Set(parts)];
+
+const itemsText =
+  uniqueParts.join(", ");
 
   const nbPathos = pathoKeys.length;
   const nbItems = parts.length;
 
   const pathoTxt = nbPathos > 1 ? "ses pathologies" : "sa pathologie";
-  const verbe = nbItems > 1 ? "ont été abordées" : "a été abordée";
+  const verbe =
+  nbPathos > 1
+    ? "ont été abordées"
+    : "a été abordée";
 
   // 🎯 PATIENT
   if (mode === "patient") {
@@ -4533,30 +6769,64 @@ function buildCRCPathoBloc(mode = "long") {
     return `En lien avec ${probleme} de santé, ${conseil} : ${itemsText}.`;
   }
 
-  // 🎯 COURRIER COMPLET
-  if (mode === "long") {
+  if (mode === "ordonnance") {
 
-    return `Les recommandations spécifiques en rapport avec ${pathoTxt} ${verbe} lors de la consultation : ${itemsText}.`;
-  }
+  let lines = [];
+
+    pathoKeys.forEach(key => {
+
+    const { items, short } = grouped[key];
+    if (!items || items.length === 0) return;
+
+lines.push(`${short} : ${items.join(", ")}`);
+  });
+
+  if (lines.length === 0) return "";
+
+  return `
+    <div style="margin-top:8px;">
+      <strong>Conseils associés à vos problèmes de santé :</strong>
+      <div style="margin-top:8px; line-height:1.5;">
+        ${lines.join("<br>")}
+      </div>
+    </div>
+  `;
+}
+  // 🎯 COURRIER COMPLET
+if (mode === "long") {
+
+  const resourcesSuffix =
+  buildCRCResourcesSentence(
+    hasCRCResources,
+    crcResourcesText
+  );
+
+ if (!itemsText && resourcesSuffix) {
+  return `Des ressources ou points de vigilance spécifiques en rapport avec ${pathoTxt} ont été abordés lors de la consultation.${resourcesSuffix}`;
+}
+
+return `Des éléments spécifiques en rapport avec ${pathoTxt} ont été abordés lors de la consultation : ${itemsText}.${resourcesSuffix}`;
+}
 
   // 🎯 PARAGRAPHE
-  if (mode === "paragraph") {
+ if (mode === "paragraph") {
 
-    return `Les recommandations spécifiques suivantes en rapport avec ${pathoTxt} ${verbe} lors de la consultation : ${itemsText}.`;
-  }
+  return `Des éléments spécifiques en rapport avec ${pathoTxt} ont été abordés lors de la consultation : ${itemsText}.`;
+}
 
   // 🎯 DOSSIER MÉDICAL
   if (mode === "medical") {
 
-    const verbeMed = nbPathos > 1 ? "abordées" : "abordée";
-
-    return `Recommandations spécifiques en lien avec ${pathoTxt} ${verbeMed} en consultation : ${itemsText}.`;
+       return `${itemsText}.`;
   }
 
   return "";
 }
     
-      function renderLongLetterV2(model) {
+function renderLongLetterV2(
+  model,
+  clinicalContext = null
+) {
 
   const p = model.patient;
           
@@ -4584,9 +6854,23 @@ function buildCRCPathoBloc(mode = "long") {
   const evaluationBloc = buildEvaluationAP(model);
   const motivationBloc = buildMotivation(model);
 const rcvBloc = buildRCV(model);
-const decisionBloc = buildDecisionBloc(model);
+const decisionBloc =
+  buildDecisionBloc(
+    model,
+    clinicalContext
+  );
 const prescriptionBloc = buildPrescription(model);
-const crcPathoBloc = buildCRCPathoBloc("long");
+const crcPathoBloc =
+  buildCRCPathoBloc(
+    "long",
+    clinicalContext
+  );
+
+const antecedentsBloc =
+  buildAntecedentsBloc();
+const traitementsBloc = buildTraitementsBloc();
+const objectifsBloc = buildObjectivesBlock(model);
+const objectifsCount = getObjectivesCount(model);
           
   return `
 <p style="text-align:right;">Le ${today}</p>
@@ -4596,6 +6880,18 @@ const crcPathoBloc = buildCRCPathoBloc("long");
 <p>
 Merci de m’avoir adressé ${titre} _____ en consultation d’activité physique.
 </p>
+
+${antecedentsBloc ? `
+<p>
+${antecedentsBloc}
+</p>
+` : ""}
+
+${traitementsBloc ? `
+<p>
+${traitementsBloc}
+</p>
+` : ""}
 
 <p>
 ${evaluationBloc}
@@ -4615,9 +6911,14 @@ ${decisionBloc}
 </p>
 ` : ""}
 
+${objectifsBloc ? `
 <p>
-Les objectifs de cette prescription d’activité physique sont : ${model.therapeutic_plan.objectif_principal || "à préciser"}.
+${objectifsCount > 1
+  ? "Les objectifs de cette prescription d’activité physique sont :"
+  : "L’objectif de cette prescription d’activité physique est :"}
+${objectifsBloc}.
 </p>
+` : ""}
 
 <p>
 ${prescriptionBloc}
@@ -4635,9 +6936,14 @@ Je me tiens à votre disposition pour toute précision complémentaire.
 </p>
 
 <p>Bien confraternellement.</p>
+
+${renderPhysicianSignature()}
 `;
 }     
-            function renderParagraphVersion(model) {
+     function renderParagraphVersion(
+  model,
+  clinicalContext = null
+) {
 
   const p = model.patient;
   const titre = p.sexe === "femme" ? "Madame" : "Monsieur";
@@ -4648,39 +6954,81 @@ Je me tiens à votre disposition pour toute précision complémentaire.
 const rcvBloc = buildRCV(model);
 const decisionBloc = buildDecisionBloc(model);
 const prescriptionBloc = buildPrescription(model);
-  const crcPathoBloc = buildCRCPathoBloc("paragraph");    
-                
+const crcPathoBloc =
+  buildCRCPathoBloc(
+    "paragraph",
+    clinicalContext
+  );   
+ 
+  const traitementsBloc = buildTraitementsBloc();
+  const objectifsBloc = buildObjectivesBlock(model);
+  const objectifsCount = getObjectivesCount(model);
+
   return `
+
 <p>
 ${titre} _____ a été ${participe} en consultation d’activité physique.
+${traitementsBloc}
 ${evaluationBloc}
 ${motivationBloc}
 ${rcvBloc}
 
 ${decisionBloc}
 
-Les objectifs principaux sont :
+${objectifsBloc ? `
+${objectifsCount > 1
+  ? "Les objectifs principaux sont :"
+  : "L’objectif principal est :"}
+${objectifsBloc}.
+` : ""}
+
 ${prescriptionBloc}
 
 ${crcPathoBloc}
 </p>
+
 `;
 }
-            function renderMedicalRecord(model) {
+
+function renderMedicalRecord(
+  model,
+  clinicalContext = null
+) {
 
   const evaluationBloc = buildEvaluationAP(model);
   const motivationBloc = buildMotivation(model);
   const rcvBloc = buildRCV(model);
   const prescriptionBloc = buildPrescription(model);
-  const crcPathoBloc = buildCRCPathoBloc("medical");
+const crcPathoBloc =
+  buildCRCPathoBloc(
+    "medical",
+    clinicalContext
+  );
+
+  const antecedentsBloc = buildAntecedentsBloc();
+  const traitementsBloc = buildTraitementsBloc();
   const decisionBloc = buildDecisionBloc(model);
-                
+  const objectifsBloc = buildObjectivesBlock(model);
+  const objectifsCount = getObjectivesCount(model);
+
   return `
 <p style="margin-bottom:28px;">
 <p><strong>Consultation d’activité physique – Synthèse</strong></p>
 
 <p><strong>Motif :</strong><br>
 Consultation d’activité physique sur adressage.</p>
+
+${antecedentsBloc ? `
+<p><strong>Antécédents :</strong><br>
+${antecedentsBloc.replace(/^Comme antécédent[s]?, on note :\s*/, "")}
+</p>
+` : ""}
+
+${traitementsBloc ? `
+<p><strong>Traitement actuel :</strong><br>
+${traitementsBloc.replace("Il comprend :<br>", "")}
+</p>
+` : ""}
 
 <p><strong>Évaluation de l’activité physique :</strong><br>
 ${evaluationBloc}</p>
@@ -4697,20 +7045,27 @@ ${decisionBloc}
 </p>
 ` : ""}
 
-<p><strong>Objectifs :</strong><br>
-${model.therapeutic_plan.objectif_principal || "À préciser."}</p>
+${objectifsBloc ? `
+<p><strong>${objectifsCount > 1 ? "Objectifs" : "Objectif"} :</strong><br>
+${objectifsBloc}</p>
+` : ""}
 
 <p><strong>Prescription :</strong><br>
 ${prescriptionBloc}</p>
 
 ${crcPathoBloc ? `
-<p><strong>Éléments spécifiques par pathologie :</strong><br>
+<p><strong>Conseils spécifiques par pathologie :</strong><br>
 ${crcPathoBloc}
 </p>
 ` : ""}
+
 `;
 }
-         function renderPatientVersion(model) {
+
+function renderPatientVersion(
+  model,
+  clinicalContext = null
+) {
 
   const evaluationBloc = buildEvaluationAP(model)
     .replace("Son niveau d’activité physique est actuellement", "Votre niveau d’activité physique est actuellement")
@@ -4733,7 +7088,15 @@ const prescriptionBloc = buildPrescription({ ...model, context: "patient" })
   .replace("Un travail de renforcement musculaire est conseillé", "Votre médecin vous a prescrit un travail de renforcement musculaire")
   .replace("Un travail de souplesse et de mobilité est proposé", "Votre médecin vous a prescrit un travail de souplesse et de mobilité");
 
-const crcPathoBloc = buildCRCPathoBloc("patient");
+const crcPathoBloc =
+  buildCRCPathoBloc(
+    "patient",
+    clinicalContext
+  );
+
+const objectifsBloc = buildObjectivesBlock(model);
+const objectifsCount = getObjectivesCount(model);
+
   // 🔹 Message progressivité seulement si insuffisamment actif ou actif depuis moins de 6 mois
 const progressiviteMessage = (() => {
 
@@ -4777,10 +7140,16 @@ ${decisionBloc}
 </p>
 ` : ""}
 
+${objectifsBloc ? `
 <p>
-Lors de l’échange que vous avez eu avec votre médecin, l’objectif principal retenu en termes d’activité physique est :
-<strong>${model.therapeutic_plan.objectif_principal || "à définir progressivement ensemble"}</strong>.
+Lors de l’échange que vous avez eu avec votre médecin, ${
+  objectifsCount > 1
+    ? "les objectifs principaux retenus en termes d’activité physique sont"
+    : "l’objectif principal retenu en termes d’activité physique est"
+} :
+<strong>${objectifsBloc}</strong>.
 </p>
+` : ""}
 
 <p>
 ${prescriptionBloc}
@@ -4802,9 +7171,17 @@ ${progressiviteMessage}
 <p>
 En cas de difficulté ou de question, n’hésitez pas à reprendre contact avec votre médecin.
 Vous pouvez également consulter les recommandations des cardiologues du sport avant chaque séance d’exercice :
-<a href="https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf" target="_blank">
+<a href="https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf"
+   target="_blank"
+   rel="noopener noreferrer">
 les 10 règles d’or du Club des Cardiologues du Sport
 </a>.
+<br>
+Lien direct :
+<br>
+<span style="word-break:break-all;">
+https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf
+</span>
 </p>
 
 <div style="margin-top:20px; text-align:center;">
@@ -4827,53 +7204,334 @@ les 10 règles d’or du Club des Cardiologues du Sport
 </div>
 `;
 }
-           function renderActiveMode() {
 
-  if (!clinicalModel) return;
-savedScrollPosition = window.scrollY;
-  const container = document.getElementById("outputContainer");
+function renderOrdonnanceAP(model) {
 
-  let html = "";
-               
-const pdfBtn = document.getElementById("downloadPdf");
-               
-  switch (activeMode) {
-    case "long":
-      html = renderLongLetterV2(clinicalModel);
-      break;
+  const ordonnanceHTML =
+  generatePrescriptionPatient(prescriptionModel);
 
-    case "paragraph":
-      html = renderParagraphVersion(clinicalModel);
-      break;
+  const physicianHeader =
+  renderPhysicianSignature("left");
 
-    case "medical":
-      html = renderMedicalRecord(clinicalModel);
-      break;
-    case "patient":
-  html = renderPatientVersion(clinicalModel);
-  break;
-  }
+  const identity =
+  getPhysicianIdentity();
 
-  container.classList.add("fade-out");
-               
-// Affiche bouton PDF uniquement en mode patient
-if (activeMode === "patient") {
-  pdfBtn.classList.remove("hidden");
-} else {
-  pdfBtn.classList.add("hidden");
+    const conseilsPatho =
+  buildCRCPathoBloc("ordonnance");
+
+    const today = new Date().toLocaleDateString('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+});
+
+const prenom =
+  document.querySelector('input[name="prenom"]')?.value || "";
+
+const nom =
+  document.querySelector('input[name="nom"]')?.value || "";
+
+const dureePrescription =
+  document.querySelector('input[name="duree_prescription"]')?.value || "";
+
+const includeApaCertificate =
+  document.getElementById("includeApaCertificate")?.checked || false;
+
+  return `
+
+<div style="
+  max-width:800px;
+  margin:0 auto;
+  padding:10px 18px 14px 18px;
+  background:white;
+  color:black;
+  line-height:1.55;
+">
+
+<div style="
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin-bottom:26px;
+">
+
+  <!-- Bloc médecin -->
+  <div style="
+    border:1px solid #d9d9d9;
+    border-radius:8px;
+    padding:14px;
+    min-height:120px;
+    box-sizing:border-box;
+    line-height:1.8;
+  ">
+
+    <div style="
+      font-weight:700;
+      margin-bottom:24px;
+    ">
+      Dr ${identity.firstName || ""} ${identity.lastName || ""}
+    </div>
+
+    ${identity.speciality || ""}<br>
+
+    ${identity.rpps
+      ? `RPPS : ${identity.rpps}<br>`
+      : ""}
+
+    ${identity.address || ""}<br>
+
+    ${identity.phone
+      ? `Tél. : ${identity.phone}<br>`
+      : ""}
+
+    ${identity.email || ""}
+
+  </div>
+
+  <!-- Bloc patient -->
+  <div style="
+    border:1px solid #d9d9d9;
+    border-radius:8px;
+    padding:14px;
+    min-height:120px;
+    box-sizing:border-box;
+    line-height:1.9;
+  ">
+
+   <div style="margin-bottom:24px;">
+  <strong>Nom :</strong>
+  <span data-patient-lastname>
+    ${nom || "____________"}
+  </span>
+</div>
+
+<div>
+  <strong>Prénom :</strong>
+  <span data-patient-firstname>
+    ${prenom || "____________"}
+  </span>
+</div>
+
+<div
+  class="identity-help-message"
+  style="
+    margin-top:18px;
+    font-size:12px;
+    color:#666;
+    line-height:1.4;
+  "
+>
+  Nom et prénom sont ajoutés au moment de l’impression ou de la copie, sans être enregistrés.
+</div>
+
+  </div>
+
+</div>
+
+ <h2 style="
+  margin:18px 0 24px 0;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  text-align:center;
+">
+
+  Ordonnance d'activité physique${includeApaCertificate ? " complète" : ""}
+
+</h2>
+
+<div style="
+  border:1px solid #d9d9d9;
+  border-radius:10px;
+  padding:16px;
+  background:#fcfcfc;
+">
+  ${ordonnanceHTML}
+</div>
+
+${dureePrescription ? `
+
+<div style="
+  margin-top:14px;
+  margin-left:4px;
+">
+
+  <strong>Durée prévisionnelle :</strong>
+  ${dureePrescription}
+
+</div>
+
+` : ""}
+
+${conseilsPatho ? `
+
+<div style="
+  margin-top:20px;
+  padding-top:14px;
+  border-top:1px solid #d9d9d9;
+">
+
+  ${conseilsPatho}
+
+</div>
+
+` : ""}
+
+<div style="
+  margin-top:18px;
+  padding-top:10px;
+  border-top:1px solid #d9d9d9;
+  text-align:center;
+">
+
+  <div style="
+    font-size:12px;
+    margin-bottom:6px;
+  ">
+    10 règles d’or lors des séances d’activité physique :
+  </div>
+
+  <a href="https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf"
+     target="_blank"
+     rel="noopener noreferrer">
+
+    <img 
+      src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://www.frequenceglobale.com/Client/CCS/les-regles-dor-cardiologie-sport.pdf"
+      alt="QR code - règles d’or cardiologie du sport"
+      width="90"
+      height="90"
+      loading="lazy"
+      style="cursor:pointer;"
+    >
+
+  </a>
+
+</div>
+
+<div style="
+  margin-top:60px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+">
+
+  <div>
+    <strong>Date :</strong> ${today}
+  </div>
+
+  <div style="
+    text-align:right;
+  ">
+    <div>
+  Signature et cachet du médecin
+</div>
+  </div>
+
+</div>
+
+</div>
+
+`;
 }
- container.style.opacity = "0";
-container.innerHTML = html;
-container.style.opacity = "1";
 
-  container.classList.remove("fade-out");
-  container.classList.add("fade-in");
-               
+function renderOrdonnanceAPA(model) {
+
+  const base =
+    renderOrdonnanceAP(model);
+
+  const prenom =
+  document.querySelector('input[name="prenom"]')?.value || "";
+
+const nom =
+  document.querySelector('input[name="nom"]')?.value || "";
+
+const sexe =
+  document.querySelector('input[name="sexe"]:checked')?.value || "";
+
+const civilite =
+  sexe === "femme"
+    ? "Madame"
+    : "Monsieur";
+
+const patientIdentity =
+  prenom || nom
+    ? `${civilite} ${prenom} ${nom}`.trim()
+    : "<span data-patient-certificate-identity>le/la patient(e)</span>";
+
+const apaLimitationsBlock =
+  buildAPALimitationsBlock();
+
+const apaDestinationBlock =
+  buildAPADestinationBlock();
+
+const apaOrientationOptionsBlock =
+  buildAPAOrientationOptionsBlock();
+
+const apaObjectivesBlock =
+  buildAPAObjectivesBlock();
+
+  const certificateBlock = `
+<div style="
+  margin-top:14px;
+  margin-bottom:16px;
+  padding:14px;
+  border:1px solid #d9d9d9;
+  border-radius:10px;
+  background:#fcfcfc;
+  line-height:1.6;
+">
+<p style="margin:0;">
+    Je soussigné(e), docteur en médecine, certifie avoir examiné ce jour ${patientIdentity}
+    et ne pas avoir constaté de contre-indication à la pratique d’activités physiques adaptées,
+    sous réserve des précautions et adaptations précisées dans la présente prescription.
+  </p>
+</div>
+`;
+
+  return base
+    .replace(
+      "Ordonnance d'activité physique",
+      "Certificat de NCI / Ordonnance APA"
+    )
+    .replace(
+      "ORDONNANCE D'ACTIVITÉ PHYSIQUE",
+      "CERTIFICAT DE NCI / ORDONNANCE APA"
+    )
+    .replace(
+      `<div style="
+  border:1px solid #d9d9d9;
+  border-radius:10px;
+  padding:16px;
+  background:#fcfcfc;
+">`,
+      `${apaDestinationBlock}
+      ${apaObjectivesBlock}
+${apaOrientationOptionsBlock}
+${certificateBlock}
+${apaLimitationsBlock}
+<div style="
+  border:1px solid #d9d9d9;
+  border-radius:10px;
+  padding:16px;
+  background:#fcfcfc;
+">`
+    );
+}
+
 function renderActiveMode(options = {}) {
 
-  const { scroll = false } = options;
+  const {
+    clinicalModel: explicitClinicalModel,
+    clinicalContext,
+    scroll = false
+  } = options;
 
-  if (!clinicalModel) return;
+  const model =
+    explicitClinicalModel || clinicalModel;
+
+const context =
+  clinicalContext || computeClinicalContext(model);
+
+  if (!model) return;
 
   savedScrollPosition = window.scrollY;
 
@@ -4885,20 +7543,41 @@ function renderActiveMode(options = {}) {
 
   switch (activeMode) {
     case "long":
-      html = renderLongLetterV2(clinicalModel);
+   html = renderLongLetterV2(
+  model,
+  context
+);
+
       break;
 
     case "paragraph":
-      html = renderParagraphVersion(clinicalModel);
+html = renderParagraphVersion(
+  model,
+  context
+);
       break;
 
     case "medical":
-      html = renderMedicalRecord(clinicalModel);
+html = renderMedicalRecord(
+  model,
+  context
+);
       break;
 
     case "patient":
-      html = renderPatientVersion(clinicalModel);
+  html = renderPatientVersion(
+  model,
+  context
+);
       break;
+
+          case "ordonnance":
+  html = renderOrdonnanceAP(model);
+  break;
+
+     case "apa":
+  html = renderOrdonnanceAPA(model);
+  break;
   }
 
   container.classList.add("fade-out");
@@ -4911,6 +7590,47 @@ function renderActiveMode(options = {}) {
 
   container.style.opacity = "0";
   container.innerHTML = html;
+
+  renderedOutput.html = html;
+
+  renderedOutput.edited = false;
+
+if (
+  activeMode === "ordonnance" ||
+  activeMode === "apa"
+) {
+
+  renderedOutput.text =
+    generatePrescriptionDPI(prescriptionModel);
+
+} else {
+
+  const temp = document.createElement("div");
+
+  temp.innerHTML = html;
+
+  renderedOutput.text =
+    temp.innerText
+      .replace(/\n+/g, "\n")
+      .trim();
+
+ 
+}
+
+  const finalTextContainer =
+    document.getElementById("finalTextContainer");
+
+  const finalTextOutput =
+    document.getElementById("finalTextOutput");
+
+  if (finalTextOutput) {
+    finalTextOutput.value = renderedOutput.text;
+  }
+  
+isEditingOutput = false;
+
+finalTextContainer.style.display = "none";
+
   container.style.opacity = "1";
 
   container.classList.remove("fade-out");
@@ -4925,8 +7645,6 @@ function renderActiveMode(options = {}) {
   }
 
 }
-
-}   
 
 /* =====================================
 7. MODALES / IMPRESSION / COPIE =======
@@ -5009,21 +7727,224 @@ function closeIdentityModal() {
   document.getElementById("identityModal").classList.add("hidden");
 }
 
-function injectIdentityIntoHTML(html, prenom, nom) {
+function injectIdentityIntoHTML(
+  html,
+  prenom,
+  nom
+) {
 
-  if (!prenom && !nom) return html;
+  if (!prenom && !nom) {
+    return html;
+  }
 
-  const identity = `${prenom || ""} ${nom || ""}`.trim();
+  const wrapper =
+    document.createElement("div");
 
-  return html.replace("_____", identity);
-} 
-    
+  wrapper.innerHTML = html;
+
+  const lastNameEl =
+    wrapper.querySelector("[data-patient-lastname]");
+
+  if (lastNameEl) {
+    lastNameEl.textContent =
+      nom || "____________";
+  }
+
+  const firstNameEl =
+    wrapper.querySelector("[data-patient-firstname]");
+
+  if (firstNameEl) {
+    firstNameEl.textContent =
+      prenom || "____________";
+  }
+
+const certificateIdentityEl =
+  wrapper.querySelector("[data-patient-certificate-identity]");
+
+if (certificateIdentityEl) {
+
+  const sexe =
+    document.querySelector('input[name="sexe"]:checked')?.value || "";
+
+  const civilite =
+    sexe === "femme"
+      ? "Madame"
+      : sexe === "homme"
+        ? "Monsieur"
+        : "";
+
+  const identity =
+    `${prenom || ""} ${nom || ""}`.trim();
+
+  certificateIdentityEl.textContent =
+    identity
+      ? `${civilite ? civilite + " " : ""}${identity}`
+      : "le/la patient(e)";
+}
+
+  const identity =
+    `${prenom || ""} ${nom || ""}`.trim();
+
+  let nextHTML =
+    wrapper.innerHTML;
+
+  if (identity) {
+    nextHTML = nextHTML
+      .replace(/Monsieur\s+_+/, `Monsieur ${identity}`)
+      .replace(/Madame\s+_+/, `Madame ${identity}`);
+  }
+
+  return nextHTML;
+}
+
+function escapeHTMLForPrint(value) {
+
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function textToPrintableHTML(text) {
+
+  return `
+<div style="white-space:pre-wrap; line-height:1.45;">
+${escapeHTMLForPrint(text)}
+</div>
+`;
+}
+
+function getCurrentPrintableHTML() {
+
+  const finalTextOutput =
+    document.getElementById("finalTextOutput");
+
+  const editedText =
+    finalTextOutput?.value?.trim() || "";
+
+  if (
+    renderedOutput.edited === true &&
+    editedText
+  ) {
+    return textToPrintableHTML(editedText);
+  }
+
+  return document.getElementById("outputContainer")?.innerHTML || "";
+}
+
+function injectIdentityIntoPrintableContent(
+  content,
+  prenom,
+  nom
+) {
+
+  const identity =
+    `${prenom || ""} ${nom || ""}`.trim();
+
+  if (!identity) {
+    return content;
+  }
+
+  if (
+    content.includes("data-patient-lastname") ||
+    content.includes("data-patient-firstname") ||
+    content.includes("data-patient-certificate-identity")
+  ) {
+    return injectIdentityIntoHTML(
+      content,
+      prenom,
+      nom
+    );
+  }
+
+  const safeIdentity =
+    escapeHTMLForPrint(identity);
+
+  return String(content || "")
+    .replace(/Monsieur\s+_+/g, `Monsieur ${safeIdentity}`)
+    .replace(/Madame\s+_+/g, `Madame ${safeIdentity}`);
+}
+
+function prepareBrowserPrintOutput() {
+
+  const printOutput =
+    document.getElementById("browserPrintOutput");
+
+  if (!printOutput) {
+    return;
+  }
+
+  const reportOutput =
+    document.getElementById("reportOutput");
+
+  const hasGeneratedReport =
+    reportOutput &&
+    !reportOutput.classList.contains("hidden");
+
+  if (!hasGeneratedReport) {
+    printOutput.innerHTML = "";
+    document.body.classList.remove("has-browser-print-output");
+    return;
+  }
+
+  const printableHTML =
+    getCurrentPrintableHTML();
+
+  if (!printableHTML) {
+    printOutput.innerHTML = "";
+    document.body.classList.remove("has-browser-print-output");
+    return;
+  }
+
+  printOutput.innerHTML = printableHTML;
+  document.body.classList.add("has-browser-print-output");
+}
+
+function cleanupBrowserPrintOutput() {
+
+  document.body.classList.remove("has-browser-print-output");
+
+  const printOutput =
+    document.getElementById("browserPrintOutput");
+
+  if (printOutput) {
+    printOutput.innerHTML = "";
+  }
+}
+
+window.addEventListener("beforeprint", function() {
+  prepareBrowserPrintOutput();
+});
+
+window.addEventListener("afterprint", function() {
+  cleanupBrowserPrintOutput();
+});
+
 function proceedWithAction(prenom, nom, existingWin = null) {
 
-  let content = document.getElementById("outputContainer").innerHTML;
-// injection conditionnelle selon mode
-if (activeMode === "long") {
-  content = injectIdentityIntoHTML(content, prenom, nom);
+  let content = getCurrentPrintableHTML();
+
+ console.log("IDENTITY DEBUG", {
+  activeMode,
+  prenom,
+  nom,
+  hasLastNameSpan: content.includes("data-patient-lastname"),
+  hasFirstNameSpan: content.includes("data-patient-firstname")
+});
+
+  // injection conditionnelle selon mode
+if (
+  activeMode === "long" ||
+  activeMode === "ordonnance" ||
+    activeMode === "apa"
+) {
+  content = injectIdentityIntoPrintableContent(
+    content,
+    prenom,
+    nom
+  );
 }
 
 if (activeMode === "medical" || activeMode === "patient") {
@@ -5048,8 +7969,51 @@ if (!win) {
       <head>
         <title>Impression</title>
         <style>
-          body { font-family: Arial; margin: 15mm; }
-        </style>
+
+  body {
+    font-family: Arial, sans-serif;
+    margin: 15mm;
+    color: black;
+  }
+
+  h1, h2, h3 {
+    margin-top: 0;
+  }
+
+  p {
+    line-height: 1.45;
+  }
+
+ @media print {
+
+ .identity-help-message {
+  display:none !important;
+}
+
+  body {
+    margin: 8mm;
+    font-size: 13px;
+  }
+
+  h1, h2, h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 8px;
+    line-height: 1.35;
+  }
+
+  .prescription-patient {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+}
+
+</style>
       </head>
       <body>
         ${content}
@@ -5079,51 +8043,139 @@ if (!win) {
   identityAction = null;
 }
 
-  if (identityAction === "copy") {
+if (identityAction === "copy") {
 
-    const temp = document.createElement("div");
-    temp.innerHTML = content;
+  let text =
+    document.getElementById("finalTextOutput")?.value?.trim();
 
-    temp.querySelectorAll("a").forEach(link => {
-      const replacement = link.innerText + " : " + link.href;
-      link.replaceWith(replacement);
-    });
-
-    const text = temp.innerText
-      .replace(/\n+/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Compte-rendu copié.");
-    });
-
+  if (!text) {
+    alert("Aucun compte-rendu disponible.");
+    return;
   }
+
+  // Nettoyage spécifique copie : le QR code patient crée une ligne texte inutile
+  // "Accès rapide :" dans le presse-papiers, sans intérêt en DPI.
+  if (activeMode === "patient") {
+    text = text
+      .replace(/\n\s*Accès rapide\s*:\s*\.\s*/g, "\n")
+      .replace(/\n\s*Accès rapide\s*:\s*/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  let copiedMessage = "Compte-rendu copié.";
+
+  if (activeMode === "patient") {
+    copiedMessage = "Version patient.e copiée.";
+  }
+
+  if (activeMode === "ordonnance") {
+    copiedMessage = "Ordonnance copiée.";
+  }
+
+  navigator.clipboard.writeText(text).then(() => {
+    alert(copiedMessage);
+  });
+
 }
-    
+}
+
+function closeAPALimitationsPanelAfterReset() {
+
+  const apaPanel =
+    document.getElementById("apaLimitationsPanel");
+
+  if (apaPanel) {
+    apaPanel.hidden = true;
+  }
+
+  const toggleBtn =
+    document.getElementById("toggleApaLimitationsPanel");
+
+  if (toggleBtn) {
+    toggleBtn.textContent = "Configurer";
+  }
+
+  const compactText =
+    document.getElementById("apaLimitationsCompactText");
+
+  if (compactText) {
+    compactText.textContent = "Aucune sélectionnée";
+  }
+
+  document
+    .querySelectorAll(".body-map-fallback")
+    .forEach(details => {
+      details.open = false;
+    });
+}
+
 function resetFormulaireComplet() {
 
+  isProgrammaticUpdate = true;
+
   // 🔹 reset radios / checkbox
-  document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => {
-    el.checked = false;
-  });
+  document
+    .querySelectorAll('input[type="radio"], input[type="checkbox"]')
+    .forEach(el => {
+      el.checked = false;
+    });
 
   // 🔹 reset inputs texte / number
-  document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => {
-    el.value = "";
-  });
+  document
+    .querySelectorAll('input[type="text"], input[type="number"], textarea')
+    .forEach(el => {
+      el.value = "";
+    });
 
   // 🔹 reset motivation UI (important)
-  document.querySelectorAll('#actif-subgroup, #inactif-subgroup, #sixmois-subgroup')
-    .forEach(el => el.style.display = "none");
+  document
+    .querySelectorAll('#actif-subgroup, #inactif-subgroup, #sixmois-subgroup')
+    .forEach(el => {
+      el.style.display = "none";
+    });
 
+  // 🔹 reset visuel body-map locomotrice
+  if (typeof updateBodyMapFromCheckboxes === "function") {
+    updateBodyMapFromCheckboxes();
+  }
+
+  // 🔹 reset texte compact limitations APA
+  if (typeof updateAPALimitationsCompactText === "function") {
+    updateAPALimitationsCompactText();
+  }
+
+ // 🔹 fermeture complète du panneau précautions / limitations
+closeAPALimitationsPanelAfterReset();
+
+// 🔹 reset mémo classes médicamenteuses / AP
+if (typeof updateMedicationApaPanel === "function") {
+  updateMedicationApaPanel();
 }
+
+if (typeof updateMedicationOtherField === "function") {
+  updateMedicationOtherField();
+}
+
+isProgrammaticUpdate = false;
+}
+
 const resetConsultationBtnTop =
   document.getElementById("resetConsultationBtnTop");
 
 if (resetConsultationBtnTop) {
 
   resetConsultationBtnTop.addEventListener("click", function(){
+
+    consultationState.reportGenerated = false;
+consultationState.reportDirty = false;
+
+const warning =
+  document.getElementById("crcDirtyWarning");
+
+if (warning) {
+  warning.classList.add("hidden");
+}
 
     const confirmationReset = confirm(
       "Effacer toutes les données de la consultation en cours ?"
@@ -5134,6 +8186,16 @@ if (resetConsultationBtnTop) {
     }
 
     resetFormulaireComplet();
+
+    consultationState.reportGenerated = false;
+    consultationState.reportDirty = false;
+
+    const crcWarning =
+      document.getElementById("crcDirtyWarning");
+
+    if (crcWarning) {
+      crcWarning.classList.add("hidden");
+}
 
     // 🔹 reset blocs commentaires patient
     const importanceBlock =
@@ -5305,15 +8367,12 @@ function resetBlocAutoEvaluationPatient() {
 
 }    
 function importPatientJSON(jsonText) {
-console.count("IMPORT JSON EXECUTE");
+
   isImporting = true;
 
   // 🔥 AJOUT CRITIQUE
 resetBlocAutoEvaluationPatient();
 
-  console.log("IMPORT JSON APPELE");
-      console.log("IMPORT JSON APPELE");
-      console.log("JSON reçu :", jsonText);
       let data;
 
  let questionnaire;
@@ -5359,7 +8418,6 @@ try {
   return;
 
 }
-    console.log("JSON importé :", data);
       
     questionnaire = data.q ?? data.questionnaire;
    niveau =
@@ -5391,9 +8449,9 @@ if (actifDepuis === "non") actifDepuis = "moins_6_mois";
     confianceComment = data.cc ?? data.confiance_commentaire;
       const confianceTruncated = data.cc_truncated ?? false;
            
-    console.log("niveau QR importé :", niveau);       
-    console.log("motivation import :", actifDepuis, apEnvisagee, ap6Mois);
-          
+    
+       isProgrammaticUpdate = true;
+
         if (questionnaire) {
 
   const radio = document.querySelector(`input[name="questionnaire"][value="${questionnaire}"]`);
@@ -5505,16 +8563,20 @@ if (confBlock && confField) {
   }
 
 }
-    
-         
-setTimeout(() => {
-  isImporting = false;
-}, 100); 
+          
+requestAnimationFrame(() => {
+
+  requestAnimationFrame(() => {
+
+    isImporting = false;
+    isProgrammaticUpdate = false;
+
+  });
+
+});
       
 }
 function appliquerMotivation(actifDepuis, apEnvisagee, ap6Mois){
-
-  console.log("Application motivation après affichage UI");
 
     const actifBlock = document.getElementById('actif-subgroup');
     const inactifBlock = document.getElementById('inactif-subgroup');
@@ -5613,14 +8675,7 @@ if(mode === "marshall"){
   inactif.style.setProperty("display", "", "important");
 
 }
-    if (DEBUG) {
-  console.log("DEBUG niveau :", mode, {
-    tres: document.getElementById("niveau_tres_actif").parentElement.style.display,
-    actif: document.getElementById("niveau_actif").parentElement.style.display,
-    moyen: document.getElementById("niveau_moyen").parentElement.style.display,
-    inactif: document.getElementById("niveau_inactif").parentElement.style.display
-  });
-}
+
 }
 
 // ==========================
@@ -5790,6 +8845,43 @@ function initHandicap() {
   });
 
 }
+
+function initAutresAtcd() {
+
+  const autresAtcdCheckbox =
+    document.getElementById("autres_atcd_checkbox");
+
+  const autresAtcdBlock =
+    document.getElementById("autres_atcd_block");
+
+  if (!autresAtcdCheckbox || !autresAtcdBlock) return;
+
+  function updateDisplay() {
+
+    autresAtcdBlock.style.display =
+      autresAtcdCheckbox.checked
+        ? "block"
+        : "none";
+
+    // 🔹 reset textarea si décoché
+    if (!autresAtcdCheckbox.checked) {
+
+      const textarea =
+        document.getElementById("autresAtcd");
+
+      if (textarea) {
+        textarea.value = "";
+      }
+    }
+  }
+
+  autresAtcdCheckbox.addEventListener(
+    "change",
+    updateDisplay
+  );
+
+  updateDisplay();
+}
  
         function initActivitePhysique() {
 
@@ -5817,8 +8909,6 @@ function resetMotivation() {
 }
 
 function updateNiveauUI(value) {
-
-  console.log("updateNiveauUI appelée avec :", value);
 
   resetMotivation();
 
@@ -5973,8 +9063,458 @@ resetMotivation();
   updateDisplay(); // état initial
 }
 
-         
+function initAerobieMode() {
+
+  const radios =
+    document.querySelectorAll('input[name="mode_aerobie"]');
+
+  const fittBlock =
+    document.getElementById("ordonnance_aerobie_subgroup");
+
+  const intensiteBlock =
+    document.getElementById("intensite_aerobie_block");
+
+  const pasBlock =
+    document.getElementById("aerobie_pas_subgroup");
+
+  function updateDisplay() {
+
+    const selected =
+      document.querySelector('input[name="mode_aerobie"]:checked');
+
+    if (!selected) {
+
+      fittBlock.style.display = "none";
+      intensiteBlock.style.display = "none";
+      pasBlock.style.display = "none";
+
+      return;
+    }
+
+    if (selected.value === "fitt") {
+
+      fittBlock.style.display = "flex";
+      intensiteBlock.style.display = "block";
+      pasBlock.style.display = "none";
+
+    } else if (selected.value === "pas") {
+
+      fittBlock.style.display = "none";
+      intensiteBlock.style.display = "none";
+      pasBlock.style.display = "block";
+    }
+  }
+
+  radios.forEach(radio => {
+    radio.addEventListener("change", updateDisplay);
+  });
+
+  updateDisplay();
+}
+
+function initObjectifAutre() {
+
+  const checkbox =
+    document.getElementById("objectif_autre_checkbox");
+
+  const input =
+    document.getElementById("objectif_autre");
+
+  if (!checkbox || !input) return;
+
+  function updateDisplay() {
+
+    input.style.display =
+      checkbox.checked
+        ? "inline-block"
+        : "none";
+
+    if (!checkbox.checked) {
+      input.value = "";
+    }
+  }
+
+  checkbox.addEventListener("change", updateDisplay);
+
+  updateDisplay();
+}
+
+function initPrecautionsAucune() {
+
+  const aucune =
+    document.getElementById("precaution_aucune");
+
+  const autres =
+    document.querySelectorAll(
+      'input[name="precaution_ap"]:not(#precaution_aucune)'
+    );
+
+  if (!aucune) return;
+
+  aucune.addEventListener("change", function() {
+
+    if (aucune.checked) {
+
+      autres.forEach(el => {
+        el.checked = false;
+      });
+
+    }
+
+  });
+
+  autres.forEach(el => {
+
+    el.addEventListener("change", function() {
+
+      if (el.checked) {
+        aucune.checked = false;
+      }
+
+    });
+
+  });
+
+}
+
 function buildClinicalModel() {
+
+  const aerobieFrequence =
+    document.querySelector('input[name="fois_aerobie"]')?.value;
+
+  const aerobieIntensite =
+    document.querySelector('input[name="intensite_aerobie"]:checked')?.value;
+
+    const aerobieDuree =
+  document.querySelector('input[name="duree_aerobie"]')?.value;
+
+  const aerobieType =
+  document.querySelector('input[name="type_aerobie"]')?.value;
+
+  const modeAerobie =
+  document.querySelector('input[name="mode_aerobie"]:checked')?.value;
+
+const objectifPas =
+  document.querySelector('input[name="objectif_pas"]')?.value;
+
+const consignesPas =
+  document.querySelector('textarea[name="consignes_pas"]')?.value;
+
+  prescriptionModel.activites = [];
+  prescriptionModel.objectifs = [];
+  prescriptionModel.limitations = [];
+  prescriptionModel.recommandations = [];
+  prescriptionModel.orientationAPA = {
+
+  active: false,
+  orientations: [],
+  commentaire: "",
+  consentementPartage: false,
+  bilanSouhaite: false
+};
+
+  const pathologiesSelectionnees =
+  document.querySelectorAll(".patho:checked");
+
+pathologiesSelectionnees.forEach(patho => {
+
+  const data =
+    PATHO_DATA[patho.value];
+
+  if (!data) return;
+
+  if (Array.isArray(data.adaptations)) {
+
+    prescriptionModel.recommandations.push(
+      ...data.adaptations
+    );
+
+  }
+
+  if (Array.isArray(data.regles)) {
+
+    prescriptionModel.recommandations.push(
+      ...data.regles
+    );
+
+  }
+
+});
+
+  const objectifsSelectionnes =
+  document.querySelectorAll(
+    'input[name="objectif_ap"]:checked'
+  );
+
+objectifsSelectionnes.forEach(obj => {
+
+  prescriptionModel.objectifs.push(
+    obj.value
+  );
+
+});
+
+const objectifAutre =
+  document.getElementById("objectif_autre");
+
+if (
+  objectifAutre &&
+  objectifAutre.value.trim()
+) {
+
+  prescriptionModel.objectifs.push(
+    objectifAutre.value.trim()
+  );
+
+}
+
+const limitationsSelectionnees =
+  document.querySelectorAll(
+    'input[name="limitation_ap"]:checked'
+  );
+
+limitationsSelectionnees.forEach(limitation => {
+
+  prescriptionModel.limitations.push(
+    limitation.value
+  );
+
+});
+
+const precautionsSelectionnees =
+  document.querySelectorAll(
+    'input[name="precaution_ap"]:checked'
+  );
+
+precautionsSelectionnees.forEach(precaution => {
+
+  prescriptionModel.limitations.push(
+    precaution.value
+  );
+
+});
+
+const orientationToggle =
+  document.getElementById(
+    "orientation_ap_toggle"
+  );
+
+if (
+  orientationToggle &&
+  orientationToggle.checked
+) {
+
+  prescriptionModel.orientationAPA.active = true;
+
+  const orientationsSelectionnees =
+    document.querySelectorAll(
+      'input[name="orientation_ap"]:checked'
+    );
+
+  const checkedOrientations =
+  Array.from(
+    orientationsSelectionnees
+  ).map(el => el.value);
+
+const consentementBlock =
+  document.getElementById(
+    "consentement_partage_block"
+  );
+
+const bilanBlock =
+  document.getElementById(
+    "bilan_condition_block"
+  );
+
+const afficherConsentement =
+  checkedOrientations.some(o =>
+    [
+      "apa",
+      "educateur",
+      "kine",
+      "ergo",
+      "psychomot"
+    ].includes(o)
+  );
+
+if (consentementBlock) {
+
+  consentementBlock.style.display =
+    afficherConsentement
+      ? "block"
+      : "none";
+}
+
+
+  orientationsSelectionnees.forEach(orientation => {
+
+    prescriptionModel.orientationAPA.orientations.push(
+      orientation.value
+    );
+
+  });
+
+  prescriptionModel.orientationAPA.consentementPartage =
+  document.getElementById(
+    "consentement_partage_apa"
+  )?.checked || false;
+
+  prescriptionModel.orientationAPA.bilanSouhaite =
+  document.getElementById(
+    "bilan_condition_apa"
+  )?.checked || false;
+
+  const orientationCommentaire =
+    document.querySelector(
+      'textarea[name="orientation_commentaire"]'
+    );
+
+  if (
+    orientationCommentaire &&
+    orientationCommentaire.value.trim()
+  ) {
+
+    prescriptionModel.orientationAPA.commentaire =
+      orientationCommentaire.value.trim();
+  }
+}
+
+  prescriptionModel.duree_prescription =
+  document.querySelector('input[name="duree_prescription"]')?.value || "";
+
+if (
+  modeAerobie === "fitt" &&
+  aerobieFrequence
+) {
+
+  prescriptionModel.activites.push({
+
+    categorie: "endurance",
+
+    mode: "fitt",
+
+    type: aerobieType || "",
+
+    intensite: aerobieIntensite || "",
+
+    frequence: {
+      valeur: aerobieFrequence
+    },
+
+    duree: {
+      valeur: aerobieDuree
+    }
+  });
+
+  markPrescriptionDirty();
+}
+
+if (
+  modeAerobie === "pas" &&
+  objectifPas
+) {
+
+  prescriptionModel.activites.push({
+
+    categorie: "endurance",
+
+    mode: "pas",
+
+    objectif_pas: objectifPas,
+
+    consignes_pas: consignesPas || ""
+  });
+
+  markPrescriptionDirty();
+}
+
+  const renforcementFrequence =
+  document.querySelector('input[name="fois_renforcement"]')?.value;
+
+  const renforcementType =
+  document.querySelector('input[name="type_renforcement"]')?.value;
+
+  const renforcementDuree =
+  document.querySelector('input[name="duree_renforcement"]')?.value;
+  
+if (renforcementFrequence) {
+
+  prescriptionModel.activites.push({
+    categorie: "renforcement",
+
+  type: renforcementType || "",
+
+   frequence: {
+  valeur: renforcementFrequence
+},
+
+duree: {
+  valeur: renforcementDuree
+}
+  });
+
+  markPrescriptionDirty();
+}
+
+const souplesseFrequence =
+  document.querySelector('input[name="fois_souplesse"]')?.value;
+
+  const souplesseType =
+  document.querySelector('input[name="type_souplesse"]')?.value;
+
+  const souplesseDuree =
+  document.querySelector('input[name="duree_souplesse"]')?.value;
+
+if (souplesseFrequence) {
+
+  prescriptionModel.activites.push({
+    categorie: "souplesse",
+
+type: souplesseType || "",
+
+    frequence: {
+      valeur: souplesseFrequence
+    },
+    duree: {
+  valeur: souplesseDuree
+}
+  });
+
+  markPrescriptionDirty();
+}
+
+const equilibreFrequence =
+  document.querySelector('input[name="fois_equilibre"]')?.value;
+
+const equilibreType =
+  document.querySelector('input[name="type_equilibre"]')?.value;
+
+const equilibreDuree =
+  document.querySelector('input[name="duree_equilibre"]')?.value;
+
+if (equilibreFrequence) {
+
+  prescriptionModel.activites.push({
+    categorie: "equilibre",
+
+    type: equilibreType || "",
+
+    frequence: {
+      valeur: equilibreFrequence
+    },
+
+    duree: {
+      valeur: equilibreDuree
+    }
+  });
+
+  markPrescriptionDirty();
+}
+
+const pathologies =
+  Array.from(pathologiesSelectionnees)
+    .map(patho => patho.value);
+
   return {
 
     meta: {
@@ -5983,11 +9523,12 @@ function buildClinicalModel() {
 
     situation: document.querySelector('input[name="situation"]:checked')?.value || null,
 
-    patient: {
+   patient: {
   sexe: document.querySelector('input[name="sexe"]:checked')?.value || "homme",
   questionnaire: document.querySelector('input[name="questionnaire"]:checked')?.value || null,
   pas_moyens: document.querySelector('input[name="nombre_pas"]')?.value || null,
-  heures_assises: document.querySelector('input[name="heures_assises"]')?.value || null
+  heures_assises: document.querySelector('input[name="heures_assises"]')?.value || null,
+  pathologies
 },
 
    evaluation: {
@@ -6005,10 +9546,18 @@ function buildClinicalModel() {
       leviers: document.querySelector('textarea[name="leviers"]')?.value || null
     },
 
-    therapeutic_plan: {
-      objectif_principal: document.querySelector('textarea[name="objectifs_ap"]')?.value || null,
-      indicateur_cible_libre: null
-    },
+therapeutic_plan: {
+
+  objectifs:
+    prescriptionModel.objectifs,
+
+  objectif_principal:
+    document.querySelector(
+      'textarea[name="objectifs_ap"]'
+    )?.value || null,
+
+  indicateur_cible_libre: null
+},
 
     prescription: {
   aerobie: {
@@ -6023,6 +9572,7 @@ function buildClinicalModel() {
   },
   fiches_promotion: document.querySelector('input[name="fiches_promotion"]:checked')?.value || null
 },
+
 
 decision: {
   specialite: "aucune", // on structurera l’interface ensuite
@@ -6077,14 +9627,16 @@ function initHASListeners() {
     cb.addEventListener("change", updatePathoRules);
   });
 
-  document.querySelectorAll('input, textarea').forEach(el => {
-    el.addEventListener("change", updateHAS);
-    el.addEventListener("input", updateHAS);
-  });
+document.querySelectorAll('input, textarea').forEach(el => {
 
-  document.querySelectorAll('input[type="radio"]').forEach(el => {
-    el.addEventListener("click", updateHAS);
-  });
+  if (el.id === "finalTextOutput") {
+    return;
+  }
+
+  el.addEventListener("change", updateHAS);
+// el.addEventListener("input", updateHAS);
+
+});
 
   const refreshBtn = document.getElementById("refreshHAS");
   if (refreshBtn) {
@@ -6100,7 +9652,8 @@ function initHASListeners() {
         e.target.name === "crc_detail" ||
         e.target.name === "crc_mode"
       ) {
-        updateHAS();
+
+           updateHAS();
       }
 
     });
@@ -6150,43 +9703,670 @@ document.getElementById("confirmPrint")?.addEventListener("click", function() {
   const generateBtn = document.getElementById('generateReport');
 
   if (generateBtn) {
-    generateBtn.addEventListener("click", handleGenerate);
-  }
+
+  generateBtn.onclick = handleGenerate;
+
+}
 
 const refreshBtn = document.getElementById('refreshCRCBtn');
 
 if (refreshBtn) {
 
-  refreshBtn.addEventListener("click", function(e){
+refreshBtn.onclick = function(e){
 
-    e.preventDefault();
-    e.stopPropagation();
+  e.preventDefault();
+  e.stopPropagation();
 
-    handleGenerate(e);
+  handleGenerate(e, {
+    preserveMode: true
   });
-}    
+
+};
+
+}
     
   const printBtn = document.getElementById('printReport');
 
   if (printBtn) {
-    printBtn.addEventListener("click", function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openIdentityModal("print");
-    });
-  }
+
+  printBtn.onclick = function(e){
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    openIdentityModal("print");
+
+  };
+}
 
   const copyBtn = document.getElementById('copyReport');
 
   if (copyBtn) {
-    copyBtn.addEventListener("click", function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openIdentityModal("copy");
-    });
+
+  copyBtn.onclick = function(e){
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    openIdentityModal("copy");
+
+  };
+}
+
+const editBtn = document.getElementById('editReport');
+
+if (editBtn) {
+
+  editBtn.onclick = function(e){
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const finalTextContainer =
+      document.getElementById("finalTextContainer");
+
+    const finalTextOutput =
+      document.getElementById("finalTextOutput");
+
+    isEditingOutput = !isEditingOutput;
+
+    if (isEditingOutput) {
+
+      finalTextContainer.style.display = "block";
+
+              finalTextOutput.oninput = function(){
+
+  renderedOutput.text =
+    finalTextOutput.value;
+
+  renderedOutput.edited = true;
+};
+
+    } else {
+
+      finalTextContainer.style.display = "none";
+    }
+
+   };
+
+}
+
+initPhysicianIdentityButtons();
+
+initBodyMapButtons();
+
+}
+
+function initPhysicianIdentityButtons() {
+
+  const identity =
+    getPhysicianIdentity();
+
+  const fields = {
+
+    lastName:
+      document.getElementById("physician_lastName"),
+
+    firstName:
+      document.getElementById("physician_firstName"),
+
+    speciality:
+      document.getElementById("physician_speciality"),
+
+    rpps:
+      document.getElementById("physician_rpps"),
+
+    address:
+      document.getElementById("physician_address"),
+
+    phone:
+      document.getElementById("physician_phone"),
+
+    email:
+      document.getElementById("physician_email")
+  };
+
+  Object.keys(fields).forEach(key => {
+
+    if (fields[key]) {
+
+      fields[key].value =
+        identity[key] || "";
+    }
+  });
+
+  const saveBtn =
+    document.getElementById(
+      "savePhysicianIdentityBtn"
+    );
+
+  if (saveBtn) {
+
+    saveBtn.onclick = function() {
+
+      const nextIdentity = {};
+
+      Object.keys(fields).forEach(key => {
+
+        const rawValue =
+          fields[key]?.value || "";
+
+        if (
+          key === "lastName" ||
+          key === "firstName" ||
+          key === "speciality"
+        ) {
+
+          nextIdentity[key] =
+            capitalizeFirstLetter(rawValue);
+
+        } else {
+
+          nextIdentity[key] =
+            rawValue.trim();
+        }
+
+      });
+
+      savePhysicianIdentity(
+        nextIdentity
+      );
+
+      renderActiveMode();
+
+      alert(
+        "Coordonnées médecin enregistrées sur cet appareil."
+      );
+    };
+  }
+
+  const resetBtn =
+    document.getElementById(
+      "resetPhysicianIdentityBtn"
+    );
+
+  if (resetBtn) {
+
+    resetBtn.onclick = function() {
+
+      resetPhysicianIdentity();
+
+      Object.keys(fields).forEach(key => {
+
+        if (fields[key]) {
+
+          fields[key].value = "";
+        }
+      });
+
+      renderActiveMode();
+
+      alert(
+        "Coordonnées médecin réinitialisées."
+      );
+    };
   }
 }
-    
+
+function initBodyMapButtons() {
+
+  document.querySelectorAll(".body-dot").forEach(dot => {
+
+    dot.onclick = function() {
+
+      const target =
+        dot.dataset.target;
+
+      const checkbox =
+        document.querySelector(
+          `input[name="limitation_ap"][value="${target}"]`
+        );
+
+      if (!checkbox) return;
+
+      checkbox.checked =
+        !checkbox.checked;
+
+      dot.classList.toggle(
+        "active",
+        checkbox.checked
+      );
+
+      updateBodyMapSelectedZones();
+
+      checkbox.dispatchEvent(
+        new Event("change", { bubbles: true })
+      );
+    };
+    });
+
+    document
+    .querySelectorAll('input[name="limitation_ap"]')
+    .forEach(checkbox => {
+
+      checkbox.onchange = function() {
+
+  updateBodyMapFromCheckboxes();
+
+  openOrientationAPIfClinicalCue();
+
+};
+
+    });
+
+    const limitationAutreCheckbox =
+  document.getElementById("limitation_autre_checkbox");
+
+if (limitationAutreCheckbox) {
+
+  limitationAutreCheckbox.addEventListener("change", function() {
+
+    openOrientationAPIfClinicalCue();
+
+  });
+
+}
+
+  const toggleApaPanelBtn =
+    document.getElementById("toggleApaLimitationsPanel");
+
+  const apaPanel =
+    document.getElementById("apaLimitationsPanel");
+
+  if (toggleApaPanelBtn && apaPanel) {
+
+    toggleApaPanelBtn.onclick = function() {
+
+      const willOpen = apaPanel.hidden;
+
+      apaPanel.hidden = !willOpen;
+
+      toggleApaPanelBtn.textContent =
+        willOpen ? "Masquer" : "Configurer";
+
+if (willOpen) {
+  document
+    .getElementById("apaLimitationsCompact")
+    ?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+}
+
+    };
+
+  }
+
+  const exerciseAdaptationsTextarea =
+    document.getElementById("apa_exercise_adaptations");
+
+  if (exerciseAdaptationsTextarea) {
+
+    exerciseAdaptationsTextarea.oninput =
+      updateAPALimitationsCompactText;
+
+  }
+
+  updateBodyMapFromCheckboxes();
+}
+
+function updateBodyMapFromCheckboxes() {
+
+  document.querySelectorAll(".body-dot").forEach(dot => {
+
+    const target =
+      dot.dataset.target;
+
+    const checkbox =
+      document.querySelector(
+        `input[name="limitation_ap"][value="${target}"]`
+      );
+
+    dot.classList.toggle(
+      "active",
+      checkbox?.checked || false
+    );
+  });
+
+  updateBodyMapSelectedZones();
+}
+
+function updateBodyMapSelectedZones() {
+
+  const output =
+    document.getElementById("bodyMapSelectedZones");
+
+  if (!output) return;
+
+  const limitationLabels = {
+    cervical: "Cervical",
+    dorsal: "Dorsal",
+    lombaire: "Lombaire",
+    epaule_d: "Épaule droite",
+    epaule_g: "Épaule gauche",
+    coude_d: "Coude droit",
+    coude_g: "Coude gauche",
+    poignet_d: "Main-poignet droit",
+    poignet_g: "Main-poignet gauche",
+    bassin: "Bassin",
+    hanche_d: "Hanche droite",
+    hanche_g: "Hanche gauche",
+    genou_d: "Genou droit",
+    genou_g: "Genou gauche",
+    cheville_d: "Cheville droite",
+    cheville_g: "Cheville gauche",
+    pied_d: "Pied droit",
+    pied_g: "Pied gauche"
+  };
+
+  const checkedInputs = Array.from(
+    document.querySelectorAll('input[name="limitation_ap"]:checked')
+  );
+
+if (!checkedInputs.length) {
+  output.innerHTML = "Aucune";
+  updateAPALimitationsCompactText();
+  return;
+}
+
+  output.innerHTML = "";
+
+  checkedInputs.forEach(input => {
+
+    const labelText =
+      limitationLabels[input.value] || input.value;
+
+    const chip =
+      document.createElement("button");
+
+    chip.type = "button";
+    chip.className = "body-zone-chip";
+    chip.dataset.target = input.value;
+
+    chip.innerHTML =
+      `${labelText} <span aria-hidden="true">×</span>`;
+
+    chip.onclick = function() {
+
+      input.checked = false;
+
+      input.dispatchEvent(
+        new Event("change", { bubbles: true })
+      );
+
+      updateBodyMapFromCheckboxes();
+    };
+
+    output.appendChild(chip);
+  });
+
+  updateAPALimitationsCompactText();
+
+}
+
+function updateAPALimitationsCompactText() {
+  const output =
+    document.getElementById("apaLimitationsCompactText");
+
+  if (!output) return;
+
+  const precautionCount = Array.from(
+    document.querySelectorAll('input[name="precaution_ap"]:checked')
+  )
+    .filter(input => input.value !== "aucune")
+    .length;
+
+  const limitationCount = Array.from(
+    document.querySelectorAll('input[name="limitation_ap"]:checked')
+  ).length;
+
+  const exerciseAdaptations =
+    document.getElementById("apa_exercise_adaptations")?.value?.trim() || "";
+
+  const parts = [];
+
+  if (limitationCount) {
+    parts.push(
+      limitationCount === 1
+        ? "1 zone locomotrice"
+        : `${limitationCount} zones locomotrices`
+    );
+  }
+
+  if (precautionCount) {
+    parts.push(
+      precautionCount === 1
+        ? "1 précaution générale"
+        : `${precautionCount} précautions générales`
+    );
+  }
+
+  if (exerciseAdaptations) {
+    parts.push("consignes renseignées");
+  }
+
+  output.textContent =
+    parts.length ? parts.join(" · ") : "Aucune sélectionnée";
+}
+
+function buildAPALimitationsBlock() {
+
+  const precautionLabels = {
+    cardio: "cardio-vasculaires",
+    respiratoire: "respiratoires",
+    metabolique: "métaboliques",
+    neurologique: "neurologiques",
+    psychique: "psychiques / cognitives",
+    chute: "risque de chute"
+  };
+
+  const limitationLabels = {
+    cervical: "cervical",
+    dorsal: "dorsal",
+    lombaire: "lombaire",
+    epaule_d: "épaule droite",
+    epaule_g: "épaule gauche",
+    coude_d: "coude droit",
+    coude_g: "coude gauche",
+    poignet_d: "main-poignet droit",
+    poignet_g: "main-poignet gauche",
+    bassin: "bassin",
+    hanche_d: "hanche droite",
+    hanche_g: "hanche gauche",
+    genou_d: "genou droit",
+    genou_g: "genou gauche",
+    cheville_d: "cheville droite",
+    cheville_g: "cheville gauche",
+    pied_d: "pied droit",
+    pied_g: "pied gauche"
+  };
+
+  const precautions = Array.from(
+    document.querySelectorAll('input[name="precaution_ap"]:checked')
+  )
+    .map(input => precautionLabels[input.value])
+    .filter(Boolean);
+
+  const limitations = Array.from(
+    document.querySelectorAll('input[name="limitation_ap"]:checked')
+  )
+    .map(input => limitationLabels[input.value])
+    .filter(Boolean);
+
+  const autreChecked =
+    document.getElementById("limitation_autre_checkbox")?.checked || false;
+
+  const autreText =
+    document.getElementById("limitation_autre")?.value?.trim() || "";
+
+if (autreChecked && autreText) {
+  limitations.push(autreText);
+}
+
+const exerciseAdaptations =
+  document.getElementById("apa_exercise_adaptations")?.value?.trim() || "";
+
+if (
+  !precautions.length &&
+  !limitations.length &&
+  !exerciseAdaptations
+) {
+  return "";
+}
+
+  return `
+<div style="
+  margin-top:14px;
+  margin-bottom:16px;
+  padding:14px;
+  border:1px solid #d9d9d9;
+  border-radius:10px;
+  background:#fcfcfc;
+  line-height:1.6;
+">
+<strong>Précautions / limitations à prendre en compte pour l’adaptation des exercices :</strong>
+
+  ${precautions.length ? `
+    <p>
+<strong>Précautions générales signalées :</strong>
+${precautions.join(", ")}.
+    </p>
+  ` : ""}
+
+  ${limitations.length ? `
+    <p>
+- Limitations locomotrices constatées : ${limitations.join(", ")}.
+    </p>
+  ` : ""}
+
+  ${exerciseAdaptations ? `
+    <p>
+- Consignes / adaptations des exercices : ${exerciseAdaptations}
+    </p>
+  ` : ""}
+
+</div>
+`;
+}
+
+function buildAPADestinationBlock() {
+
+  const orientationLabels = {
+    kine: "masseur-kinésithérapeute",
+    ergo: "ergothérapeute",
+    psychomot: "psychomotricien",
+    apa: "enseignant APA",
+    educateur: "éducateur sportif",
+    autonome: "patient en autonomie"
+  };
+
+  const selectedOrientations = Array.from(
+    document.querySelectorAll('input[name="orientation_ap"]:checked')
+  )
+    .map(input => orientationLabels[input.value])
+    .filter(Boolean);
+
+  if (!selectedOrientations.length) {
+    return "";
+  }
+
+  return `
+<p style="
+  margin: -4px 0 16px 0;
+  text-align: center;
+  font-size: 0.95rem;
+">
+  <strong>À destination de :</strong>
+  ${selectedOrientations.join(", ")}.
+</p>
+`;
+}
+
+function buildAPAOrientationOptionsBlock() {
+
+  const consentementPartage =
+    document.getElementById("consentement_partage_apa")?.checked || false;
+
+  const bilanCondition =
+    document.getElementById("bilan_condition_apa")?.checked || false;
+
+  const orientationComment =
+    document.querySelector('textarea[name="orientation_commentaire"]')?.value?.trim() || "";
+
+  if (
+    !consentementPartage &&
+    !bilanCondition &&
+    !orientationComment
+  ) {
+    return "";
+  }
+
+  const lines = [];
+
+  if (consentementPartage) {
+  lines.push(
+    "Patient informé du partage des informations médicales nécessaires avec le professionnel encadrant et ayant donné son accord oral à ce partage sur l’ordonnance."
+  );
+}
+
+  if (bilanCondition) {
+    lines.push(
+      "Bilan de condition et de capacités physiques souhaité."
+    );
+  }
+
+  if (orientationComment) {
+  lines.push(
+    `Commentaire pour le professionnel encadrant : ${orientationComment}`
+  );
+}
+
+  return `
+<div style="
+  margin: -6px 0 16px 0;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fcfcfc;
+  font-size: 0.92rem;
+  line-height: 1.45;
+">
+  <strong>Informations d’orientation / encadrement :</strong>
+  <ul style="
+    margin: 6px 0 0 18px;
+    padding: 0;
+  ">
+    ${lines.map(line => `<li>${line}</li>`).join("")}
+  </ul>
+</div>
+`;
+}
+
+function buildAPAObjectivesBlock() {
+
+  const objectifs =
+    document.querySelector('textarea[name="objectifs_ap"]')?.value?.trim() || "";
+
+  if (!objectifs) {
+    return "";
+  }
+
+  return `
+<div style="
+  margin: -6px 0 16px 0;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fcfcfc;
+  font-size: 0.92rem;
+  line-height: 1.45;
+">
+  <strong>Objectifs thérapeutiques principaux :</strong>
+  ${objectifs}
+</div>
+`;
+}
+
 // =====================================
 // 🔧 UTILITAIRE SYNCHRO UI
 // =====================================
@@ -6307,6 +10487,12 @@ if (respiratoire) {
 // 🔥 INIT
 document.addEventListener("DOMContentLoaded", function () {
 
+  if (window._uiInitialized) {
+  return;
+}
+
+window._uiInitialized = true;
+
   // =====================================
   // 1️⃣ UI DE BASE
   // =====================================
@@ -6317,6 +10503,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // =====================================
   initHandicap();
   initRespiratoire();
+  initAutresAtcd();
 
   // =====================================
   // 3️⃣ SYNCHRONISATION UI (APRÈS UI)
@@ -6359,12 +10546,6 @@ function testCMAP() {
     }
   ];
 
-  console.log("=== TESTS CMAP ===");
-
-  tests.forEach(t => {
-    console.log(t.name + " → attendu:", t.expected);
-  });
-
 }
           
 const form = document.getElementById('consultationForm');
@@ -6394,7 +10575,7 @@ document.getElementById('downloadPdf')?.addEventListener('click', function (e) {
   e.preventDefault();
   e.stopPropagation();
 
-  const content = document.getElementById("outputContainer").innerHTML;
+  const content = getCurrentPrintableHTML();
 
   const win = window.open('', '', 'width=800,height=600');
 
@@ -6670,7 +10851,10 @@ phrase += ".";
 
 }
            
-function buildDecisionBloc(model) {
+function buildDecisionBloc(
+  model,
+  clinicalContext = null
+) {
 
   let elementsPreconises = [];
   let elementsPossibles = [];
@@ -6748,7 +10932,7 @@ function buildDecisionBloc(model) {
     );
   }
 
-  return phrases.join(" ");
+return phrases.join(" ");
 }    
     
     function buildPrescription(model) {
@@ -6758,6 +10942,14 @@ const isPatient = model.context === "patient";
 
   let phrases = [];
   let documentsRemis = [];
+
+ if (
+  prescriptionModel &&
+  Array.isArray(prescriptionModel.activites) &&
+  prescriptionModel.activites.length > 0
+) {
+  return generatePrescriptionCRC(prescriptionModel);
+}
 
   // --- Ordonnance aérobie ---
   if (pr.aerobie.frequence) {
@@ -6835,8 +11027,6 @@ const isPatient = model.context === "patient";
 const crcElements = getSelectedCRC();
 const crcMode = document.querySelector('input[name="crc_mode"]:checked')?.value;
 const outputType = document.querySelector('input[name="output_type"]:checked')?.value || "medecin";                
-console.log("outputType =", outputType);
-                console.log("crcMode =", crcMode);
                 
 const selectedPathos = document.querySelectorAll('.patho:checked');
 let pathoNames = [];
@@ -6880,6 +11070,97 @@ if (phrases.length === 0) {
 return phrases.join(" ");
 }
   
+function buildObjectivesBlock(model) {
+
+const objectifs =
+  model.therapeutic_plan.objectifs || [];
+
+  if (!objectifs.length) {
+    return "";
+  }
+
+  const mappingObjectifs = {
+
+  augmenter_ap:
+    "augmenter le niveau global d’activité physique",
+
+  reduire_sedentarite:
+    "réduire la sédentarité",
+
+  controle_maladie:
+    "améliorer le contrôle d’une maladie chronique",
+
+  condition_physique:
+    "améliorer la condition physique",
+
+  capacites_cardio:
+    "améliorer les capacités cardiorespiratoires",
+
+  force:
+    "renforcer la force musculaire",
+
+  equilibre:
+    "améliorer l’équilibre et prévenir les chutes",
+
+  autonomie:
+    "préserver ou restaurer l’autonomie",
+
+  limitation:
+    "réduire une limitation fonctionnelle",
+
+  qualite_vie:
+    "améliorer la qualité de vie",
+
+  bien_etre:
+    "améliorer le bien-être psychologique"
+};
+
+  const objectifsFormates =
+    objectifs.map(obj => {
+
+      return mappingObjectifs[obj] || obj;
+
+    });
+
+  if (objectifsFormates.length === 1) {
+    return objectifsFormates[0];
+  }
+
+  if (objectifsFormates.length === 2) {
+    return objectifsFormates.join(" et ");
+  }
+
+  return objectifsFormates
+    .slice(0, -1)
+    .join(", ") +
+    " et " +
+    objectifsFormates[objectifsFormates.length - 1];
+
+}
+
+function getObjectivesCount(model) {
+
+  return (
+    model?.therapeutic_plan?.objectifs || []
+  ).length;
+}
+
+function buildRecommendationsBlock() {
+
+  const recommandations =
+    prescriptionModel.recommandations || [];
+
+  if (!recommandations.length) {
+    return "";
+  }
+
+  const recommandationsUniques =
+    [...new Set(recommandations)];
+
+  return recommandationsUniques.join(" ; ");
+
+}
+
  function copyPatientLink() {
 
   const url = "https://zgqwa4.short.gy/auto-eval-ap";
@@ -6949,10 +11230,10 @@ function closeDetails(btn) {
 
 // 🔥 TEST GLOBAL CLICK (à ajouter ici)
 document.addEventListener("click", () => {
-  console.log("GLOBAL CLICK");
+
 });
             document.getElementById("confirmPrint")?.addEventListener("click", () => {
-  console.log("CONFIRM CLICK");
+
 });
       
       document.addEventListener("toggle", function(e) {
@@ -6972,7 +11253,19 @@ document.addEventListener("click", () => {
     
     <div id="identityModal" class="modal hidden">
   <div class="modal-content">
-    <h3>Identification (facultatif)</h3>
+<h3>
+  Identité patient pour le document
+</h3>
+
+<p style="
+  font-size:13px;
+  color:#666;
+  margin-top:6px;
+  margin-bottom:18px;
+  line-height:1.5;
+">
+  Ces informations sont utilisées uniquement pour le document généré et ne sont pas enregistrées.
+</p>
 
    <label>Prénom :
   <input type="text" id="modalPrenom"
@@ -7093,7 +11386,15 @@ document.addEventListener("click", () => {
         
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/PAP-Plateforme-dev/sw.js');
+const BASE_PATH =
+  location.hostname === '127.0.0.1' ||
+  location.hostname === 'localhost'
+    ? ''
+    : '/PAP-Plateforme';
+
+navigator.serviceWorker.register(
+  `${BASE_PATH}/sw.js`
+);
 }
 </script>
         
@@ -7101,3 +11402,4 @@ if ('serviceWorker' in navigator) {
         
 </body>
 </html>
+
